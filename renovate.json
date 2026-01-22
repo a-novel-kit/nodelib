@@ -11,7 +11,7 @@
       }
     },
     {
-      "depTypeList": ["peerDependencies"],
+      "matchDepTypes": ["peerDependencies"],
       "rangeStrategy": "bump",
       "enabled": true
     }
