@@ -24,11 +24,11 @@
   },
   "peerDependencies": {
     "@eslint/compat": "^2.0.1",
-    "@eslint/js": "^9.39.1",
+    "@eslint/js": "^9.39.2",
     "@sveltejs/kit": "^2.50.0",
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@types/node": "^24.10.9",
-    "eslint": "^9.39.1",
+    "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-storybook": "^10.1.10",
