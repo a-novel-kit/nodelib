@@ -6,7 +6,7 @@
     {
       "matchManagers": ["npm"],
       "postUpgradeTasks": {
-        "commands": ["pnpm build", "pnpm i", "pnpm format"],
+        "commands": ["pnpm i", "pnpm build", "pnpm i", "pnpm format"],
         "executionMode": "branch"
       }
     },
