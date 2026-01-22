@@ -6,7 +6,7 @@
     {
       "matchManagers": ["npm"],
       "postUpgradeTasks": {
-        "commands": ["pnpm i --frozen-lockfile && pnpm format"],
+        "commands": ["pnpm format"],
         "executionMode": "branch"
       }
     },
