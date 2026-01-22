@@ -38,6 +38,8 @@
     "prettier-plugin-packagejson": "^2.5.20 || ^3.0.0",
     "prettier-plugin-sql": "^0.19.2",
     "prettier-plugin-svelte": "^3.4.1",
+    "storybook": "^10.2.0",
+    "svelte": "^5.46.4",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.53.1"
   },
@@ -58,6 +60,9 @@
       "optional": true
     },
     "prettier-plugin-svelte": {
+      "optional": true
+    },
+    "svelte": {
       "optional": true
     }
   },
