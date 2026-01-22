@@ -115,7 +115,7 @@ importers:
         specifier: ^3.13.1
         version: 3.13.1(eslint@9.39.2(jiti@2.6.1))(svelte@5.46.0)
       prettier:
-        specifier: ^3.7.4
+        specifier: ^3.8.1
         version: 3.8.1
       prettier-plugin-css-order:
         specifier: ^2.1.2
