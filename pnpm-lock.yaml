@@ -66,8 +66,8 @@ importers:
   packages/browser:
     dependencies:
       zod:
-        specifier: ^4.1.12
-        version: 4.2.1
+        specifier: ^4.3.5
+        version: 4.3.5
     devDependencies:
       typescript:
         specifier: ^5.8.3
@@ -159,7 +159,7 @@ importers:
         version: 4.17.23
       zod:
         specifier: ^4.1.12
-        version: 4.2.1
+        version: 4.3.5
     devDependencies:
       '@tanstack/react-query':
         specifier: ^5.83.0
@@ -2265,8 +2265,8 @@ packages:
   zimmerframe@1.1.4:
     resolution: {integrity: sha512-B58NGBEoc8Y9MWWCQGl/gq9xBCe4IiKM0a2x7GZdQKOW5Exr8S1W24J6OgM1njK8xCRGvAJIL/MxXHf6SkmQKQ==}
 
-  zod@4.2.1:
-    resolution: {integrity: sha512-0wZ1IRqGGhMP76gLqz8EyfBXKk0J2qo2+H3fi4mcUP/KtTocoX08nmIAHl1Z2kJIZbZee8KOpBCSNPRgauucjw==}
+  zod@4.3.5:
+    resolution: {integrity: sha512-k7Nwx6vuWx1IJ9Bjuf4Zt1PEllcwe7cls3VNzm4CQ1/hgtFUK2bRNG3rvnpPUhFjmqJKAKtjV576KnUkHocg/g==}
 
 snapshots:
 
@@ -4198,4 +4198,4 @@ snapshots:
 
   zimmerframe@1.1.4: {}
 
-  zod@4.2.1: {}
+  zod@4.3.5: {}
