@@ -23,7 +23,7 @@
     "jiti": "^2.6.1"
   },
   "peerDependencies": {
-    "@eslint/compat": "^2.0.0",
+    "@eslint/compat": "^2.0.1",
     "@eslint/js": "^9.39.1",
     "@sveltejs/kit": "^2.49.1",
     "@trivago/prettier-plugin-sort-imports": "^6.0.0",
