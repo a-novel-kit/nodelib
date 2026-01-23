@@ -15,8 +15,6 @@ jobs:
         with:
           allowed_commands: |
             [
-              "^pnpm build$",
-              "^CI=true pnpm i$",
               "^pnpm format$"
             ]
           github_token: ${{ secrets.GITHUB_TOKEN }}

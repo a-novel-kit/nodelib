@@ -22,6 +22,7 @@
     "compile:node": "rm -rf ./packages/test/dist && vite build --outDir ./packages/test/dist -c packages/test/vite.config.ts",
     "format": "prettier --write . --config prettier.config.ts",
     "preinstall": "npx only-allow pnpm",
+    "postinstall": "pnpm build && pnpm i --ignore-scripts",
     "lint": "pnpm lint:stylecheck && pnpm lint:typecheck && pnpm lint:eslint",
     "lint:ci": "pnpm build:config && pnpm build:browser && pnpm lint",
     "lint:eslint": "eslint .",
