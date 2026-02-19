@@ -19,7 +19,7 @@ importers:
         version: 10.0.1(eslint@10.0.0(jiti@2.6.1))
       '@trivago/prettier-plugin-sort-imports':
         specifier: ^6.0.0
-        version: 6.0.2(prettier-plugin-svelte@3.4.1(prettier@3.8.1)(svelte@5.51.3))(prettier@3.8.1)(svelte@5.51.3)
+        version: 6.0.2(prettier-plugin-svelte@3.5.0(prettier@3.8.1)(svelte@5.51.3))(prettier@3.8.1)(svelte@5.51.3)
       '@types/node':
         specifier: ^24.10.0
         version: 24.10.13
@@ -98,7 +98,7 @@ importers:
         version: 2.52.2(@sveltejs/vite-plugin-svelte@6.2.1(svelte@5.51.3)(vite@7.3.1(@types/node@24.10.13)(jiti@2.6.1)))(svelte@5.51.3)(typescript@5.9.3)(vite@7.3.1(@types/node@24.10.13)(jiti@2.6.1))
       '@trivago/prettier-plugin-sort-imports':
         specifier: ^6.0.2
-        version: 6.0.2(prettier-plugin-svelte@3.4.1(prettier@3.8.1)(svelte@5.51.3))(prettier@3.8.1)(svelte@5.51.3)
+        version: 6.0.2(prettier-plugin-svelte@3.5.0(prettier@3.8.1)(svelte@5.51.3))(prettier@3.8.1)(svelte@5.51.3)
       '@types/node':
         specifier: ^24.10.13
         version: 24.10.13
@@ -130,8 +130,8 @@ importers:
         specifier: ^0.19.2
         version: 0.19.2(prettier@3.8.1)
       prettier-plugin-svelte:
-        specifier: ^3.4.1
-        version: 3.4.1(prettier@3.8.1)(svelte@5.51.3)
+        specifier: ^3.5.0
+        version: 3.5.0(prettier@3.8.1)(svelte@5.51.3)
       storybook:
         specifier: ^10.2.10
         version: 10.2.10(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -1806,8 +1806,8 @@ packages:
     peerDependencies:
       prettier: ^3.0.3
 
-  prettier-plugin-svelte@3.4.1:
-    resolution: {integrity: sha512-xL49LCloMoZRvSwa6IEdN2GV6cq2IqpYGstYtMT+5wmml1/dClEoI0MZR78MiVPpu6BdQFfN0/y73yO6+br5Pg==}
+  prettier-plugin-svelte@3.5.0:
+    resolution: {integrity: sha512-2lLO/7EupnjO/95t+XZesXs8Bf3nYLIDfCo270h5QWbj/vjLqmrQ1LiRk9LPggxSDsnVYfehamZNf+rgQYApZg==}
     peerDependencies:
       prettier: ^3.0.0
       svelte: ^3.2.0 || ^4.0.0-next.0 || ^5.0.0-next.0
@@ -2753,7 +2753,7 @@ snapshots:
     dependencies:
       '@testing-library/dom': 10.4.1
 
-  '@trivago/prettier-plugin-sort-imports@6.0.2(prettier-plugin-svelte@3.4.1(prettier@3.8.1)(svelte@5.51.3))(prettier@3.8.1)(svelte@5.51.3)':
+  '@trivago/prettier-plugin-sort-imports@6.0.2(prettier-plugin-svelte@3.5.0(prettier@3.8.1)(svelte@5.51.3))(prettier@3.8.1)(svelte@5.51.3)':
     dependencies:
       '@babel/generator': 7.28.5
       '@babel/parser': 7.28.5
@@ -2765,7 +2765,7 @@ snapshots:
       parse-imports-exports: 0.2.4
       prettier: 3.8.1
     optionalDependencies:
-      prettier-plugin-svelte: 3.4.1(prettier@3.8.1)(svelte@5.51.3)
+      prettier-plugin-svelte: 3.5.0(prettier@3.8.1)(svelte@5.51.3)
       svelte: 5.51.3
     transitivePeerDependencies:
       - supports-color
@@ -3727,7 +3727,7 @@ snapshots:
       sql-formatter: 15.6.12
       tslib: 2.8.1
 
-  prettier-plugin-svelte@3.4.1(prettier@3.8.1)(svelte@5.51.3):
+  prettier-plugin-svelte@3.5.0(prettier@3.8.1)(svelte@5.51.3):
     dependencies:
       prettier: 3.8.1
       svelte: 5.51.3
