@@ -73,6 +73,9 @@
     "onlyBuiltDependencies": [
       "esbuild",
       "msw"
-    ]
+    ],
+    "overrides": {
+      "rollup": ">=4.59.0"
+    }
   }
 }
