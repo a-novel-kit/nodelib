@@ -43,14 +43,14 @@
   "devDependencies": {
     "@a-novel-kit/nodelib-config": "*",
     "@eslint/config-helpers": "^0.5.0",
-    "@eslint/js": "^10.0.0",
-    "@trivago/prettier-plugin-sort-imports": "^6.0.0",
+    "@eslint/js": "^10.0.1",
+    "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@types/node": "^24.10.0",
     "@vitest/coverage-v8": "4.0.18",
     "cookie": "^1.1.1",
-    "eslint": "^10.0.0",
+    "eslint": "^10.0.2",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.3",
+    "eslint-plugin-prettier": "^5.5.5",
     "globals": "^17.0.0",
     "jiti": "^2.6.1",
     "jsdom": "^28.0.0",
@@ -75,7 +75,10 @@
       "msw"
     ],
     "overrides": {
-      "rollup": ">=4.59.0"
+      "cookie@<0.7.0": ">=0.7.0",
+      "minimatch@>=9.0.0 <9.0.7": ">=9.0.7",
+      "minimatch@>=9.0.0 <9.0.6": ">=9.0.6",
+      "minimatch@>=10.0.0 <10.2.3": ">=10.2.3"
     }
   }
 }
