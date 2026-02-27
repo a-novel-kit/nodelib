@@ -100,7 +100,7 @@ importers:
         specifier: ^6.0.2
         version: 6.0.2(prettier-plugin-svelte@3.5.0(prettier@3.8.1)(svelte@5.53.5))(prettier@3.8.1)(svelte@5.53.5)
       '@types/node':
-        specifier: ^24.10.14
+        specifier: ^24.10.15
         version: 24.10.15
       eslint:
         specifier: ^10.0.2
