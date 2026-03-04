@@ -58,7 +58,7 @@ importers:
         version: 3.8.1
       prettier-plugin-packagejson:
         specifier: ^3.0.0
-        version: 3.0.0(prettier@3.8.1)
+        version: 3.0.1(prettier@3.8.1)
       typescript:
         specifier: ^5.8.3
         version: 5.9.3
@@ -131,7 +131,7 @@ importers:
         version: 2.2.0(postcss@8.5.6)(prettier@3.8.1)
       prettier-plugin-packagejson:
         specifier: ^2.5.20 || ^3.0.0
-        version: 3.0.0(prettier@3.8.1)
+        version: 3.0.1(prettier@3.8.1)
       prettier-plugin-sql:
         specifier: ^0.19.2
         version: 0.19.2(prettier@3.8.1)
@@ -1404,8 +1404,8 @@ packages:
   get-port-please@3.2.0:
     resolution: {integrity: sha512-I9QVvBw5U/hw3RmWpYKRumUeaDgxTPd401x364rLmWBJcOQ753eov1eTgzDqRG9bqFIfDc7gfzcQEWrUri3o1A==}
 
-  git-hooks-list@4.2.0:
-    resolution: {integrity: sha512-+6ebmUMwhxrl6CYl5n/d4RqCVvyDMK4yvvLJVPjUfLWzhaM6heksAh1uK9KqwuhQTZie4nmN9pf3X3ORRn40kg==}
+  git-hooks-list@4.2.1:
+    resolution: {integrity: sha512-WNvqJjOxxs/8ZP9+DWdwWJ7cDsd60NHf39XnD82pDVrKO5q7xfPqpkK6hwEAmBa/ZSEE4IOoR75EzbbIuwGlMw==}
 
   glob-parent@6.0.2:
     resolution: {integrity: sha512-XxwI8EOhVQgWp6iDL+3b0r86f4d6AX6zSU55HfB4ydCEuXLXc5FcYeOu+nnGftS4TEju/11rt4KJPTMgbfmv4A==}
@@ -1773,8 +1773,9 @@ packages:
     peerDependencies:
       prettier: 3.x
 
-  prettier-plugin-packagejson@3.0.0:
-    resolution: {integrity: sha512-z8/QmPSqx/ANvvQMWJSkSq1+ihBXeuwDEYdjX3ZjRJ5Ty1k7vGbFQfhzk2eDe0rwS/TNyRjWK/qnjJEStAOtDw==}
+  prettier-plugin-packagejson@3.0.1:
+    resolution: {integrity: sha512-dGMMVROGzziTdLlFNoOhJyDafp29ynxWLam7WPFX8O/iR0osRedi7ZAAz+Hy2//pXhLUrB9QvIQZjxpynQJzsw==}
+    deprecated: this version has been deprecated
     peerDependencies:
       prettier: ^3
     peerDependenciesMeta:
@@ -3320,7 +3321,7 @@ snapshots:
 
   get-port-please@3.2.0: {}
 
-  git-hooks-list@4.2.0: {}
+  git-hooks-list@4.2.1: {}
 
   glob-parent@6.0.2:
     dependencies:
@@ -3659,7 +3660,7 @@ snapshots:
     transitivePeerDependencies:
       - postcss
 
-  prettier-plugin-packagejson@3.0.0(prettier@3.8.1):
+  prettier-plugin-packagejson@3.0.1(prettier@3.8.1):
     dependencies:
       sort-package-json: 3.6.0
     optionalDependencies:
@@ -3790,7 +3791,7 @@ snapshots:
     dependencies:
       detect-indent: 7.0.2
       detect-newline: 4.0.1
-      git-hooks-list: 4.2.0
+      git-hooks-list: 4.2.1
       is-plain-obj: 4.1.0
       semver: 7.7.4
       sort-object-keys: 2.1.0
