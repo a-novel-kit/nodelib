@@ -17,10 +17,6 @@
       "types": "./dist/http/index.d.ts",
       "import": "./dist/http/index.es.js"
     },
-    "./e2e": {
-      "types": "./dist/e2e/index.d.ts",
-      "import": "./dist/e2e/index.es.js"
-    },
     "./form": {
       "types": "./dist/form/index.d.ts",
       "import": "./dist/form/index.es.js"
