@@ -20,7 +20,7 @@
     "LICENSE"
   ],
   "devDependencies": {
-    "jiti": "^2.6.1"
+    "jiti": "catalog:"
   },
   "peerDependencies": {
     "@eslint/compat": "^2.0.3",
