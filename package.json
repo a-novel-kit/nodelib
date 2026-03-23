@@ -46,7 +46,7 @@
     "@eslint/js": "catalog:",
     "@trivago/prettier-plugin-sort-imports": "catalog:",
     "@types/node": "^24.10.0",
-    "@vitest/coverage-v8": "4.1.0",
+    "@vitest/coverage-v8": "4.1.1",
     "cookie": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
