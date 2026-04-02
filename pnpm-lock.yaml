@@ -179,8 +179,8 @@ importers:
         specifier: ^5.5.5
         version: 5.5.5(eslint-config-prettier@10.1.8(eslint@10.1.0(jiti@2.6.1)))(eslint@10.1.0(jiti@2.6.1))(prettier@3.8.1)
       eslint-plugin-storybook:
-        specifier: ^10.3.3
-        version: 10.3.3(eslint@10.1.0(jiti@2.6.1))(storybook@10.3.3(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(typescript@6.0.2)
+        specifier: ^10.3.4
+        version: 10.3.4(eslint@10.1.0(jiti@2.6.1))(storybook@10.3.4(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(typescript@6.0.2)
       eslint-plugin-svelte:
         specifier: ^3.16.0
         version: 3.16.0(eslint@10.1.0(jiti@2.6.1))(svelte@5.55.1)
@@ -200,8 +200,8 @@ importers:
         specifier: ^3.5.1
         version: 3.5.1(prettier@3.8.1)(svelte@5.55.1)
       storybook:
-        specifier: ^10.3.3
-        version: 10.3.3(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        specifier: ^10.3.4
+        version: 10.3.4(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       svelte:
         specifier: ^5.55.1
         version: 5.55.1
@@ -1201,6 +1201,9 @@ packages:
   '@vitest/utils@4.1.2':
     resolution: {integrity: sha512-xw2/TiX82lQHA06cgbqRKFb5lCAy3axQ4H4SoUFhUsg+wztiet+co86IAMDtF6Vm1hc7J6j09oh/rgDn+JdKIQ==}
 
+  '@webcontainer/env@1.1.1':
+    resolution: {integrity: sha512-6aN99yL695Hi9SuIk1oC88l9o0gmxL1nGWWQ/kNy81HigJ0FoaoTXpytCj6ItzgyCEwA9kF1wixsTuv5cjsgng==}
+
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
     peerDependencies:
@@ -1450,11 +1453,11 @@ packages:
       eslint-config-prettier:
         optional: true
 
-  eslint-plugin-storybook@10.3.3:
-    resolution: {integrity: sha512-jo8wZvKaJlxxrNvf4hCsROJP3CdlpaLiYewAs5Ww+PJxCrLelIi5XVHWOAgBvvr3H9WDKvUw8xuvqPYqAlpkFg==}
+  eslint-plugin-storybook@10.3.4:
+    resolution: {integrity: sha512-6jRb9ucYWKRkbuxpN+83YA3wAWuKn6rp+OVXivy0FPa82v8eciHG8OidbznmzrfcRJYkNWUb7GrPjG/rf4Vqaw==}
     peerDependencies:
       eslint: '>=8'
-      storybook: ^10.3.3
+      storybook: ^10.3.4
 
   eslint-plugin-svelte@3.16.0:
     resolution: {integrity: sha512-DJXxqpYZUxcE0SfYo8EJzV2ZC+zAD7fJp1n1HwcEMRR1cOEUYvjT9GuzJeNghMjgb7uxuK3IJAzI+x6zzUxO5A==}
@@ -2182,8 +2185,8 @@ packages:
   std-env@4.0.0:
     resolution: {integrity: sha512-zUMPtQ/HBY3/50VbpkupYHbRroTRZJPRLvreamgErJVys0ceuzMkD44J/QjqhHjOzK42GQ3QZIeFG1OYfOtKqQ==}
 
-  storybook@10.3.3:
-    resolution: {integrity: sha512-tMoRAts9EVqf+mEMPLC6z1DPyHbcPe+CV1MhLN55IKsl0HxNjvVGK44rVPSePbltPE6vIsn4bdRj6CCUt8SJwQ==}
+  storybook@10.3.4:
+    resolution: {integrity: sha512-866YXZy9k59tLPl9SN3KZZOFeBC/swxkuBVtW8iQjJIzfCrvk7zXQd8RSQ4ignmCdArVvY4lGMCAT4yNaZSt1g==}
     hasBin: true
     peerDependencies:
       prettier: ^2 || ^3
@@ -3354,6 +3357,8 @@ snapshots:
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.0
 
+  '@webcontainer/env@1.1.1': {}
+
   acorn-jsx@5.3.2(acorn@8.16.0):
     dependencies:
       acorn: 8.16.0
@@ -3570,11 +3575,11 @@ snapshots:
     optionalDependencies:
       eslint-config-prettier: 10.1.8(eslint@10.1.0(jiti@2.6.1))
 
-  eslint-plugin-storybook@10.3.3(eslint@10.1.0(jiti@2.6.1))(storybook@10.3.3(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(typescript@6.0.2):
+  eslint-plugin-storybook@10.3.4(eslint@10.1.0(jiti@2.6.1))(storybook@10.3.4(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(typescript@6.0.2):
     dependencies:
       '@typescript-eslint/utils': 8.58.0(eslint@10.1.0(jiti@2.6.1))(typescript@6.0.2)
       eslint: 10.1.0(jiti@2.6.1)
-      storybook: 10.3.3(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      storybook: 10.3.4(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -4277,7 +4282,7 @@ snapshots:
 
   std-env@4.0.0: {}
 
-  storybook@10.3.3(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+  storybook@10.3.4(@testing-library/dom@10.4.1)(prettier@3.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
     dependencies:
       '@storybook/global': 5.0.0
       '@storybook/icons': 2.0.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -4285,6 +4290,7 @@ snapshots:
       '@testing-library/user-event': 14.6.1(@testing-library/dom@10.4.1)
       '@vitest/expect': 3.2.4
       '@vitest/spy': 3.2.4
+      '@webcontainer/env': 1.1.1
       esbuild: 0.27.4
       open: 10.2.0
       recast: 0.23.11
