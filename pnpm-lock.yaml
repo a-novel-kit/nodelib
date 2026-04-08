@@ -161,8 +161,8 @@ importers:
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.2.0(jiti@2.6.1))
       '@sveltejs/kit':
-        specifier: ^2.56.1
-        version: 2.56.1(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.2)(vite@8.0.7(@types/node@24.12.2)(esbuild@0.27.4)(jiti@2.6.1)(yaml@2.8.3)))(svelte@5.55.2)(typescript@6.0.2)(vite@8.0.7(@types/node@24.12.2)(esbuild@0.27.4)(jiti@2.6.1)(yaml@2.8.3))
+        specifier: ^2.57.0
+        version: 2.57.0(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.2)(vite@8.0.7(@types/node@24.12.2)(esbuild@0.27.4)(jiti@2.6.1)(yaml@2.8.3)))(svelte@5.55.2)(typescript@6.0.2)(vite@8.0.7(@types/node@24.12.2)(esbuild@0.27.4)(jiti@2.6.1)(yaml@2.8.3))
       '@trivago/prettier-plugin-sort-imports':
         specifier: ^6.0.2
         version: 6.0.2(prettier-plugin-svelte@3.5.1(prettier@3.8.1)(svelte@5.55.2))(prettier@3.8.1)(svelte@5.55.2)
@@ -956,8 +956,8 @@ packages:
     peerDependencies:
       acorn: ^8.9.0
 
-  '@sveltejs/kit@2.56.1':
-    resolution: {integrity: sha512-9hDOl3yUh8UXWt+mN29dbcdrW0vNwPvMqi01y2Mw+ceErNIISh8MeEY7fXT2Dx1CjC/kfsVqrbxw7DifYr4hsg==}
+  '@sveltejs/kit@2.57.0':
+    resolution: {integrity: sha512-TMiqCTy9ZW4KBHvmTgeWU/hF6jcFpeMgR+9ekE06uhhGnbUZ7wpIY6l1Uk4ThRzlWYJnCVfzmtVNaHaDjaSiSg==}
     engines: {node: '>=18.13'}
     hasBin: true
     peerDependencies:
@@ -3041,7 +3041,7 @@ snapshots:
     dependencies:
       acorn: 8.16.0
 
-  '@sveltejs/kit@2.56.1(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.2)(vite@8.0.7(@types/node@24.12.2)(esbuild@0.27.4)(jiti@2.6.1)(yaml@2.8.3)))(svelte@5.55.2)(typescript@6.0.2)(vite@8.0.7(@types/node@24.12.2)(esbuild@0.27.4)(jiti@2.6.1)(yaml@2.8.3))':
+  '@sveltejs/kit@2.57.0(@sveltejs/vite-plugin-svelte@7.0.0(svelte@5.55.2)(vite@8.0.7(@types/node@24.12.2)(esbuild@0.27.4)(jiti@2.6.1)(yaml@2.8.3)))(svelte@5.55.2)(typescript@6.0.2)(vite@8.0.7(@types/node@24.12.2)(esbuild@0.27.4)(jiti@2.6.1)(yaml@2.8.3))':
     dependencies:
       '@standard-schema/spec': 1.1.0
       '@sveltejs/acorn-typescript': 1.0.9(acorn@8.16.0)
