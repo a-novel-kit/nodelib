@@ -40,7 +40,7 @@
     "prettier-plugin-svelte": "^3.5.1",
     "storybook": "^10.3.5",
     "svelte": "^5.55.4",
-    "typescript": "^6.0.2",
+    "typescript": "^6.0.3",
     "typescript-eslint": "^8.58.2"
   },
   "peerDependenciesMeta": {
