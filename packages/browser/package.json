@@ -30,7 +30,7 @@
     "vitest": "catalog:"
   },
   "peerDependencies": {
-    "zod": "^4.3.6"
+    "zod": "^4.4.1"
   },
   "packageManager": "pnpm@10.33.2",
   "engines": {
