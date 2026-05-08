@@ -24,3 +24,6 @@ catalog:
   typescript: ^6.0.0
   typescript-eslint: ^8.38.0
   vitest: ^4.0.0
+allowBuilds:
+  esbuild: true
+  msw: true
