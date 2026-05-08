@@ -11,7 +11,7 @@ catalog:
   "@eslint/js": ^10.0.1
   "@trivago/prettier-plugin-sort-imports": ^6.0.2
   "@types/lodash-es": ^4.17.12
-  cookie: ^1.1.1
+  cookie: ^0.7.0
   eslint: ^10.0.2
   eslint-config-prettier: ^10.1.8
   eslint-plugin-prettier: ^5.5.5
