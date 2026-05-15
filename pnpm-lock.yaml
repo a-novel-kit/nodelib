@@ -22,8 +22,8 @@ catalogs:
       specifier: ^4.17.12
       version: 4.17.12
     cookie:
-      specifier: ^1.0.0
-      version: 1.1.1
+      specifier: ^0.7.0
+      version: 0.7.2
     eslint:
       specifier: ^10.0.2
       version: 10.3.0
@@ -85,7 +85,7 @@ importers:
         version: 4.1.6(vitest@4.1.6)
       cookie:
         specifier: 'catalog:'
-        version: 1.1.1
+        version: 0.7.2
       eslint:
         specifier: 'catalog:'
         version: 10.3.0(jiti@2.7.0)
@@ -1577,6 +1577,10 @@ packages:
 
   cookie@0.6.0:
     resolution: {integrity: sha512-U71cyTamuh1CRNCfpGY6to28lxvNwPG4Guz/EVjgf3Jmzv0vlDp1atT9eS5dDjMYHucpHbWns6Lwf3BKz6svdw==}
+    engines: {node: '>= 0.6'}
+
+  cookie@0.7.2:
+    resolution: {integrity: sha512-yki5XnKuf750l50uGTllt6kKILY4nQ1eNIQatoXEByZ5dWgnKqbnqmTrBE5B4N7lrMJKQ2ytWMiTO2o0v6Ew/w==}
     engines: {node: '>= 0.6'}
 
   cookie@1.1.1:
@@ -3918,6 +3922,8 @@ snapshots:
   convert-source-map@2.0.0: {}
 
   cookie@0.6.0: {}
+
+  cookie@0.7.2: {}
 
   cookie@1.1.1: {}
 
