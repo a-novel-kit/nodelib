@@ -41,7 +41,7 @@
     "storybook": "^10.4.0",
     "svelte": "^5.55.8",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.59.3"
+    "typescript-eslint": "^8.59.4"
   },
   "peerDependenciesMeta": {
     "@sveltejs/kit": {
