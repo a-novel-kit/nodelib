@@ -40,3 +40,4 @@ minimumReleaseAgeExclude:
   - "@typescript-eslint/utils@8.59.4"
   - "@typescript-eslint/visitor-keys@8.59.4"
   - typescript-eslint@8.59.4
+  - prettier-plugin-svelte@4.0.0
