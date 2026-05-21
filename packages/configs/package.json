@@ -37,7 +37,7 @@
     "prettier-plugin-css-order": "^2.2.0",
     "prettier-plugin-packagejson": "^2.5.20 || ^3.0.0",
     "prettier-plugin-sql": "^0.20.0",
-    "prettier-plugin-svelte": "^3.5.2",
+    "prettier-plugin-svelte": "^4.0.0",
     "storybook": "^10.4.0",
     "svelte": "^5.55.8",
     "typescript": "^6.0.3",
