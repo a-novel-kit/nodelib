@@ -39,7 +39,7 @@
     "prettier-plugin-sql": "^0.20.0",
     "prettier-plugin-svelte": "^4.0.1",
     "storybook": "^10.4.1",
-    "svelte": "^5.55.9",
+    "svelte": "^5.55.10",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.60.0"
   },
