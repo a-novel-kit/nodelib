@@ -45,4 +45,6 @@ minimumReleaseAgeExclude:
   - storybook@10.4.1
   - "@sveltejs/kit@2.61.1"
   - eslint-plugin-svelte@3.18.0
+  - eslint-plugin-svelte@3.19.0
+  - svelte-eslint-parser@1.7.0
   - "@types/node@24.13.0"
