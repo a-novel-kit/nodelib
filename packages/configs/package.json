@@ -25,7 +25,7 @@
   "peerDependencies": {
     "@eslint/compat": "^2.1.0",
     "@eslint/js": "^10.0.1",
-    "@sveltejs/kit": "^2.62.0",
+    "@sveltejs/kit": "^2.63.0",
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@types/node": "^24.12.4",
     "eslint": "^10.4.1",
