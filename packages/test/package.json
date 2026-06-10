@@ -36,7 +36,6 @@
     "LICENSE"
   ],
   "dependencies": {
-    "get-port-please": "catalog:",
     "globals": "^16.5.0",
     "lodash-es": "catalog:"
   },
