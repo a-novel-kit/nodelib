@@ -21,9 +21,6 @@ catalogs:
     '@types/lodash-es':
       specifier: ^4.17.12
       version: 4.17.12
-    cookie:
-      specifier: ^1.0.0
-      version: 1.1.1
     eslint:
       specifier: ^10.0.2
       version: 10.4.1
@@ -33,9 +30,6 @@ catalogs:
     eslint-plugin-prettier:
       specifier: ^5.5.5
       version: 5.5.6
-    get-port-please:
-      specifier: ^3.2.0
-      version: 3.2.0
     jiti:
       specifier: ^2.6.1
       version: 2.7.0
@@ -83,9 +77,6 @@ importers:
       '@vitest/coverage-v8':
         specifier: 4.1.8
         version: 4.1.8(vitest@4.1.8)
-      cookie:
-        specifier: 'catalog:'
-        version: 1.1.1
       eslint:
         specifier: 'catalog:'
         version: 10.4.1(jiti@2.7.0)
@@ -220,9 +211,6 @@ importers:
       '@testing-library/react':
         specifier: ^16.3.0
         version: 16.3.2(@testing-library/dom@10.4.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-      get-port-please:
-        specifier: 'catalog:'
-        version: 3.2.0
       globals:
         specifier: ^16.5.0
         version: 16.5.0
@@ -1860,9 +1848,6 @@ packages:
   get-caller-file@2.0.5:
     resolution: {integrity: sha512-DyFP3BM/3YHTQOCUL/w0OZHR0lpKeGrxotcHWcqNEdnltqFwXVfhEBQ94eIo34AfQpo0rGki4cyIiftY06h2Fg==}
     engines: {node: 6.* || 8.* || >= 10.*}
-
-  get-port-please@3.2.0:
-    resolution: {integrity: sha512-I9QVvBw5U/hw3RmWpYKRumUeaDgxTPd401x364rLmWBJcOQ753eov1eTgzDqRG9bqFIfDc7gfzcQEWrUri3o1A==}
 
   git-hooks-list@4.2.1:
     resolution: {integrity: sha512-WNvqJjOxxs/8ZP9+DWdwWJ7cDsd60NHf39XnD82pDVrKO5q7xfPqpkK6hwEAmBa/ZSEE4IOoR75EzbbIuwGlMw==}
@@ -4194,8 +4179,6 @@ snapshots:
     optional: true
 
   get-caller-file@2.0.5: {}
-
-  get-port-please@3.2.0: {}
 
   git-hooks-list@4.2.1: {}
 
