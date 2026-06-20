@@ -11,9 +11,9 @@ Shared Node.js libraries.
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/a-novel-kit/nodelib)
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/a-novel-kit/nodelib/main.yaml)
-[![codecov](https://codecov.io/gh/a-novel-kit/nodelib/graph/badge.svg?token=0APmxMlooh)](https://codecov.io/gh/a-novel-kit/nodelib)
+[![codecov](https://codecov.io/gh/a-novel-kit/nodelib/graph/badge.svg)](https://codecov.io/gh/a-novel-kit/nodelib)
 
-![Coverage graph](https://codecov.io/gh/a-novel-kit/nodelib/graphs/sunburst.svg?token=0APmxMlooh)
+![Coverage graph](https://codecov.io/gh/a-novel-kit/nodelib/graphs/sunburst.svg)
 
 ## Installation
 
