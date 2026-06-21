@@ -11,7 +11,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: a-novel-kit/workflows/publish-actions/auto-release@v1.0.2
+      - uses: a-novel-kit/workflows/publish-actions/auto-release@v1.0.3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -23,7 +23,7 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: a-novel-kit/workflows/publish-actions/npm@v1.0.2
+      - uses: a-novel-kit/workflows/publish-actions/npm@v1.0.3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           app_private_key: ${{ secrets.PUBLISH_BOT_PRIVATE_KEY }}
