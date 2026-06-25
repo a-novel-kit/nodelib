@@ -1,44 +1,42 @@
 # Contributing to nodelib
 
-For platform-wide setup (Go, Node, Podman, the `a-novel` CLI) and the day-to-day commands, see the [developer onboarding guide](https://github.com/a-novel-kit/.github/blob/master/README.md). This file documents what is specific to `nodelib`.
+Platform setup and day-to-day commands are in the [developer onboarding guide](https://github.com/a-novel-kit/.github/blob/master/README.md). This file covers what's specific to `nodelib`.
 
 ## Repo layout
 
-`nodelib` is a [pnpm](https://pnpm.io) workspace. Every published package lives under `packages/*`, each exposing its source directly (no `src/` indirection) with a colocated `package.json`, `tsconfig.json`, and `vite.config.ts`:
+`nodelib` is a [pnpm](https://pnpm.io) workspace. Every published package lives under `packages/*` with its own `package.json` and build config:
 
 - `packages/browser` → `@a-novel-kit/nodelib-browser`
 - `packages/configs` → `@a-novel-kit/nodelib-config`
 - `packages/test` → `@a-novel-kit/nodelib-test`
 
-Shared dependency versions are pinned through the workspace catalog in `pnpm-workspace.yaml` (the `catalog:` entries in each `package.json`).
+Shared dependency versions are pinned via the `pnpm-workspace.yaml` catalog.
 
 ## Working in the repo
 
 All commands run from the repo root:
 
 - `pnpm install` — install the workspace.
-- `pnpm build` — compile every package (Vite bundle + `tsc` type declarations) into its `dist/`.
-- `pnpm test` — run the [Vitest](https://vitest.dev) suite; tests are colocated as `*.test.ts` files next to their sources.
-- `pnpm lint` — run Prettier (style check), `tsc --noEmit` (type check), and ESLint.
+- `pnpm build` — bundle every package into its `dist/` (Vite + `tsc` declarations).
+- `pnpm test` — run the [Vitest](https://vitest.dev) suite (`*.test.ts` beside its source).
+- `pnpm lint` — Prettier check, `tsc --noEmit`, and ESLint.
 - `pnpm format` — apply Prettier across the workspace.
 
-CI runs `pnpm lint:ci` and `pnpm test:ci`, which build the config and browser packages first so the rest of the workspace can resolve them. Prettier is gated in CI, so run `pnpm format` before committing.
+CI builds the config and browser packages first so the rest can resolve them, and gates on Prettier — run `pnpm format` before committing.
 
 ## Publishing
 
-Packages are published to GitHub Packages under the `@a-novel-kit/` scope. The three packages share a single version, bumped together via `pnpm version` and released by pushing the resulting tag (`git push --follow-tags`); the release workflow builds and publishes from the tag.
+Packages publish to GitHub Packages under `@a-novel-kit/`. All three share one version: bump them together (`pnpm version`) and push the tag (`git push --follow-tags`); the release workflow publishes from it.
 
 ## The bar for additions
 
-`nodelib` stays small on purpose — it holds only the glue two or more projects would otherwise copy between repos. Weigh any addition against two questions:
+`nodelib` stays small on purpose. Weigh any addition against two questions:
 
 - Does a well-maintained library already do it? Use that library; don't wrap it here.
 - Does only one project need it? Keep it there until a second one does.
 
-The sweet spot is a small, dependency-light helper that several projects share and nothing upstream covers cleanly.
+The sweet spot: a small, dependency-light helper several projects share that nothing upstream covers cleanly.
 
 ## Questions?
 
-- Open an issue at https://github.com/a-novel-kit/nodelib/issues
-- Check existing issues for similar problems
-- Include relevant logs and environment details
+[Open an issue](https://github.com/a-novel-kit/nodelib/issues) — include logs and environment details.
