@@ -1,6 +1,6 @@
 # Node lib
 
-The shared Node.js/TypeScript packages the A-Novel frontends and tooling reuse — HTTP/utility helpers, the common ESLint + Prettier config, and the test toolkit.
+The shared Node.js/TypeScript packages the A-Novel frontends and tooling reuse.
 
 [![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/agorastoryverse)](https://twitter.com/agorastoryverse)
 [![Discord](https://img.shields.io/discord/1315240114691248138?logo=discord)](https://discord.gg/rp4Qr8cA)
@@ -17,7 +17,7 @@ The shared Node.js/TypeScript packages the A-Novel frontends and tooling reuse �
 
 ## What this is
 
-`nodelib` collects the small amount of cross-cutting glue that the A-Novel frontends and JS/TS tooling would otherwise copy from one repo to the next — fetch/HTTP error handling, browser utilities, the shared ESLint and Prettier configuration, and a test toolkit. It is the JS/TS analogue of [`golib`](https://github.com/a-novel-kit/golib): a pnpm workspace that publishes a handful of focused, independently installable packages under the `@a-novel-kit/` scope on GitHub Packages. It is deliberately kept minimal — anything a well-maintained dependency already covers belongs in that dependency, not here.
+`nodelib` collects the cross-cutting glue that the A-Novel frontends and JS/TS tooling would otherwise copy from one repo to the next — the JS/TS analogue of [`golib`](https://github.com/a-novel-kit/golib). It is a pnpm workspace that publishes a handful of focused, independently installable packages under the `@a-novel-kit/` scope, kept deliberately small.
 
 ## Installation
 
@@ -38,12 +38,12 @@ pnpm add -D @a-novel-kit/nodelib-test
 
 ## Packages
 
-| Package                        | What it provides                                                                                                                                                                                                                                                       | Install                                   |
-| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| `@a-novel-kit/nodelib-browser` | Browser runtime helpers. `./http`: the `HttpError` class and `newHttpError` / `isHttpError` / `isHttpStatusError` guards, `handleHttpResponse`, Zod-backed `decodeHttpResponse`, and `HTTP_HEADERS`. `./utils`: a `Debounce` class and a configurable `retry` wrapper. | `pnpm add @a-novel-kit/nodelib-browser`   |
-| `@a-novel-kit/nodelib-config`  | The shared dev-tooling config. `Eslint(opts)` builds the flat ESLint config (TypeScript plus optional Svelte / Storybook layers) and `Prettier(opts)` builds the Prettier config (with optional Svelte / SQL plugins and the standard import-order rules).             | `pnpm add -D @a-novel-kit/nodelib-config` |
-| `@a-novel-kit/nodelib-test`    | The test toolkit. `./msw`: a fluent MSW request-matcher builder (body / headers / path & search params). `./http`: `expectStatus`. `./form`: the `writeField` Testing-Library helper. `./mocks/tolgee` and `./mocks/query_client`: ready-made mocks.                   | `pnpm add -D @a-novel-kit/nodelib-test`   |
+| Package                        | What it provides                                                                                                                           | Install                                   |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------- |
+| `@a-novel-kit/nodelib-browser` | Browser runtime helpers: typed HTTP error handling and Zod-backed response decoding, plus small utilities (debounce, retry).               | `pnpm add @a-novel-kit/nodelib-browser`   |
+| `@a-novel-kit/nodelib-config`  | Shared dev-tooling config: factories for the flat ESLint and Prettier configs (TypeScript, with optional Svelte / Storybook / SQL layers). | `pnpm add -D @a-novel-kit/nodelib-config` |
+| `@a-novel-kit/nodelib-test`    | Test toolkit: a fluent MSW request-matcher builder, HTTP/form assertions, and ready-made mocks (Tolgee, query client).                     | `pnpm add -D @a-novel-kit/nodelib-test`   |
 
 ## Contributing
 
-Platform setup and the day-to-day commands live in the [developer onboarding guide](https://github.com/a-novel-kit/.github/blob/master/README.md); `nodelib`-specific notes are in [CONTRIBUTING.md](./CONTRIBUTING.md). The bar for additions is deliberately high — convenience wrappers around well-maintained dependencies, and one-off helpers only one project needs, do not belong here.
+Platform setup and the day-to-day commands live in the [developer onboarding guide](https://github.com/a-novel-kit/.github/blob/master/README.md); `nodelib`-specific notes are in [CONTRIBUTING.md](./CONTRIBUTING.md).

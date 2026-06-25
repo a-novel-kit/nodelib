@@ -30,12 +30,12 @@ Packages are published to GitHub Packages under the `@a-novel-kit/` scope. The t
 
 ## The bar for additions
 
-`nodelib` is intentionally minimal — it holds only the cross-cutting glue that the frontends and tooling would otherwise copy between repos. Before adding to it, weigh the addition against this bar:
+`nodelib` stays small on purpose — it holds only the glue two or more projects would otherwise copy between repos. Weigh any addition against two questions:
 
-- **A well-maintained library already does it?** Use that library directly; do not wrap it here.
-- **Only one project needs it?** Keep it in that project until a second one does.
+- Does a well-maintained library already do it? Use that library; don't wrap it here.
+- Does only one project need it? Keep it there until a second one does.
 
-Good additions are small, dependency-light helpers that at least two projects share and that no upstream library covers cleanly.
+The sweet spot is a small, dependency-light helper that several projects share and nothing upstream covers cleanly.
 
 ## Questions?
 
