@@ -15,11 +15,11 @@ jobs:
       contents: read
       packages: read
     steps:
-      - uses: a-novel-kit/workflows/node-actions/lint-node@v1.2.2
+      - uses: a-novel-kit/workflows/node-actions/lint-node@v1.3.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           app_private_key: ${{ secrets.DEPENDENCY_BOT_PRIVATE_KEY }}
-          app_id: ${{ vars.DEPENDENCY_BOT_ID }}
+          client_id: ${{ vars.DEPENDENCY_BOT_CLIENT_ID }}
           lint_action: "lint:ci"
 
   test:
@@ -30,11 +30,11 @@ jobs:
       contents: read
       packages: read
     steps:
-      - uses: a-novel-kit/workflows/node-actions/test-node@v1.2.2
+      - uses: a-novel-kit/workflows/node-actions/test-node@v1.3.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           app_private_key: ${{ secrets.DEPENDENCY_BOT_PRIVATE_KEY }}
-          app_id: ${{ vars.DEPENDENCY_BOT_ID }}
+          client_id: ${{ vars.DEPENDENCY_BOT_CLIENT_ID }}
           test_action: "test:ci"
 
   report-codecov:
@@ -44,7 +44,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: a-novel-kit/workflows/generic-actions/codecov@v1.2.2
+      - uses: a-novel-kit/workflows/generic-actions/codecov@v1.3.0
         with:
           codecov_token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -56,8 +56,8 @@ jobs:
       contents: read
       packages: read
     steps:
-      - uses: a-novel-kit/workflows/node-actions/build-node@v1.2.2
+      - uses: a-novel-kit/workflows/node-actions/build-node@v1.3.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           app_private_key: ${{ secrets.DEPENDENCY_BOT_PRIVATE_KEY }}
-          app_id: ${{ vars.DEPENDENCY_BOT_ID }}
+          client_id: ${{ vars.DEPENDENCY_BOT_CLIENT_ID }}
