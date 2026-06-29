@@ -9,7 +9,7 @@ on:
       - "**"
 
 jobs:
-  lint:
+  lint-js:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -22,10 +22,10 @@ jobs:
           client_id: ${{ vars.DEPENDENCY_BOT_CLIENT_ID }}
           lint_action: "lint:ci"
 
-  test:
+  test-js:
     runs-on: ubuntu-latest
     needs:
-      - lint
+      - lint-js
     permissions:
       contents: read
       packages: read
@@ -40,7 +40,7 @@ jobs:
   report-codecov:
     runs-on: ubuntu-latest
     needs:
-      - test
+      - test-js
     permissions:
       contents: read
     steps:
@@ -48,9 +48,9 @@ jobs:
         with:
           codecov_token: ${{ secrets.CODECOV_TOKEN }}
 
-  build:
+  build-js:
     needs:
-      - test
+      - test-js
     runs-on: ubuntu-latest
     permissions:
       contents: read
