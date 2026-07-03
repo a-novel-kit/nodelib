@@ -166,7 +166,7 @@ importers:
         specifier: ^3.20.0
         version: 3.20.0(eslint@10.6.0(jiti@2.7.0))(svelte@5.56.4(@typescript-eslint/types@8.62.1))
       prettier:
-        specifier: ^3.9.3
+        specifier: ^3.9.4
         version: 3.9.4
       prettier-plugin-css-order:
         specifier: ^2.2.0
