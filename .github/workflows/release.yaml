@@ -43,7 +43,7 @@ jobs:
       tag: ${{ steps.core.outputs.tag }}
     steps:
       - id: core
-        uses: a-novel-kit/workflows/publish-actions/release-core@v1.9.0
+        uses: a-novel-kit/workflows/publish-actions/release-core@v1.10.0
         with:
           release_type: ${{ inputs.release_type }}
           dry_run: ${{ inputs.dry_run }}
@@ -60,7 +60,7 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: a-novel-kit/workflows/publish-actions/npm@v1.9.0
+      - uses: a-novel-kit/workflows/publish-actions/npm@v1.10.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           app_private_key: ${{ secrets.PUBLISH_BOT_PRIVATE_KEY }}
@@ -75,7 +75,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: a-novel-kit/workflows/generic-actions/archive-board-items@v1.9.0
+      - uses: a-novel-kit/workflows/generic-actions/archive-board-items@v1.10.0
         with:
           client_id: ${{ vars.AGENT_BOT_CLIENT_ID }}
           app_private_key: ${{ secrets.AGENT_BOT_PRIVATE_KEY }}
