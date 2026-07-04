@@ -26,7 +26,7 @@ CI builds the config and browser packages first so the rest can resolve them, an
 
 ## Publishing
 
-Packages publish to GitHub Packages under `@a-novel-kit/`. All three share one version: bump them together (`pnpm version`) and push the tag (`git push --follow-tags`); the release workflow publishes from it.
+Packages publish to GitHub Packages under `@a-novel-kit/`, and all three share one version so they release together. Cut a release from the GitHub UI (**Actions ▸ release**), choosing the bump type; the workflow bumps the shared version, tags the commit, and publishes from that tag. A protected `release` environment gates who can publish.
 
 ## The bar for additions
 

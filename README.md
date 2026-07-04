@@ -38,11 +38,11 @@ pnpm add -D @a-novel-kit/nodelib-test
 
 ## Packages
 
-| Package                        | What it's for                                                                                                                                                                             | Install                                   |
-| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| `@a-novel-kit/nodelib-browser` | Bundles the runtime helpers the browser apps share, so each frontend handles HTTP responses and errors the same way instead of reinventing them. A few async utilities live here too.     | `pnpm add @a-novel-kit/nodelib-browser`   |
-| `@a-novel-kit/nodelib-config`  | Provides the shared ESLint and Prettier setup as factories, so each repo enables only the layers it needs — TypeScript, Svelte, Storybook, SQL — instead of copying configuration around. | `pnpm add -D @a-novel-kit/nodelib-config` |
-| `@a-novel-kit/nodelib-test`    | Gathers the testing tools the frontends share — request mocking, response assertions, and prebuilt service mocks — so tests read consistently and stay quick to write.                    | `pnpm add -D @a-novel-kit/nodelib-test`   |
+| Package                        | What it's for                                                                                                                                                                         | Install                                   |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| `@a-novel-kit/nodelib-browser` | Bundles the runtime helpers the browser apps share, so each frontend handles HTTP responses and errors the same way instead of reinventing them. A few async utilities live here too. | `pnpm add @a-novel-kit/nodelib-browser`   |
+| `@a-novel-kit/nodelib-config`  | Provides the shared ESLint and Prettier setup as factories, so each repo enables only the layers it needs (Svelte or Storybook, say) instead of copying configuration around.         | `pnpm add -D @a-novel-kit/nodelib-config` |
+| `@a-novel-kit/nodelib-test`    | Gathers the testing tools the frontends share, like request mocking and prebuilt service mocks, so tests read consistently and stay quick to write.                                   | `pnpm add -D @a-novel-kit/nodelib-test`   |
 
 ## Contributing
 

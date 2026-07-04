@@ -1,5 +1,11 @@
 import { HttpResponse } from "msw";
 
+/**
+ * Matches the request URL's query parameters against `expect`, or defers to `expect` when it is a predicate.
+ *
+ * Every parameter in `expect` must be present with matching values, compared order-insensitively for repeated keys.
+ * By default extra query parameters are allowed; pass `strict` to also reject any parameter absent from `expect`.
+ */
 export const matchSearchParams = async (
   request: Request,
   expect: URLSearchParams | ((req: URLSearchParams) => Promise<boolean | HttpResponse<any>>),

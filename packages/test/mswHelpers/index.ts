@@ -1,3 +1,11 @@
+/**
+ * Chainable request matchers layered over msw's `http` handlers.
+ *
+ * `http` mirrors msw's own `http` object but returns a builder that accumulates assertions on the incoming
+ * request — body, headers, path and query parameters — before delegating to the final response resolver. It lets a
+ * test say "respond this way only when the request looks like that" without hand-writing the matching logic in every
+ * handler.
+ */
 import { matchBodyBytes, matchBodyFormData, matchBodyJSON, matchBodyText } from "./body";
 import { matchHeaders } from "./headers";
 import { matchPathParams } from "./path_params";
@@ -6,6 +14,10 @@ import { matchSearchParams } from "./search_params";
 
 import { HttpRequestHandler, HttpResponse, HttpResponseResolver, RequestHandlerOptions, http as mswHTTP } from "msw";
 
+/**
+ * Builder that accumulates request matchers and turns them into a single msw handler. Obtain one through {@link http},
+ * chain any number of matchers, then call `resolve` with the response resolver to produce the handler.
+ */
 class Resolver {
   private readonly handler: HttpRequestHandler;
 
@@ -29,6 +41,11 @@ class Resolver {
     return this;
   }
 
+  /**
+   * Registers a raw matcher predicate. When `errorResponse` is given, a non-match responds with it instead of leaving
+   * the request unhandled — use it to turn a failed expectation into a visible response rather than a silent
+   * pass-through. Every typed matcher below funnels through this method.
+   */
   resolver(fn: ResolverFn, errorResponse?: HttpResponse<any>): this {
     if (errorResponse) {
       this.resolvers.push(async (args) => {
@@ -67,6 +84,10 @@ class Resolver {
     return this.resolver(async ({ request }) => matchSearchParams(request, expect, strict), errorResponse);
   }
 
+  /**
+   * Builds the msw handler. Matchers run in registration order: a `false` result leaves the request unhandled, an
+   * `HttpResponse` answers immediately, and only once every matcher passes does `resolver` produce the real response.
+   */
   resolve(resolver: HttpResponseResolver): ReturnType<typeof this.handler> {
     return this.handler(
       this.url,
@@ -90,6 +111,10 @@ class Resolver {
   }
 }
 
+/**
+ * Entry point mirroring msw's `http`, with one method per HTTP verb. Each binds a fresh matcher builder to the given
+ * URL, ready to chain matchers and finish with `.resolve()`.
+ */
 export const http = {
   all: (url: string, options?: RequestHandlerOptions) => new Resolver(mswHTTP.all).withURL(url).withOptions(options),
   head: (url: string, options?: RequestHandlerOptions) => new Resolver(mswHTTP.head).withURL(url).withOptions(options),
