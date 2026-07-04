@@ -2,11 +2,16 @@ import type { PrettierConfig as SortImportsConfig } from "@trivago/prettier-plug
 import type { Config } from "prettier";
 import type { SqlOptions } from "prettier-plugin-sql";
 
+/** Options for {@link Prettier}, enabling the Svelte and SQL plugin chains a package needs. */
 export interface PrettierOptions {
   svelte?: boolean;
   sql?: boolean;
 }
 
+/**
+ * Builds the shared Prettier config for a-novel packages, wiring in import sorting and package.json
+ * formatting. Pass {@link PrettierOptions} to add Svelte or SQL formatting.
+ */
 export function Prettier(opts: PrettierOptions = {}): Config & SortImportsConfig & Partial<SqlOptions> {
   const baseConfig: Config & SortImportsConfig & Partial<SqlOptions> = {
     useTabs: false,

@@ -1,5 +1,11 @@
 import { HttpResponse } from "msw";
 
+/**
+ * Matches the request's headers against `expect`, or defers to `expect` when it is a predicate.
+ *
+ * The request must carry every header in `expect` with an equal value; headers present only on the request are
+ * ignored.
+ */
 export const matchHeaders = async (
   request: Request,
   expect: Headers | ((req: Headers) => Promise<boolean | HttpResponse<any>>)

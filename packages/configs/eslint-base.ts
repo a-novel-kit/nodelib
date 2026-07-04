@@ -9,15 +9,25 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import globals from "globals";
 import ts from "typescript-eslint";
 
+/** Options for {@link Eslint}, toggling the framework plugins and ignore sources a package needs. */
 export interface EslintOptions {
+  /** Treats the package as a reusable library, relaxing rules that assume a deployed app with a fixed route table. */
   isLib?: boolean;
+  /** Svelte config; when provided, enables Svelte parsing and its recommended and Prettier rule sets. */
   svelte?: SvelteConfig;
   storybook?: boolean;
   ignores?: string[];
+  /** Path to a .gitignore file whose patterns are converted into ESLint ignores. */
   gitIgnorePath?: string;
+  /** Extra flat-config block deep-merged over the defaults, so a package can add or override rules. */
   customRules?: ConfigWithExtends;
 }
 
+/**
+ * Builds the shared flat ESLint config for a-novel Node and Svelte packages. The returned array is
+ * ready to spread into a package's eslint.config; pass {@link EslintOptions} to enable Svelte,
+ * Storybook, or library-specific rules.
+ */
 export function Eslint(opts: EslintOptions = {}): Parameters<typeof defineConfig> {
   let customRules: ConfigWithExtends = {
     languageOptions: {
@@ -39,7 +49,7 @@ export function Eslint(opts: EslintOptions = {}): Parameters<typeof defineConfig
     },
   };
 
-  // Only ignore links without resolve in lib mode, as they can be generic, reusable elements.
+  // In library mode links can be generic and reusable, with no concrete route table to resolve against.
   if (opts.svelte && opts.isLib) {
     customRules.rules!["svelte/no-navigation-without-resolve"] = ["error", { ignoreLinks: true }];
   }
@@ -58,7 +68,8 @@ export function Eslint(opts: EslintOptions = {}): Parameters<typeof defineConfig
     };
   }
 
-  // Make sure to insert rules in the correct order.
+  // Flat config lets later blocks override earlier ones, so group by precedence and keep the Prettier
+  // style block last so it can switch off formatting rules the other blocks turn on.
   const sortedRules: Record<string, ConfigWithExtends[]> = {
     ignoreRules: [globalIgnores(["**/dist/**", "**/.*/**", ...(opts.ignores ?? [])])],
     langRules: [js.configs.recommended, ...ts.configs.recommended],
@@ -82,7 +93,7 @@ export function Eslint(opts: EslintOptions = {}): Parameters<typeof defineConfig
       },
     });
     customRules.rules!["@typescript-eslint/no-empty-object-type"] = "off";
-    // We only use it for internal content. This is never used to render user inputs.
+    // Disabled because {@html} only renders internal content here, never user input.
     customRules.rules!["svelte/no-at-html-tags"] = "off";
   }
 

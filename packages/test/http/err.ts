@@ -8,6 +8,10 @@ function prettyRes(res: any): string {
   }
 }
 
+/**
+ * expectStatus awaits the given promise and asserts that it rejects with an HTTP error carrying the
+ * given status code, throwing a descriptive failure otherwise.
+ */
 export async function expectStatus(callback: Promise<any>, status: number) {
   const res = await callback.catch((err) => err);
 

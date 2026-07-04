@@ -1,3 +1,9 @@
+/**
+ * Debounce collapses a burst of rapid calls into at most one execution per quiet period. The first
+ * call in a burst runs immediately; while further calls keep arriving, each supersedes the last and
+ * only the final one runs, fired once the calls stop. This keeps a leading response snappy while
+ * shielding the target function from repeated triggers.
+ */
 export class Debounce {
   private _immediate: boolean;
   private readonly _delay: number;
@@ -6,11 +12,9 @@ export class Debounce {
   private _cooldownTimer: ReturnType<typeof setTimeout> | undefined;
 
   /**
-   * Creates a new Debounce instance.
-   * @param delay - Duration in milliseconds to wait before executing the function after the last call.
-   * @param cooldownReset - Duration in milliseconds before allowing another immediate execution.
-   *                        Defaults to the same value as delay. Unlike delay, cooldownReset controls
-   *                        how soon a subsequent call can bypass the delay and execute immediately.
+   * @param delay - Milliseconds of quiet required after the last call before the trailing call runs.
+   * @param cooldownReset - Milliseconds of quiet after which an incoming call is again allowed to run
+   *   immediately instead of being delayed. Defaults to `delay`.
    */
   constructor(delay: number, cooldownReset: number = delay) {
     this._delay = delay;
@@ -19,16 +23,15 @@ export class Debounce {
   }
 
   private _shouldExecuteImmediately(): boolean {
-    // If a cooldown is active, delay it again.
-    // Otherwise, activate it.
+    // Every call restarts the cooldown; the immediate slot only reopens once calls stop for a full
+    // cooldown window.
     clearTimeout(this._cooldownTimer);
     this._cooldownTimer = setTimeout(() => {
       this._cooldownTimer = undefined;
-      // Allow immediate execution again for a single call.
       this._immediate = true;
     }, this._cooldownReset);
 
-    // We allow the current call and only this one to ignore the delay, while the cooldown is active.
+    // Only the first call of a burst may skip the delay.
     if (this._immediate) {
       this._immediate = false;
       return true;
@@ -38,9 +41,8 @@ export class Debounce {
   }
 
   /**
-   * Cancels any pending delayed execution and resets the immediate execution state.
-   * This will clear any active timers, preventing the debounced function from being called
-   * if it was scheduled but not yet executed.
+   * Cancels a pending trailing execution and resets the debouncer, so the next call runs
+   * immediately as if the instance were fresh.
    */
   cancel() {
     clearTimeout(this._timer);
@@ -49,10 +51,12 @@ export class Debounce {
     this._immediate = true;
   }
 
+  /**
+   * Feeds a call into the debouncer. The function runs immediately when the debouncer is idle,
+   * otherwise it is scheduled and supersedes any call still waiting to run.
+   */
   call(fn: () => void) {
     clearTimeout(this._timer);
-    // To prevent initial delay, the first call after some time is immediately executed and activates the cooldown
-    // timer.
     if (this._shouldExecuteImmediately()) {
       fn();
       return;

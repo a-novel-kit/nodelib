@@ -3,7 +3,8 @@ import { newHttpError } from "./error";
 import type { ZodType } from "zod";
 
 /**
- * Check the response status, and throw an HttpError if not ok (2xx).
+ * handleHttpResponse passes an ok (2xx) response through unchanged and throws an HttpError for
+ * any other status.
  */
 export async function handleHttpResponse(response: Response): Promise<Response> {
   if (!response.ok) {
@@ -13,7 +14,8 @@ export async function handleHttpResponse(response: Response): Promise<Response> 
 }
 
 /**
- * Decode the JSON body of an HTTP response, and validate it using the given Zod validator.
+ * decodeHttpResponse builds a response handler that parses the JSON body and validates it against
+ * the given Zod schema, resolving to the typed value or rejecting on a validation failure.
  */
 export function decodeHttpResponse<T>(validator: ZodType<T>) {
   return async function (response: Response): Promise<T> {
