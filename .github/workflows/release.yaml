@@ -1,9 +1,9 @@
 name: release
 
-# Releases are cut from the GitHub UI (Actions ▸ release ▸ pick a type ▸ Run),
-# not from a tag push. workflow_call exposes the same inputs so an agent can
-# drive an identical release later. The protected `release` environment is the
-# "who can publish" gate (configure its required reviewers).
+# Releases are cut from the GitHub UI: Actions ▸ release ▸ pick a type ▸ Run.
+# workflow_call exposes the same inputs so an agent can drive an identical
+# release. The protected `release` environment gates who may publish; its
+# required reviewers are the list.
 on:
   workflow_dispatch:
     inputs:
@@ -50,8 +50,8 @@ jobs:
           client_id: ${{ vars.AGENT_BOT_CLIENT_ID }}
           app_private_key: ${{ secrets.AGENT_BOT_PRIVATE_KEY }}
 
-  # Publish the npm package from the bumped tag, so it carries the new version
-  # rather than the pre-bump default branch (the dispatch runs on master).
+  # Publish the npm package from the bumped tag, so it carries the new version;
+  # the dispatch itself runs on master, which is still pre-bump.
   build:
     needs: [release]
     if: ${{ !inputs.dry_run }}

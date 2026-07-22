@@ -1,6 +1,6 @@
 /**
- * Browser-side helpers for fetch requests: turning failed responses into typed errors, decoding
- * and validating JSON bodies against a Zod schema, and common request headers.
+ * Browser-side helpers for fetch requests: typed errors for failed responses, JSON bodies decoded
+ * through a Zod schema, and reusable request headers.
  */
 
 export * from "./error";

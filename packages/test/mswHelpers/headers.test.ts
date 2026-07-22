@@ -14,8 +14,6 @@ describe("matchHeaders", () => {
     expect(got).toBe(true);
   });
 
-  // The three rejection cases below are the ones that pass vacuously when the matcher iterates the
-  // Headers instance with Object.entries: the loop body never runs, so it can only ever return true.
   it("rejects a header whose value differs", async () => {
     const got = await matchHeaders(
       request({ authorization: "Bearer wrong" }),

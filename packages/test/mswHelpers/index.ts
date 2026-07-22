@@ -1,10 +1,9 @@
 /**
  * Chainable request matchers layered over msw's `http` handlers.
  *
- * `http` mirrors msw's own `http` object but returns a builder that accumulates assertions on the incoming
- * request — body, headers, path and query parameters — before delegating to the final response resolver. It lets a
- * test say "respond this way only when the request looks like that" without hand-writing the matching logic in every
- * handler.
+ * `http` mirrors msw's own `http` object, returning a builder that accumulates assertions on the incoming request
+ * before delegating to the final response resolver. A test can then say "respond this way only when the request
+ * looks like that" without hand-writing the matching logic in every handler.
  */
 import { matchBodyBytes, matchBodyFormData, matchBodyJSON, matchBodyText } from "./body";
 import { matchHeaders } from "./headers";
@@ -42,9 +41,8 @@ class Resolver {
   }
 
   /**
-   * Registers a raw matcher predicate. When `errorResponse` is given, a non-match responds with it instead of leaving
-   * the request unhandled — use it to turn a failed expectation into a visible response rather than a silent
-   * pass-through. Every typed matcher below funnels through this method.
+   * Registers a raw matcher predicate, the method every typed matcher funnels through. Passing `errorResponse` makes
+   * a non-match answer with it, turning a failed expectation into a visible response instead of an unhandled request.
    */
   resolver(fn: ResolverFn, errorResponse?: HttpResponse<any>): this {
     if (errorResponse) {
