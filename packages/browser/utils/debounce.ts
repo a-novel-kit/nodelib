@@ -1,8 +1,7 @@
 /**
  * Debounce collapses a burst of rapid calls into at most one execution per quiet period. The first
- * call in a burst runs immediately; while further calls keep arriving, each supersedes the last and
- * only the final one runs, fired once the calls stop. This keeps a leading response snappy while
- * shielding the target function from repeated triggers.
+ * call in a burst runs immediately, keeping the response snappy; each further call supersedes the
+ * last, and only the final one runs, fired once the calls stop.
  */
 export class Debounce {
   private _immediate: boolean;
@@ -13,8 +12,8 @@ export class Debounce {
 
   /**
    * @param delay - Milliseconds of quiet required after the last call before the trailing call runs.
-   * @param cooldownReset - Milliseconds of quiet after which an incoming call is again allowed to run
-   *   immediately instead of being delayed. Defaults to `delay`.
+   * @param cooldownReset - Milliseconds of quiet after which an incoming call again runs
+   *   immediately. Defaults to `delay`.
    */
   constructor(delay: number, cooldownReset: number = delay) {
     this._delay = delay;
@@ -23,8 +22,8 @@ export class Debounce {
   }
 
   private _shouldExecuteImmediately(): boolean {
-    // Every call restarts the cooldown; the immediate slot only reopens once calls stop for a full
-    // cooldown window.
+    // Every call restarts the cooldown, so the immediate slot reopens only once calls stop for a
+    // full cooldown window.
     clearTimeout(this._cooldownTimer);
     this._cooldownTimer = setTimeout(() => {
       this._cooldownTimer = undefined;

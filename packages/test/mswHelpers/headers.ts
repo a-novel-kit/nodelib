@@ -14,9 +14,8 @@ export const matchHeaders = async (
     return (expect as (req: Headers) => Promise<boolean | HttpResponse<any>>)(request.headers);
   }
 
-  // Headers keeps its data in internal slots rather than own enumerable properties, so Object.entries
-  // on it yields an empty list and every comparison would be skipped — making the matcher pass for any
-  // request. Iterate the Headers API instead, as matchSearchParams does for URLSearchParams.
+  // Headers keeps its data in internal slots, so only its own iterator exposes the entries; a
+  // generic object walk sees an empty list and the matcher accepts every request.
   for (const [key, value] of expect.entries()) {
     if (request.headers.get(key) !== value) {
       return false;

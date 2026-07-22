@@ -18,8 +18,8 @@ export class HttpError extends Error {
 }
 
 /**
- * newHttpError builds an HttpError from a failed response, reading its body as text. A body
- * that cannot be decoded is replaced with the decode error message rather than rejecting.
+ * newHttpError builds an HttpError from a failed response, reading its body as text. It always
+ * resolves: a body that cannot be decoded is replaced with the decode error message.
  */
 export async function newHttpError(response: Response): Promise<HttpError> {
   const text = await response.text().catch((err) => `failed to decode response: ${err.message}`);

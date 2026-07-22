@@ -28,8 +28,8 @@ export default defineConfig({
       exclude: ["packages/browser/dist", "packages/test/dist"],
       allowExternal: true,
     },
-    // Every package holding tests needs an entry here: vitest only collects from registered projects,
-    // so a package omitted from this list reports no failures because it is never run at all.
+    // Every package holding tests needs an entry here. Vitest collects only from registered
+    // projects, so a package left out is never run and silently reports no failures.
     projects: [
       {
         root: "packages/browser",

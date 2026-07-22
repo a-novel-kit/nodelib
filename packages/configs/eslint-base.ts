@@ -68,8 +68,8 @@ export function Eslint(opts: EslintOptions = {}): Parameters<typeof defineConfig
     };
   }
 
-  // Flat config lets later blocks override earlier ones, so group by precedence and keep the Prettier
-  // style block last so it can switch off formatting rules the other blocks turn on.
+  // Flat config lets later blocks override earlier ones, so blocks are grouped by precedence and
+  // the Prettier style block goes last, where it can switch off formatting rules the others enable.
   const sortedRules: Record<string, ConfigWithExtends[]> = {
     ignoreRules: [globalIgnores(["**/dist/**", "**/.*/**", ...(opts.ignores ?? [])])],
     langRules: [js.configs.recommended, ...ts.configs.recommended],
@@ -93,7 +93,7 @@ export function Eslint(opts: EslintOptions = {}): Parameters<typeof defineConfig
       },
     });
     customRules.rules!["@typescript-eslint/no-empty-object-type"] = "off";
-    // Disabled because {@html} only renders internal content here, never user input.
+    // Consuming packages render only internal content through {@html}.
     customRules.rules!["svelte/no-at-html-tags"] = "off";
   }
 
