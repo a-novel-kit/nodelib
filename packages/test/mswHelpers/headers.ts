@@ -14,7 +14,10 @@ export const matchHeaders = async (
     return (expect as (req: Headers) => Promise<boolean | HttpResponse<any>>)(request.headers);
   }
 
-  for (const [key, value] of Object.entries(expect)) {
+  // Headers keeps its data in internal slots rather than own enumerable properties, so Object.entries
+  // on it yields an empty list and every comparison would be skipped — making the matcher pass for any
+  // request. Iterate the Headers API instead, as matchSearchParams does for URLSearchParams.
+  for (const [key, value] of expect.entries()) {
     if (request.headers.get(key) !== value) {
       return false;
     }
