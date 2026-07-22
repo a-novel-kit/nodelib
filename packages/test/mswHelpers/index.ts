@@ -42,7 +42,7 @@ class Resolver {
 
   /**
    * Registers a raw matcher predicate, the method every typed matcher funnels through. Passing `errorResponse` makes
-   * a non-match answer with it, turning a failed expectation into a visible response instead of an unhandled request.
+   * a non-match answer with it, so a failed expectation surfaces as a visible response.
    */
   resolver(fn: ResolverFn, errorResponse?: HttpResponse<any>): this {
     if (errorResponse) {
