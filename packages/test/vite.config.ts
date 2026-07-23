@@ -18,9 +18,6 @@ export default defineConfig({
       entry: {
         mswHelpers: "packages/test/mswHelpers/index.ts",
         http: "packages/test/http/index.ts",
-        "test/form": "packages/test/form/index.ts",
-        "mocks/tolgee": "packages/test/mocks/tolgee/index.ts",
-        "mocks/query_client": "packages/test/mocks/query_client/index.ts",
       },
       name,
       formats: ["es"],
@@ -30,9 +27,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         mswHelpers: "packages/test/mswHelpers/index.ts",
-        form: "packages/test/form/index.ts",
-        "mocks/tolgee": "packages/test/mocks/tolgee/index.ts",
-        "mocks/query_client": "packages/test/mocks/query_client/index.ts",
         http: "packages/test/http/index.ts",
       },
       output: {
