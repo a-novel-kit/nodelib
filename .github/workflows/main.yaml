@@ -69,8 +69,6 @@ jobs:
 
   test-js:
     runs-on: ubuntu-latest
-    needs:
-      - lint-js
     permissions:
       contents: read
       packages: read
@@ -94,8 +92,6 @@ jobs:
           codecov_token: ${{ secrets.CODECOV_TOKEN }}
 
   build-js:
-    needs:
-      - test-js
     runs-on: ubuntu-latest
     permissions:
       contents: read
