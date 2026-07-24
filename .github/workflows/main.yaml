@@ -69,8 +69,6 @@ jobs:
 
   test-js:
     runs-on: ubuntu-latest
-    # No needs. lint-js ran on its own runner against its own checkout, so its verdict could not
-    # change this job's — it only delayed the tests, and with them the coverage upload, by a lint.
     permissions:
       contents: read
       packages: read
