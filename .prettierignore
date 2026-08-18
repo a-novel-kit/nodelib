@@ -3,3 +3,4 @@ dist
 build
 
 **/*.gen.ts
+packages/configs/fixtures/i18n/generated

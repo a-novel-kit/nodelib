@@ -1,0 +1,39 @@
+{
+  "name": "@a-novel-kit/nodelib-i18n",
+  "version": "1.4.0",
+  "private": false,
+  "description": "Framework-agnostic i18next runtime helpers for request-rendered applications",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/a-novel-kit/nodelib.git"
+  },
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.es.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "devDependencies": {
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "i18next": "^26.3.6"
+  },
+  "packageManager": "pnpm@11.22.0",
+  "engines": {
+    "node": ">=24.0.0",
+    "npm": ">=10.9.2"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  }
+}

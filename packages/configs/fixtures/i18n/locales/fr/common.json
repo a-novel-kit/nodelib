@@ -1,0 +1,16 @@
+{
+  "fixture": {
+    "collaborators_creator_one": "{{count}} créateur collabore",
+    "collaborators_creator_many": "{{count}} créateurs collaborent",
+    "collaborators_creator_other": "{{count}} créateurs collaborent",
+    "collaborators_reader_one": "{{count}} lecteur collabore",
+    "collaborators_reader_many": "{{count}} lecteurs collaborent",
+    "collaborators_reader_other": "{{count}} lecteurs collaborent",
+    "items_one": "{{count}} élément",
+    "items_many": "{{count}} éléments",
+    "items_other": "{{count}} éléments",
+    "perspective_creator": "Vue créateur",
+    "perspective_reader": "Vue lecteur",
+    "ready": "Les traductions statiques sont prêtes"
+  }
+}

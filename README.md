@@ -32,6 +32,7 @@ Then install the package(s) you need (each is published independently):
 
 ```bash
 pnpm add @a-novel-kit/nodelib-browser
+pnpm add @a-novel-kit/nodelib-i18n
 pnpm add -D @a-novel-kit/nodelib-config
 pnpm add -D @a-novel-kit/nodelib-test
 ```
@@ -41,7 +42,8 @@ pnpm add -D @a-novel-kit/nodelib-test
 | Package                        | What it's for                                                                                                                                                                         | Install                                   |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
 | `@a-novel-kit/nodelib-browser` | Bundles the runtime helpers the browser apps share, so each frontend handles HTTP responses and errors the same way instead of reinventing them. A few async utilities live here too. | `pnpm add @a-novel-kit/nodelib-browser`   |
-| `@a-novel-kit/nodelib-config`  | Provides the shared ESLint and Prettier setup as factories, so each repo enables only the layers it needs (Svelte or Storybook, say) instead of copying configuration around.         | `pnpm add -D @a-novel-kit/nodelib-config` |
+| `@a-novel-kit/nodelib-config`  | Provides shared lint, formatting, SvelteKit, Vitest, Storybook, and localization-tool presets without forcing optional tools onto every consumer.                                     | `pnpm add -D @a-novel-kit/nodelib-config` |
+| `@a-novel-kit/nodelib-i18n`    | Creates request-isolated i18next instances and resolves supported locales while leaving catalogs and product locale policy with each application.                                     | `pnpm add @a-novel-kit/nodelib-i18n`      |
 | `@a-novel-kit/nodelib-test`    | Gathers the testing tools the frontends share, like request mocking and prebuilt service mocks, so tests read consistently and stay quick to write.                                   | `pnpm add -D @a-novel-kit/nodelib-test`   |
 
 ## Contributing

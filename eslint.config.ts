@@ -6,7 +6,7 @@ import { defineConfig } from "eslint/config";
 
 export default defineConfig(
   ...Eslint({
-    ignores: ["**/build/**"],
+    ignores: ["**/build/**", "packages/configs/fixtures/**/*.svelte"],
     gitIgnorePath: path.join(import.meta.dirname, ".gitignore"),
   })
 );

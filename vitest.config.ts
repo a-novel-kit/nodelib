@@ -24,8 +24,13 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "json", "html", "lcov"],
       reportsDirectory: "coverage",
-      include: ["packages/browser/**/*.{ts,tsx}", "packages/test/**/*.{ts,tsx}"],
-      exclude: ["packages/browser/dist", "packages/test/dist"],
+      include: [
+        "packages/browser/**/*.{ts,tsx}",
+        "packages/configs/**/*.ts",
+        "packages/i18n/**/*.ts",
+        "packages/test/**/*.{ts,tsx}",
+      ],
+      exclude: ["packages/browser/dist", "packages/configs/dist", "packages/i18n/dist", "packages/test/dist"],
       allowExternal: true,
     },
     // Every package holding tests needs an entry here. Vitest collects only from registered
@@ -33,6 +38,14 @@ export default defineConfig({
     projects: [
       {
         root: "packages/browser",
+        extends: true,
+      },
+      {
+        root: "packages/configs",
+        extends: true,
+      },
+      {
+        root: "packages/i18n",
         extends: true,
       },
       {
