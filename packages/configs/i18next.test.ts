@@ -1,4 +1,4 @@
-import { I18next } from "./i18next";
+import { I18next, type I18nextOptions } from "./i18next";
 
 import { describe, expect, it } from "vitest";
 
@@ -16,6 +16,7 @@ describe("I18next", () => {
       primaryLanguage: "en",
       secondaryLanguages: ["fr"],
       removeUnusedKeys: true,
+      outputFormat: "json",
       warnOnConflicts: "error",
     });
     expect(config.types).toMatchObject({
@@ -42,6 +43,52 @@ describe("I18next", () => {
       output: "fixtures/i18n/locales/{{language}}/{{namespace}}.json",
       preservePatterns: ["runtime.allowed.*"],
       removeUnusedKeys: true,
+    });
+  });
+
+  it("protects the static catalog contract from untyped overrides", () => {
+    const unsafeOverrides = {
+      defaultNS: "unsafe",
+      extractFromComments: true,
+      functions: ["translate"],
+      generateBasePluralForms: true,
+      ignore: [],
+      indentation: 4,
+      input: ["unsafe/**/*"],
+      mergeNamespaces: true,
+      output: "unsafe.yaml",
+      outputFormat: "yaml",
+      preservePatterns: ["runtime.allowed.*"],
+      primaryLanguage: "fr",
+      removeUnusedKeys: false,
+      secondaryLanguages: [],
+      sort: false,
+      warnOnConflicts: false,
+    } as unknown as NonNullable<I18nextOptions["extract"]>;
+
+    const config = I18next({
+      locales: ["en", "fr"],
+      primaryLanguage: "en",
+      extract: unsafeOverrides,
+    });
+
+    expect(config.extract).toMatchObject({
+      defaultNS: "common",
+      extractFromComments: false,
+      functions: ["translate"],
+      generateBasePluralForms: false,
+      ignore: ["src/**/*.test.ts", "src/lib/i18n/generated/**"],
+      indentation: 2,
+      input: ["src/**/*.{svelte,ts}"],
+      mergeNamespaces: false,
+      output: "src/lib/i18n/locales/{{language}}/{{namespace}}.json",
+      outputFormat: "json",
+      preservePatterns: ["runtime.allowed.*"],
+      primaryLanguage: "en",
+      removeUnusedKeys: true,
+      secondaryLanguages: ["fr"],
+      sort: true,
+      warnOnConflicts: "error",
     });
   });
 });

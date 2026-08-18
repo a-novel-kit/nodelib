@@ -4,6 +4,21 @@ import I18nextSveltePlugin from "i18next-cli-plugin-svelte";
 type ExtractConfig = I18nextToolkitConfig["extract"];
 type LintConfig = NonNullable<I18nextToolkitConfig["lint"]>;
 type TypesConfig = NonNullable<I18nextToolkitConfig["types"]>;
+type SharedExtractOption =
+  | "defaultNS"
+  | "extractFromComments"
+  | "generateBasePluralForms"
+  | "ignore"
+  | "indentation"
+  | "input"
+  | "mergeNamespaces"
+  | "output"
+  | "outputFormat"
+  | "primaryLanguage"
+  | "removeUnusedKeys"
+  | "secondaryLanguages"
+  | "sort"
+  | "warnOnConflicts";
 
 /** Defines product policy layered over the shared static i18next catalog contract. */
 export interface I18nextOptions {
@@ -22,7 +37,7 @@ export interface I18nextOptions {
   /** Source globs excluded from extraction. */
   ignore?: ExtractConfig["ignore"];
   /** Extraction settings that reflect a product-specific message format. */
-  extract?: Partial<ExtractConfig>;
+  extract?: Omit<Partial<ExtractConfig>, SharedExtractOption>;
   /** Lint settings that reflect a product-specific source convention. */
   lint?: LintConfig;
   /** Generated-type settings that reflect a product-specific output layout. */
@@ -43,20 +58,22 @@ export function I18next(options: I18nextOptions): I18nextToolkitConfig {
   return defineConfig({
     locales: [...options.locales],
     extract: {
+      functions: ["t", "*.t"],
+      ...options.extract,
       defaultNS: defaultNamespace,
       extractFromComments: false,
-      functions: ["t", "*.t"],
       generateBasePluralForms: false,
       ignore: options.ignore ?? ["src/**/*.test.ts", `${generatedDirectory}/**`],
       indentation: 2,
       input: options.input ?? ["src/**/*.{svelte,ts}"],
+      mergeNamespaces: false,
       output: `${localeDirectory}/{{language}}/{{namespace}}.json`,
+      outputFormat: "json",
       primaryLanguage: options.primaryLanguage,
       removeUnusedKeys: true,
       secondaryLanguages: [...secondaryLanguages],
       sort: true,
       warnOnConflicts: "error",
-      ...options.extract,
     },
     lint: {
       checkConcatenation: "error",
