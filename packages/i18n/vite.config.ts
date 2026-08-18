@@ -1,4 +1,4 @@
-import { name, peerDependencies } from "./package.json";
+import { name, peerDependencies } from "./package.json" with { type: "json" };
 
 import { defineConfig } from "vite";
 

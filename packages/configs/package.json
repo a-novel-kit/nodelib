@@ -35,6 +35,7 @@
     "@storybook/addon-vitest": "catalog:",
     "@sveltejs/adapter-node": "catalog:",
     "@sveltejs/kit": "catalog:",
+    "@types/node": "catalog:",
     "@vitest/browser-playwright": "catalog:",
     "estree-walker": "catalog:",
     "i18next-cli": "catalog:",
@@ -45,6 +46,7 @@
   },
   "peerDependencies": {
     "@eslint/compat": "^2.1.0",
+    "@eslint/config-helpers": "^0.7.0",
     "@eslint/js": "^10.0.1",
     "@storybook/addon-vitest": "^10.5.4",
     "@sveltejs/adapter-node": "^5.5.7",
@@ -54,10 +56,10 @@
     "@vitest/browser-playwright": "^4.1.10",
     "eslint": "^10.8.1",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-prettier": "^5.5.6",
-    "eslint-plugin-storybook": "^10.5.8",
+    "eslint-plugin-storybook": "^10.5.4",
     "eslint-plugin-svelte": "^3.23.0",
     "estree-walker": "^3.0.3",
+    "globals": "^17.0.0",
     "i18next-cli": "^1.69.2",
     "i18next-cli-plugin-svelte": "^2.4.1",
     "prettier": "^3.9.6",
@@ -65,7 +67,7 @@
     "prettier-plugin-packagejson": "^2.5.20 || ^3.0.0",
     "prettier-plugin-sql": "^0.20.0",
     "prettier-plugin-svelte": "^4.1.1",
-    "storybook": "^10.5.8",
+    "storybook": "^10.5.4",
     "svelte": "^5.56.9",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.67.0",
@@ -82,13 +84,10 @@
     "@sveltejs/kit": {
       "optional": true
     },
+    "@types/node": {
+      "optional": true
+    },
     "@vitest/browser-playwright": {
-      "optional": true
-    },
-    "eslint-plugin-storybook": {
-      "optional": true
-    },
-    "eslint-plugin-svelte": {
       "optional": true
     },
     "estree-walker": {

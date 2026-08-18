@@ -1,7 +1,6 @@
 import { includeIgnoreFile } from "@eslint/compat";
 import type { ConfigWithExtends } from "@eslint/config-helpers";
 import js from "@eslint/js";
-import type { Config as SvelteConfig } from "@sveltejs/kit";
 import prettier from "eslint-config-prettier";
 import storybook from "eslint-plugin-storybook";
 import svelte from "eslint-plugin-svelte";
@@ -14,7 +13,7 @@ export interface EslintOptions {
   /** Treats the package as a reusable library, relaxing rules that assume a deployed app with a fixed route table. */
   isLib?: boolean;
   /** Svelte config; when provided, enables Svelte parsing and its recommended and Prettier rule sets. */
-  svelte?: SvelteConfig;
+  svelte?: object;
   storybook?: boolean;
   ignores?: string[];
   /** Path to a .gitignore file whose patterns are converted into ESLint ignores. */

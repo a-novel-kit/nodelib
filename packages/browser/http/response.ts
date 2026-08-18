@@ -1,4 +1,4 @@
-import { newHttpError } from "./error";
+import { newHttpError } from "./error.js";
 
 import type { ZodType } from "zod";
 

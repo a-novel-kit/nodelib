@@ -1,9 +1,11 @@
 {
   "extends": "./tsconfig.json",
-  "exclude": ["**/*.test.ts"],
+  "exclude": ["**/*.test.ts", "vite.config.ts"],
   "compilerOptions": {
     "declaration": true,
     "emitDeclarationOnly": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "outDir": "dist",
     "declarationMap": true,
     "noEmit": false

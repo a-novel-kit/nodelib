@@ -1,2 +1,2 @@
-export * from "./instance";
-export * from "./locale";
+export * from "./instance.js";
+export * from "./locale.js";

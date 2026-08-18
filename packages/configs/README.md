@@ -5,8 +5,8 @@ Shared tool configuration for a-novel TypeScript packages and SvelteKit applicat
 ## Installation
 
 Install the config package with the peer tools used by your project. Platform applications normally
-install the SvelteKit, Vitest, Storybook, and i18next peers; non-Svelte packages can continue to use
-the root ESLint and Prettier entrypoint without loading those optional tools.
+install the SvelteKit, Vitest, Storybook, and i18next peers; other packages can continue to use the
+root ESLint and Prettier entrypoint.
 
 ```bash
 pnpm add --save-dev @a-novel-kit/nodelib-config
