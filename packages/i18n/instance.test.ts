@@ -67,4 +67,10 @@ describe("createRequestI18n", () => {
   it("rejects an empty namespace set", async () => {
     await expect(createRequestI18n(options("en", []))).rejects.toThrow("At least one namespace is required");
   });
+
+  it("requires the default namespace in the requested set", async () => {
+    await expect(createRequestI18n(options("en", ["account"]))).rejects.toThrow(
+      "The default namespace must be included in the requested namespaces"
+    );
+  });
 });
