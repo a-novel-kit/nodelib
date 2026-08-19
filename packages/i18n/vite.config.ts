@@ -7,6 +7,7 @@ export default defineConfig({
     lib: {
       entry: {
         index: "packages/i18n/index.ts",
+        svelte: "packages/i18n/svelte.ts",
       },
       name,
       formats: ["es"],
@@ -16,10 +17,14 @@ export default defineConfig({
     rollupOptions: {
       input: {
         index: "packages/i18n/index.ts",
+        svelte: "packages/i18n/svelte.ts",
       },
       output: {
         format: "es",
-        entryFileNames: "index.es.js",
+        entryFileNames: (chunkInfo) => {
+          const entryName = chunkInfo.name === "index" ? "index" : `${chunkInfo.name}/index`;
+          return `${entryName}.es.js`;
+        },
       },
       external: Object.keys(peerDependencies),
     },

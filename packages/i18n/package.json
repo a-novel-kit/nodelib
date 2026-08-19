@@ -2,7 +2,7 @@
   "name": "@a-novel-kit/nodelib-i18n",
   "version": "1.6.2",
   "private": false,
-  "description": "Framework-agnostic i18next runtime helpers for request-rendered applications",
+  "description": "Scoped i18next runtime helpers for request-rendered applications",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/a-novel-kit/nodelib.git"
@@ -13,6 +13,11 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.es.js"
+    },
+    "./svelte": {
+      "types": "./dist/svelte.d.ts",
+      "svelte": "./dist/svelte/index.es.js",
+      "import": "./dist/svelte/index.es.js"
     }
   },
   "files": [
@@ -26,7 +31,13 @@
     "vitest": "catalog:"
   },
   "peerDependencies": {
-    "i18next": "^26.3.6"
+    "i18next": "^26.3.6",
+    "svelte": "^5.56.9"
+  },
+  "peerDependenciesMeta": {
+    "svelte": {
+      "optional": true
+    }
   },
   "packageManager": "pnpm@11.22.0",
   "engines": {
