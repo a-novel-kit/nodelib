@@ -1,6 +1,6 @@
 {
   "name": "@a-novel-kit/nodelib-i18n",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "private": false,
   "description": "Framework-agnostic i18next runtime helpers for request-rendered applications",
   "repository": {
