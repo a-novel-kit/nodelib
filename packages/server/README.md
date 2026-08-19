@@ -19,33 +19,45 @@ errors contain field names only.
 ```ts
 import { environmentHttpUrl, environmentInteger, parseEnvironment } from "@a-novel-kit/nodelib-server";
 
-const config = parseEnvironment(process.env, {
-  serviceUrl: environmentHttpUrl("SERVICE_URL"),
-  timeoutMs: environmentInteger("HEALTHCHECK_TIMEOUT_MS", {
-    defaultValue: 2_000,
-    minimum: 100,
-    maximum: 10_000,
-  }),
-});
+function getConfig() {
+  return parseEnvironment(process.env, {
+    serviceUrl: environmentHttpUrl("SERVICE_URL"),
+    timeoutMs: environmentInteger("HEALTHCHECK_TIMEOUT_MS", {
+      defaultValue: 2_000,
+      minimum: 100,
+      maximum: 10_000,
+    }),
+  });
+}
 ```
 
 ## Health aggregation
 
-Register complete health endpoint URLs and pass the framework fetch implementation. A service is up
-when its endpoint is reachable and contract-valid. The aggregate is up when every proxied dependency
-also reports up.
+Declare stable service names and resolve private configuration inside each registry entry. A service
+is up when its endpoint is reachable and contract-valid. The aggregate is up when every proxied
+dependency also reports up.
 
 ```ts
 import { aggregateHealth } from "@a-novel-kit/nodelib-server";
 
 const health = await aggregateHealth({
-  fetch,
-  services: {
-    authentication: { url: new URL("healthcheck", `${config.serviceUrl}/`) },
+  config: {
+    authentication: () => {
+      const config = getConfig();
+
+      return {
+        timeoutMs: config.timeoutMs,
+        url: new URL("healthcheck", `${config.serviceUrl}/`),
+      };
+    },
   },
-  timeoutMs: config.timeoutMs,
+  fetch,
 });
 ```
 
-Valid dependency maps pass through unchanged. Failed requests return a down service entry without an
-exception string or fabricated dependencies.
+Configuration resolution happens inside `aggregateHealth`. When it fails, every service named by
+`config` is returned as down without an exception string or fabricated dependency map. Failed
+requests use the same non-disclosing service-down response. Valid dependency maps pass through
+unchanged.
+
+Already-validated callers can instead provide an eager `services` registry and shared `timeoutMs`.
