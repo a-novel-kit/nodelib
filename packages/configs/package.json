@@ -24,6 +24,10 @@
     "./vitest-sveltekit": {
       "types": "./dist/vitest-sveltekit.d.ts",
       "import": "./dist/vitest-sveltekit/index.es.js"
+    },
+    "./yaml": {
+      "types": "./dist/yaml.d.ts",
+      "import": "./dist/yaml/index.es.js"
     }
   },
   "files": [
@@ -31,6 +35,9 @@
     "README.md",
     "LICENSE"
   ],
+  "dependencies": {
+    "yaml": "catalog:"
+  },
   "devDependencies": {
     "@storybook/addon-vitest": "catalog:",
     "@sveltejs/adapter-node": "catalog:",

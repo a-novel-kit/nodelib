@@ -46,6 +46,23 @@ describe("I18next", () => {
     });
   });
 
+  it("derives YAML extraction and type paths when the product selects YAML", () => {
+    const config = I18next({
+      catalogFormat: "yaml",
+      locales: ["en", "fr"],
+      primaryLanguage: "en",
+    });
+
+    expect(config.extract).toMatchObject({
+      output: "src/lib/i18n/locales/{{language}}/{{namespace}}.yaml",
+      outputFormat: "yaml",
+    });
+    expect(config.types).toMatchObject({
+      basePath: "src/lib/i18n/locales/en",
+      input: ["src/lib/i18n/locales/en/**/*.yaml"],
+    });
+  });
+
   it("protects the static catalog contract from untyped overrides", () => {
     const unsafeOverrides = {
       defaultNS: "unsafe",

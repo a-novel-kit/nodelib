@@ -14,11 +14,12 @@ pnpm add --save-dev @a-novel-kit/nodelib-config
 
 ## Entry points
 
-| Import                                         | Role                                                      |
-| ---------------------------------------------- | --------------------------------------------------------- |
-| `@a-novel-kit/nodelib-config`                  | ESLint and Prettier factories                             |
-| `@a-novel-kit/nodelib-config/i18next`          | Static JSON extraction, status, and generated-type policy |
-| `@a-novel-kit/nodelib-config/sveltekit`        | Adapter-node SvelteKit and Vite defaults                  |
-| `@a-novel-kit/nodelib-config/vitest-sveltekit` | Unit, browser-component, and Storybook test projects      |
+| Import                                         | Role                                                    |
+| ---------------------------------------------- | ------------------------------------------------------- |
+| `@a-novel-kit/nodelib-config`                  | ESLint and Prettier factories                           |
+| `@a-novel-kit/nodelib-config/i18next`          | Static JSON or YAML extraction, status, and type policy |
+| `@a-novel-kit/nodelib-config/sveltekit`        | Adapter-node SvelteKit and Vite defaults                |
+| `@a-novel-kit/nodelib-config/vitest-sveltekit` | Unit, browser-component, and Storybook test projects    |
+| `@a-novel-kit/nodelib-config/yaml`             | Build-time JSON-compatible YAML modules for Vite        |
 
 Each framework entrypoint accepts product-specific paths or policy while preserving the shared defaults.

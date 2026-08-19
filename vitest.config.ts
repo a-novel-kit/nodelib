@@ -28,9 +28,16 @@ export default defineConfig({
         "packages/browser/**/*.{ts,tsx}",
         "packages/configs/**/*.ts",
         "packages/i18n/**/*.ts",
+        "packages/server/**/*.ts",
         "packages/test/**/*.{ts,tsx}",
       ],
-      exclude: ["packages/browser/dist", "packages/configs/dist", "packages/i18n/dist", "packages/test/dist"],
+      exclude: [
+        "packages/browser/dist",
+        "packages/configs/dist",
+        "packages/i18n/dist",
+        "packages/server/dist",
+        "packages/test/dist",
+      ],
       allowExternal: true,
     },
     // Every package holding tests needs an entry here. Vitest collects only from registered
@@ -46,6 +53,10 @@ export default defineConfig({
       },
       {
         root: "packages/i18n",
+        extends: true,
+      },
+      {
+        root: "packages/server",
         extends: true,
       },
       {

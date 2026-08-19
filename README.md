@@ -17,7 +17,7 @@ The shared Node.js/TypeScript packages the A-Novel frontends and tooling reuse.
 
 ## What this is
 
-`nodelib` collects the cross-cutting glue that the A-Novel frontends and JS/TS tooling would otherwise copy from one repo to the next — the JS/TS analogue of [`golib`](https://github.com/a-novel-kit/golib). It is a pnpm workspace that publishes a handful of focused, independently installable packages under the `@a-novel-kit/` scope, kept deliberately small.
+`nodelib` collects the cross-cutting glue that the A-Novel frontends and JS/TS tooling would otherwise copy from one repo to the next. It is the JS/TS analogue of [`golib`](https://github.com/a-novel-kit/golib). The pnpm workspace publishes focused packages under the `@a-novel-kit/` scope and keeps each one small.
 
 ## Installation
 
@@ -28,24 +28,26 @@ The packages are published to GitHub Packages, which requires a Personal Access 
 //npm.pkg.github.com/:_authToken=${YOUR_PERSONAL_ACCESS_TOKEN}
 ```
 
-Then install the package(s) you need (each is published independently):
+Then install the package or packages the application needs:
 
 ```bash
 pnpm add @a-novel-kit/nodelib-browser
 pnpm add @a-novel-kit/nodelib-i18n
+pnpm add @a-novel-kit/nodelib-server
 pnpm add -D @a-novel-kit/nodelib-config
 pnpm add -D @a-novel-kit/nodelib-test
 ```
 
 ## Packages
 
-| Package                        | What it's for                                                                                                                                                                         | Install                                   |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| `@a-novel-kit/nodelib-browser` | Bundles the runtime helpers the browser apps share, so each frontend handles HTTP responses and errors the same way instead of reinventing them. A few async utilities live here too. | `pnpm add @a-novel-kit/nodelib-browser`   |
-| `@a-novel-kit/nodelib-config`  | Provides shared lint, formatting, SvelteKit, Vitest, Storybook, and localization-tool presets without forcing optional tools onto every consumer.                                     | `pnpm add -D @a-novel-kit/nodelib-config` |
-| `@a-novel-kit/nodelib-i18n`    | Creates request-isolated i18next instances and resolves supported locales while leaving catalogs and product locale policy with each application.                                     | `pnpm add @a-novel-kit/nodelib-i18n`      |
-| `@a-novel-kit/nodelib-test`    | Gathers the testing tools the frontends share, like request mocking and prebuilt service mocks, so tests read consistently and stay quick to write.                                   | `pnpm add -D @a-novel-kit/nodelib-test`   |
+| Package                        | What it is for                                                                                                                                        | Install                                   |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| `@a-novel-kit/nodelib-browser` | Runtime helpers that let browser applications handle HTTP responses, retries, and other shared async behavior consistently.                           | `pnpm add @a-novel-kit/nodelib-browser`   |
+| `@a-novel-kit/nodelib-config`  | Shared lint, formatting, SvelteKit, Vitest, Storybook, localization, and YAML build configuration without forcing optional tools onto every consumer. | `pnpm add -D @a-novel-kit/nodelib-config` |
+| `@a-novel-kit/nodelib-i18n`    | Request-isolated i18next runtime helpers and supported-locale negotiation that leave catalogs and product locale policy with each application.        | `pnpm add @a-novel-kit/nodelib-i18n`      |
+| `@a-novel-kit/nodelib-server`  | Server runtime primitives for private environment parsing and bounded downstream health aggregation in platform applications.                         | `pnpm add @a-novel-kit/nodelib-server`    |
+| `@a-novel-kit/nodelib-test`    | Testing helpers that keep request mocks and service fixtures consistent across frontend repositories.                                                 | `pnpm add -D @a-novel-kit/nodelib-test`   |
 
 ## Contributing
 
-Platform setup and the day-to-day commands live in the [developer onboarding guide](https://github.com/a-novel-kit/.github/blob/master/README.md); `nodelib`-specific notes are in [CONTRIBUTING.md](./CONTRIBUTING.md).
+Start with the [developer onboarding guide](https://github.com/a-novel-kit/.github/blob/master/README.md), then read the [nodelib contribution guide](./CONTRIBUTING.md).
