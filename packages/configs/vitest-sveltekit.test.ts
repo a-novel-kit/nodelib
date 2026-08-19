@@ -16,6 +16,7 @@ describe("SvelteKitVitest", () => {
   });
 
   it("builds the standard project matrix from consumer policy", () => {
+    const vitePlugins = vi.fn(() => [{ name: "consumer-yaml" }]);
     const config = SvelteKitVitest({
       rootUrl: new URL(import.meta.url),
       coverageInclude: ["app/**/*.ts"],
@@ -25,6 +26,7 @@ describe("SvelteKitVitest", () => {
       storybookConfigDirectory: "/workspace/.storybook",
       storybookScript: "pnpm storybook:test",
       storybookUrl: "http://127.0.0.1:6006",
+      vitePlugins,
     });
 
     expect(config.test?.coverage?.include).toEqual(["app/**/*.ts"]);
@@ -43,6 +45,14 @@ describe("SvelteKitVitest", () => {
         expect.objectContaining({ test: expect.objectContaining({ name: "storybook" }) }),
       ])
     );
+    for (const project of config.test?.projects ?? []) {
+      expect(project).toEqual(
+        expect.objectContaining({
+          plugins: expect.arrayContaining([expect.objectContaining({ name: "consumer-yaml" })]),
+        })
+      );
+    }
+    expect(vitePlugins).toHaveBeenCalledTimes(3);
     expect(mocks.storybookTest).toHaveBeenCalledWith({
       configDir: "/workspace/.storybook",
       storybookScript: "pnpm storybook:test",

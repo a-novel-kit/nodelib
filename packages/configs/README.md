@@ -23,3 +23,17 @@ pnpm add --save-dev @a-novel-kit/nodelib-config
 | `@a-novel-kit/nodelib-config/yaml`             | Build-time JSON-compatible YAML modules for Vite        |
 
 Each framework entrypoint accepts product-specific paths or policy while preserving the shared defaults.
+
+Source formats that need an extra Vite transformer can supply a factory to the Vitest matrix. The factory
+is called separately for unit, browser-component, and Storybook projects so plugins never share mutable
+project state.
+
+```ts
+import { SvelteKitVitest } from "@a-novel-kit/nodelib-config/vitest-sveltekit";
+import { Yaml } from "@a-novel-kit/nodelib-config/yaml";
+
+export default SvelteKitVitest({
+  rootUrl: import.meta.url,
+  vitePlugins: () => [Yaml()],
+});
+```
