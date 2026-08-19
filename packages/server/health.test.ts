@@ -16,7 +16,7 @@ const services = {
 };
 
 describe("aggregateHealth", () => {
-  it("preserves a valid service response and reports complete readiness", async () => {
+  it("resolves private service configuration inside the health boundary", async () => {
     const dependencies = {
       "api:jsonKeys": { status: "up" as const },
       "client:postgres": { status: "up" as const },
@@ -24,13 +24,17 @@ describe("aggregateHealth", () => {
     };
     const fetchImplementation = vi.fn<typeof globalThis.fetch>(async () => response(dependencies));
 
-    await expect(
-      aggregateHealth({
-        fetch: fetchImplementation,
-        services,
-        timeoutMs: 500,
-      })
-    ).resolves.toEqual({
+    const health = await aggregateHealth({
+      config: {
+        authentication: () => ({
+          timeoutMs: 500,
+          url: services.authentication.url,
+        }),
+      },
+      fetch: fetchImplementation,
+    });
+
+    expect(health).toEqual({
       services: {
         authentication: {
           dependencies,
@@ -43,6 +47,33 @@ describe("aggregateHealth", () => {
       headers: { accept: "application/json" },
       signal: expect.any(AbortSignal),
     });
+  });
+
+  it("derives a stable down response from config keys when private configuration fails", async () => {
+    const fetchImplementation = vi.fn<typeof globalThis.fetch>();
+
+    const health = await aggregateHealth({
+      config: {
+        authentication: () => {
+          throw new Error("private configuration detail");
+        },
+        jsonKeys: () => ({
+          timeoutMs: 500,
+          url: "http://json-keys:8080/healthcheck",
+        }),
+      },
+      fetch: fetchImplementation,
+    });
+
+    expect(health).toEqual({
+      services: {
+        authentication: { status: "down" },
+        jsonKeys: { status: "down" },
+      },
+      status: "down",
+    });
+    expect(health.services.jsonKeys.status).toBe("down");
+    expect(fetchImplementation).not.toHaveBeenCalled();
   });
 
   it("keeps service reachability distinct from a down dependency", async () => {
@@ -81,7 +112,7 @@ describe("aggregateHealth", () => {
     });
   });
 
-  it("rejects an invalid deadline before sending requests", async () => {
+  it("rejects an invalid deadline before sending requests for an eager registry", async () => {
     const fetchImplementation = vi.fn<typeof globalThis.fetch>();
 
     await expect(aggregateHealth({ fetch: fetchImplementation, services, timeoutMs: 0 })).rejects.toThrow(RangeError);
