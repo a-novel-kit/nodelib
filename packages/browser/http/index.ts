@@ -3,6 +3,6 @@
  * through a Zod schema, and reusable request headers.
  */
 
-export * from "./error";
-export * from "./headers";
-export * from "./response";
+export * from "./error.js";
+export * from "./headers.js";
+export * from "./response.js";

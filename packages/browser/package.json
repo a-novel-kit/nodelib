@@ -25,8 +25,7 @@
   ],
   "devDependencies": {
     "typescript": "catalog:",
-    "typescript-eslint": "catalog:",
-    "vite": "^8.0.0",
+    "vite": "catalog:",
     "vitest": "catalog:"
   },
   "peerDependencies": {

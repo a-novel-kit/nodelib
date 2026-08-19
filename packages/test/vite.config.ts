@@ -1,4 +1,4 @@
-import { name, peerDependencies } from "./package.json";
+import { name, peerDependencies } from "./package.json" with { type: "json" };
 
 import path from "node:path";
 import url from "node:url";

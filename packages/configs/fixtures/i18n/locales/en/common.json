@@ -1,0 +1,13 @@
+{
+  "fixture": {
+    "collaborators_creator_one": "{{count}} creator is collaborating",
+    "collaborators_creator_other": "{{count}} creators are collaborating",
+    "collaborators_reader_one": "{{count}} reader is collaborating",
+    "collaborators_reader_other": "{{count}} readers are collaborating",
+    "items_one": "{{count}} item",
+    "items_other": "{{count}} items",
+    "perspective_creator": "Creator view",
+    "perspective_reader": "Reader view",
+    "ready": "Static translations are ready"
+  }
+}

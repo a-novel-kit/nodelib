@@ -1,7 +1,8 @@
 {
-  "name": "@a-novel-kit/nodelib-test",
+  "name": "@a-novel-kit/nodelib-i18n",
   "version": "1.4.0",
   "private": false,
+  "description": "Framework-agnostic i18next runtime helpers for request-rendered applications",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/a-novel-kit/nodelib.git"
@@ -9,13 +10,9 @@
   "license": "MIT",
   "type": "module",
   "exports": {
-    "./msw": {
-      "types": "./dist/mswHelpers/index.d.ts",
-      "import": "./dist/mswHelpers/index.es.js"
-    },
-    "./http": {
-      "types": "./dist/http/index.d.ts",
-      "import": "./dist/http/index.es.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.es.js"
     }
   },
   "files": [
@@ -23,19 +20,13 @@
     "README.md",
     "LICENSE"
   ],
-  "dependencies": {
-    "lodash-es": "catalog:"
-  },
   "devDependencies": {
-    "@types/lodash-es": "catalog:",
-    "@types/node": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"
   },
   "peerDependencies": {
-    "@a-novel-kit/nodelib-browser": "*",
-    "msw": "^2.10.4"
+    "i18next": "^26.3.6"
   },
   "packageManager": "pnpm@11.22.0",
   "engines": {

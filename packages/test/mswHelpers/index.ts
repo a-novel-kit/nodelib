@@ -5,11 +5,11 @@
  * before delegating to the final response resolver. A test can then say "respond this way only when the request
  * looks like that" without hand-writing the matching logic in every handler.
  */
-import { matchBodyBytes, matchBodyFormData, matchBodyJSON, matchBodyText } from "./body";
-import { matchHeaders } from "./headers";
-import { matchPathParams } from "./path_params";
-import { ResolverFn } from "./resolver";
-import { matchSearchParams } from "./search_params";
+import { matchBodyBytes, matchBodyFormData, matchBodyJSON, matchBodyText } from "./body.js";
+import { matchHeaders } from "./headers.js";
+import { matchPathParams } from "./path_params.js";
+import { ResolverFn } from "./resolver.js";
+import { matchSearchParams } from "./search_params.js";
 
 import { HttpRequestHandler, HttpResponse, HttpResponseResolver, RequestHandlerOptions, http as mswHTTP } from "msw";
 

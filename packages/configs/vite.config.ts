@@ -1,4 +1,4 @@
-import { name, peerDependencies } from "./package.json";
+import { name, peerDependencies } from "./package.json" with { type: "json" };
 
 import { defineConfig } from "vite";
 
@@ -7,6 +7,9 @@ export default defineConfig({
     lib: {
       entry: {
         index: "packages/configs/index.ts",
+        i18next: "packages/configs/i18next.ts",
+        sveltekit: "packages/configs/sveltekit.ts",
+        "vitest-sveltekit": "packages/configs/vitest-sveltekit.ts",
       },
       name,
       formats: ["es"],
@@ -16,6 +19,9 @@ export default defineConfig({
     rollupOptions: {
       input: {
         index: "packages/configs/index.ts",
+        i18next: "packages/configs/i18next.ts",
+        sveltekit: "packages/configs/sveltekit.ts",
+        "vitest-sveltekit": "packages/configs/vitest-sveltekit.ts",
       },
       output: {
         format: "es",
