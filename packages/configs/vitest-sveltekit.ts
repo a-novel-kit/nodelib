@@ -1,5 +1,6 @@
 import { fileURLToPath } from "node:url";
 
+import type { PluginOption } from "vite";
 import { type ViteUserConfig, defineConfig, defineProject } from "vitest/config";
 
 import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
@@ -24,12 +25,15 @@ export interface SvelteKitVitestOptions {
   storybookScript?: string;
   /** Existing Storybook URL used by CI or a local test process. */
   storybookUrl?: string;
+  /** Additional Vite plugins constructed independently for each Vitest project. */
+  vitePlugins?: () => readonly PluginOption[];
 }
 
 /** Builds the standard unit, browser-component, and Storybook Vitest projects for a SvelteKit app. */
 export function SvelteKitVitest(options: SvelteKitVitestOptions): ViteUserConfig {
   const rootUrl = typeof options.rootUrl === "string" ? new URL(options.rootUrl) : options.rootUrl;
   const storybookConfigDirectory = options.storybookConfigDirectory ?? fileURLToPath(new URL("./.storybook", rootUrl));
+  const vitePlugins = (): PluginOption[] => [...(options.vitePlugins?.() ?? [])];
 
   return defineConfig({
     test: {
@@ -46,7 +50,7 @@ export function SvelteKitVitest(options: SvelteKitVitestOptions): ViteUserConfig
       },
       projects: [
         defineProject({
-          plugins: [sveltekit()],
+          plugins: [sveltekit(), ...vitePlugins()],
           test: {
             name: "unit",
             environment: "node",
@@ -55,7 +59,7 @@ export function SvelteKitVitest(options: SvelteKitVitestOptions): ViteUserConfig
           },
         }),
         defineProject({
-          plugins: [sveltekit()],
+          plugins: [sveltekit(), ...vitePlugins()],
           test: {
             name: "browser",
             include: [...(options.browserInclude ?? ["src/**/*.svelte.test.ts"])],
@@ -70,6 +74,7 @@ export function SvelteKitVitest(options: SvelteKitVitestOptions): ViteUserConfig
         defineProject({
           plugins: [
             sveltekit(),
+            ...vitePlugins(),
             storybookTest({
               configDir: storybookConfigDirectory,
               storybookScript: options.storybookScript ?? "pnpm storybook",
