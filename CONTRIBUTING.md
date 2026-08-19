@@ -8,6 +8,8 @@ The library taxonomy — what a library is, the aggregated-vs-graduated split, a
 
 - `packages/browser` → `@a-novel-kit/nodelib-browser`
 - `packages/configs` → `@a-novel-kit/nodelib-config`
+- `packages/i18n` → `@a-novel-kit/nodelib-i18n`
+- `packages/server` → `@a-novel-kit/nodelib-server`
 - `packages/test` → `@a-novel-kit/nodelib-test`
 
 Shared dependency versions are pinned once in the `pnpm-workspace.yaml` **catalog**, so every package resolves the same version of a shared dependency.
@@ -22,11 +24,11 @@ All commands run from the repo root:
 - `pnpm lint` — Prettier check, `tsc --noEmit`, and ESLint.
 - `pnpm format` — apply Prettier across the workspace.
 
-CI builds the config and browser packages first so the rest can resolve them, and gates on Prettier — run `pnpm format` before committing.
+CI builds the packages required by repository tooling before running lint and tests, and gates on Prettier — run `pnpm format` before committing.
 
 ## Publishing
 
-Packages publish to GitHub Packages under `@a-novel-kit/`, and all three share one version so they release together. Cut a release from the GitHub UI (**Actions ▸ release**), choosing the bump type; the workflow bumps the shared version, tags the commit, and publishes from that tag. A protected `release` environment gates who can publish.
+Packages publish to GitHub Packages under `@a-novel-kit/`, and all five share one version so they release together. Cut a release from the GitHub UI (**Actions ▸ release**), choosing the bump type; the workflow bumps the shared version, tags the commit, and publishes from that tag. A protected `release` environment gates who can publish.
 
 ## The bar for additions
 

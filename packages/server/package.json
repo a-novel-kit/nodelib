@@ -1,0 +1,36 @@
+{
+  "name": "@a-novel-kit/nodelib-server",
+  "version": "1.5.0",
+  "private": false,
+  "description": "Framework-independent server runtime primitives for a-novel platform applications",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/a-novel-kit/nodelib.git"
+  },
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.es.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "devDependencies": {
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  },
+  "packageManager": "pnpm@11.22.0",
+  "engines": {
+    "node": ">=24.0.0",
+    "npm": ">=10.9.2"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  }
+}

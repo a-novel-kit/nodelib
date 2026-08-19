@@ -4,6 +4,10 @@ import I18nextSveltePlugin from "i18next-cli-plugin-svelte";
 type ExtractConfig = I18nextToolkitConfig["extract"];
 type LintConfig = NonNullable<I18nextToolkitConfig["lint"]>;
 type TypesConfig = NonNullable<I18nextToolkitConfig["types"]>;
+
+/** CatalogFormat selects the repository format used for source messages and generated updates. */
+export type CatalogFormat = "json" | "yaml";
+
 type SharedExtractOption =
   | "defaultNS"
   | "extractFromComments"
@@ -30,6 +34,8 @@ export interface I18nextOptions {
   secondaryLanguages?: readonly string[];
   /** Namespace used by translation calls without an explicit namespace. */
   defaultNamespace?: string;
+  /** Repository format for runtime source catalogs. */
+  catalogFormat?: CatalogFormat;
   /** Directory containing product locales and generated declarations. */
   rootDirectory?: string;
   /** Source globs scanned for statically discoverable translation calls. */
@@ -46,8 +52,10 @@ export interface I18nextOptions {
   plugins?: readonly Plugin[];
 }
 
-/** Builds the static JSON i18next CLI configuration shared by Svelte applications. */
+/** Builds the static i18next CLI configuration shared by Svelte applications. */
 export function I18next(options: I18nextOptions): I18nextToolkitConfig {
+  const catalogFormat = options.catalogFormat ?? "json";
+  const catalogExtension = catalogFormat === "yaml" ? "yaml" : "json";
   const defaultNamespace = options.defaultNamespace ?? "common";
   const rootDirectory = options.rootDirectory ?? "src/lib/i18n";
   const localeDirectory = `${rootDirectory}/locales`;
@@ -67,8 +75,8 @@ export function I18next(options: I18nextOptions): I18nextToolkitConfig {
       indentation: 2,
       input: options.input ?? ["src/**/*.{svelte,ts}"],
       mergeNamespaces: false,
-      output: `${localeDirectory}/{{language}}/{{namespace}}.json`,
-      outputFormat: "json",
+      output: `${localeDirectory}/{{language}}/{{namespace}}.${catalogExtension}`,
+      outputFormat: catalogFormat,
       primaryLanguage: options.primaryLanguage,
       removeUnusedKeys: true,
       secondaryLanguages: [...secondaryLanguages],
@@ -83,7 +91,7 @@ export function I18next(options: I18nextOptions): I18nextToolkitConfig {
     },
     types: {
       basePath: `${localeDirectory}/${options.primaryLanguage}`,
-      input: [`${localeDirectory}/${options.primaryLanguage}/**/*.json`],
+      input: [`${localeDirectory}/${options.primaryLanguage}/**/*.${catalogExtension}`],
       output: `${generatedDirectory}/i18next.d.ts`,
       resourcesFile: `${generatedDirectory}/resources.d.ts`,
       ...options.types,

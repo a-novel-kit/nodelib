@@ -1,4 +1,4 @@
-import { name, peerDependencies } from "./package.json" with { type: "json" };
+import { dependencies, name, peerDependencies } from "./package.json" with { type: "json" };
 
 import { defineConfig } from "vite";
 
@@ -10,6 +10,7 @@ export default defineConfig({
         i18next: "packages/configs/i18next.ts",
         sveltekit: "packages/configs/sveltekit.ts",
         "vitest-sveltekit": "packages/configs/vitest-sveltekit.ts",
+        yaml: "packages/configs/yaml.ts",
       },
       name,
       formats: ["es"],
@@ -22,6 +23,7 @@ export default defineConfig({
         i18next: "packages/configs/i18next.ts",
         sveltekit: "packages/configs/sveltekit.ts",
         "vitest-sveltekit": "packages/configs/vitest-sveltekit.ts",
+        yaml: "packages/configs/yaml.ts",
       },
       output: {
         format: "es",
@@ -30,7 +32,7 @@ export default defineConfig({
           return `${entryName}.es.js`;
         },
       },
-      external: Object.keys(peerDependencies),
+      external: [...Object.keys(dependencies), ...Object.keys(peerDependencies)],
     },
   },
 });
