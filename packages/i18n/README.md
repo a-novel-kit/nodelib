@@ -1,6 +1,6 @@
 # @a-novel-kit/nodelib-i18n
 
-Framework-agnostic localization runtime helpers for request-rendered applications.
+Scoped localization runtime helpers for request-rendered applications.
 
 ## Installation
 
@@ -30,3 +30,50 @@ const i18n = await createRequestI18n({
   loadNamespace: async (language, namespace) => (await import(`./locales/${language}/${namespace}.json`)).default,
 });
 ```
+
+## Bundled catalogs in Svelte
+
+Install Svelte alongside the package when using its optional `./svelte` entry point. Keep product
+catalogs in the product repository and create one instance per rendered component tree. Bundled
+resources initialize synchronously, so descendants can translate during their first render.
+
+```svelte
+<!-- StudioI18nProvider.svelte -->
+<script lang="ts">
+  import resources from "./resources";
+
+  import type { Snippet } from "svelte";
+
+  import { createStaticI18n } from "@a-novel-kit/nodelib-i18n";
+  import { setI18nContext } from "@a-novel-kit/nodelib-i18n/svelte";
+
+  let { children, locale }: { children: Snippet; locale: "en" | "fr" } = $props();
+
+  setI18nContext(
+    createStaticI18n({
+      locale,
+      defaultLocale: "en",
+      defaultNamespace: "common",
+      namespaces: ["common"],
+      resources,
+    })
+  );
+</script>
+
+{@render children()}
+```
+
+Components read the native context and translate each message where it is rendered:
+
+```svelte
+<script lang="ts">
+  import { getI18nContext } from "@a-novel-kit/nodelib-i18n/svelte";
+
+  const { t } = getI18nContext();
+</script>
+
+<h1>{t("shell.home")}</h1>
+```
+
+Use the same provider as a global Storybook decorator or test wrapper. The context belongs to the
+component tree, so concurrent server renders do not share mutable locale state.

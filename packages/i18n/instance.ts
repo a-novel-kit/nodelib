@@ -23,6 +23,56 @@ export interface RequestI18nOptions<Locale extends string, Namespace extends str
   loadNamespace: NamespaceLoader<Locale, Namespace>;
 }
 
+/** Defines already-bundled catalogs for one isolated i18next instance. */
+export interface StaticI18nOptions<Locale extends string, Namespace extends string> {
+  /** Locale selected for this component tree or request. */
+  locale: Locale;
+  /** Source locale used when a selected catalog lacks a message. */
+  defaultLocale: Locale;
+  /** Namespace used when a translation key omits an explicit namespace. */
+  defaultNamespace: Namespace;
+  /** Namespaces available in the bundled resources. */
+  namespaces: readonly Namespace[];
+  /** Product-owned static catalogs, keyed by locale and namespace. */
+  resources: Resource;
+}
+
+function validateNamespaces<Namespace extends string>(
+  defaultNamespace: Namespace,
+  namespaces: readonly Namespace[]
+): void {
+  if (namespaces.length === 0) {
+    throw new RangeError("At least one namespace is required");
+  }
+  if (!namespaces.includes(defaultNamespace)) {
+    throw new RangeError("The default namespace must be included in the requested namespaces");
+  }
+}
+
+/** Creates an immediately usable i18next instance from product-owned static catalogs. */
+export function createStaticI18n<Locale extends string, Namespace extends string>(
+  options: StaticI18nOptions<Locale, Namespace>
+): i18n {
+  validateNamespaces(options.defaultNamespace, options.namespaces);
+
+  const instance = createInstance();
+  void instance.init({
+    compatibilityJSON: "v4",
+    defaultNS: options.defaultNamespace,
+    fallbackLng: options.defaultLocale,
+    initAsync: false,
+    interpolation: {
+      escapeValue: false,
+    },
+    lng: options.locale,
+    ns: [...options.namespaces],
+    resources: options.resources,
+    returnNull: false,
+  });
+
+  return instance;
+}
+
 async function loadLanguage<Locale extends string, Namespace extends string>(
   locale: Locale,
   namespaces: readonly Namespace[],
@@ -39,12 +89,7 @@ async function loadLanguage<Locale extends string, Namespace extends string>(
 export async function createRequestI18n<Locale extends string, Namespace extends string>(
   options: RequestI18nOptions<Locale, Namespace>
 ): Promise<i18n> {
-  if (options.namespaces.length === 0) {
-    throw new RangeError("At least one namespace is required");
-  }
-  if (!options.namespaces.includes(options.defaultNamespace)) {
-    throw new RangeError("The default namespace must be included in the requested namespaces");
-  }
+  validateNamespaces(options.defaultNamespace, options.namespaces);
 
   const resources: Resource = {
     [options.locale]: await loadLanguage(options.locale, options.namespaces, options.loadNamespace),
@@ -58,19 +103,11 @@ export async function createRequestI18n<Locale extends string, Namespace extends
     );
   }
 
-  const instance = createInstance();
-  await instance.init({
-    compatibilityJSON: "v4",
-    defaultNS: options.defaultNamespace,
-    fallbackLng: options.defaultLocale,
-    interpolation: {
-      escapeValue: false,
-    },
-    lng: options.locale,
-    ns: [...options.namespaces],
+  return createStaticI18n({
+    defaultLocale: options.defaultLocale,
+    defaultNamespace: options.defaultNamespace,
+    locale: options.locale,
+    namespaces: options.namespaces,
     resources,
-    returnNull: false,
   });
-
-  return instance;
 }

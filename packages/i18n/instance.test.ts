@@ -1,4 +1,4 @@
-import { type TranslationResource, createRequestI18n } from "./instance";
+import { type TranslationResource, createRequestI18n, createStaticI18n } from "./instance";
 
 import { describe, expect, it, vi } from "vitest";
 
@@ -48,6 +48,24 @@ function options(locale: Locale, namespaces: readonly Namespace[] = ["common"]) 
     loadNamespace: vi.fn(async (language: Locale, namespace: Namespace) => resources[language][namespace]),
   };
 }
+
+describe("createStaticI18n", () => {
+  it("returns an immediately usable instance backed by bundled catalogs", () => {
+    const i18n = createStaticI18n({
+      defaultLocale: "en",
+      defaultNamespace: "common",
+      locale: "fr",
+      namespaces: ["common", "account"],
+      resources,
+    });
+
+    expect(i18n.t("ready")).toBe("Les traductions statiques sont prêtes");
+    expect(i18n.t("items", { count: 2 })).toBe("2 éléments");
+    expect(i18n.t("perspective", { context: "reader" })).toBe("Vue lecteur");
+    expect(i18n.t("fallback_only")).toBe("Source locale fallback");
+    expect(i18n.t("account:title")).toBe("Compte");
+  });
+});
 
 describe("createRequestI18n", () => {
   it("loads requested catalogs with source-locale fallback", async () => {

@@ -308,6 +308,9 @@ importers:
       i18next:
         specifier: ^26.3.6
         version: 26.3.6(typescript@6.0.3)
+      svelte:
+        specifier: ^5.56.9
+        version: 5.56.9(@typescript-eslint/types@8.67.0)
     devDependencies:
       typescript:
         specifier: 'catalog:'
