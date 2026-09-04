@@ -29,7 +29,7 @@ catalog:
   globals: ^17.0.0
   jiti: ^2.6.1
   jsdom: ^30.0.0
-  i18next: 26.4.0
+  i18next: 26.4.1
   i18next-cli: 1.71.3
   i18next-cli-plugin-svelte: 2.4.1
   lodash-es: ^4.17.23
