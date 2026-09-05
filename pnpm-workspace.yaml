@@ -30,7 +30,7 @@ catalog:
   jiti: ^2.6.1
   jsdom: ^30.0.0
   i18next: 26.4.1
-  i18next-cli: 1.72.2
+  i18next-cli: 1.72.4
   i18next-cli-plugin-svelte: 2.4.1
   lodash-es: ^4.17.23
   prettier: ^3.7.4
