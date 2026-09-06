@@ -31,7 +31,7 @@
     "vitest": "catalog:"
   },
   "peerDependencies": {
-    "i18next": "^26.4.1",
+    "i18next": "^26.4.2",
     "svelte": "^5.57.0"
   },
   "peerDependenciesMeta": {
