@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "postUpdateOptions": ["pnpmDedupe"],
+  "extends": ["github>a-novel-kit/workflows//renovate/library#v1.31.0"],
   "packageRules": [
     {
       "matchManagers": ["npm"],
@@ -8,11 +8,6 @@
         "commands": ["pnpm format"],
         "executionMode": "branch"
       }
-    },
-    {
-      "matchDepTypes": ["peerDependencies"],
-      "rangeStrategy": "bump",
-      "enabled": true
     }
   ]
 }
