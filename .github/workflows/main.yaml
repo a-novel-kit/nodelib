@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - "**"
+      # merge_group already runs the queue; a push run on its branch would repeat every job.
+      - "!gh-readonly-queue/**"
     tags-ignore:
       - "**"
 
