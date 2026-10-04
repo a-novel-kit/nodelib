@@ -15,6 +15,7 @@ describe("HttpError", () => {
     it("catches decoding error", async () => {
       class mockedResponse {
         readonly status = 404;
+        readonly headers = new Headers({ "Content-Type": "application/problem+json" });
         async text(): Promise<string> {
           throw new Error("bad");
         }
@@ -25,6 +26,47 @@ describe("HttpError", () => {
 
       expect(err.status).toBe(404);
       expect(err.message).toBe("request failed with status 404: failed to decode response: bad");
+      expect(err.tags).toEqual({});
+    });
+
+    it.each([
+      {
+        name: "reads the tags of a problem details body",
+        contentType: "application/problem+json",
+        body: { type: "about:blank", status: 422, tags: { invalidFields: { email: "email" }, accountExists: true } },
+        expectTags: { invalidFields: { email: "email" }, accountExists: true },
+      },
+      {
+        name: "ignores a JSON body that is not problem details",
+        contentType: "application/json",
+        body: { tags: { accountExists: true } },
+        expectTags: {},
+      },
+      {
+        name: "ignores a problem details body without tags",
+        contentType: "application/problem+json",
+        body: { type: "about:blank", status: 400 },
+        expectTags: {},
+      },
+      {
+        name: "ignores invalid fields of the wrong shape",
+        contentType: "application/problem+json",
+        body: { tags: { invalidFields: ["email"] } },
+        expectTags: {},
+      },
+    ])("$name", async ({ contentType, body, expectTags }) => {
+      const response = new Response(JSON.stringify(body), { status: 422, headers: { "Content-Type": contentType } });
+      const err = await newHttpError(response);
+
+      expect(err.status).toBe(422);
+      expect(err.tags).toEqual(expectTags);
+    });
+
+    it("ignores a problem details body that is not JSON", async () => {
+      const response = new Response("{", { status: 400, headers: { "Content-Type": "application/problem+json" } });
+      const err = await newHttpError(response);
+
+      expect(err.tags).toEqual({});
     });
   });
 
