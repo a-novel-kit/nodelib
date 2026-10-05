@@ -25,7 +25,7 @@ export function Prettier(opts: PrettierOptions = {}): Config & SortImportsConfig
     singleQuote: false,
     printWidth: 120,
     importOrder: [
-      "^\\$",
+      "^[\\$#]",
       "^\\.(\\.)?\\/",
       "^node\\:",
       "^virtual\\:",
