@@ -18,7 +18,7 @@ pnpm add --save-dev @a-novel-kit/nodelib-config
 | ---------------------------------------------- | ------------------------------------------------------- |
 | `@a-novel-kit/nodelib-config`                  | ESLint and Prettier factories                           |
 | `@a-novel-kit/nodelib-config/i18next`          | Static JSON or YAML extraction, status, and type policy |
-| `@a-novel-kit/nodelib-config/sveltekit`        | Adapter-node SvelteKit and Vite defaults                |
+| `@a-novel-kit/nodelib-config/sveltekit`        | Vite config with SvelteKit and the Node adapter         |
 | `@a-novel-kit/nodelib-config/vitest-sveltekit` | Unit, browser-component, and Storybook test projects    |
 | `@a-novel-kit/nodelib-config/yaml`             | Build-time JSON-compatible YAML modules for Vite        |
 
