@@ -24,6 +24,24 @@ pnpm add --save-dev @a-novel-kit/nodelib-config
 
 Each framework entrypoint accepts product-specific paths or policy while preserving the shared defaults.
 
+## Commands
+
+`nodelib-i18n-changes` reports the translation changes a branch makes since its merge base with
+`--base` (default `origin/master`). It reads every locale's JSON or YAML catalogs under `--catalogs`
+(default `src/lib/i18n/locales`, the `I18next()` preset's location) and exits non-zero on a finding.
+
+| Check   | Reports                                                                              |
+| ------- | ------------------------------------------------------------------------------------ |
+| `gaps`  | Translations the branch left empty. Gaps already at the merge base are not repeated. |
+| `drift` | Source messages the branch changed while their translations kept their values.       |
+
+```bash
+nodelib-i18n-changes gaps --source en
+nodelib-i18n-changes drift --source en --base origin/master
+```
+
+The base branch must be fetched, as in a CI checkout with `fetch-depth: 0`.
+
 Source formats that need an extra Vite transformer can supply a factory to the Vitest matrix. The factory
 is called separately for unit, browser-component, and Storybook projects so plugins never share mutable
 project state.
