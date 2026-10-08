@@ -124,5 +124,11 @@ describe("HttpError", () => {
     it("doesn't catch other errors", () => {
       expect(isDowntimeError(new TypeError("not an HttpError"))).toBe(false);
     });
+
+    it("doesn't fail on an HttpError from a copy that predates tags", () => {
+      const error = Object.assign(new Error("request failed with status 503"), { name: "HttpError", status: 503 });
+
+      expect(isDowntimeError(error)).toBe(false);
+    });
   });
 });
