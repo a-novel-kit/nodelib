@@ -1,4 +1,4 @@
-import { isHttpError, isHttpStatusError, newHttpError } from "./error";
+import { isDowntimeError, isHttpError, isHttpStatusError, newHttpError } from "./error";
 
 import { describe, expect, it } from "vitest";
 
@@ -102,6 +102,27 @@ describe("HttpError", () => {
     it("doesn't catch other errors", () => {
       const err = new TypeError("not an HttpError");
       expect(isHttpStatusError(err, 401, 404)).toBeFalsy();
+    });
+  });
+
+  describe("isDowntimeError", () => {
+    const refusal = { type: "about:blank", title: "Service Unavailable", status: 503, tags: { downtime: true } };
+
+    it.each([
+      { name: "catches a planned downtime refusal", status: 503, body: refusal, expected: true },
+      { name: "doesn't catch an outage", status: 503, body: { ...refusal, tags: {} }, expected: false },
+      { name: "doesn't catch another status", status: 500, body: refusal, expected: false },
+    ])("$name", async ({ status, body, expected }) => {
+      const response = new Response(JSON.stringify(body), {
+        status,
+        headers: { "Content-Type": "application/problem+json" },
+      });
+
+      expect(isDowntimeError(await newHttpError(response))).toBe(expected);
+    });
+
+    it("doesn't catch other errors", () => {
+      expect(isDowntimeError(new TypeError("not an HttpError"))).toBe(false);
     });
   });
 });
