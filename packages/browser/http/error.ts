@@ -82,7 +82,8 @@ export function isHttpError(error: unknown): error is HttpError {
  * as opposed to an outage. The refusal lasts until operators clear the downtime.
  */
 export function isDowntimeError(error: unknown): error is HttpError {
-  return isHttpError(error) && error.status === 503 && error.tags.downtime === true;
+  // isHttpError matches by name, so the error may come from an older copy that predates tags.
+  return isHttpError(error) && error.status === 503 && (error as Partial<HttpError>).tags?.downtime === true;
 }
 
 /**
