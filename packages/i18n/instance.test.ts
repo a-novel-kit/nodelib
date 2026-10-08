@@ -19,6 +19,7 @@ const resources = {
       perspective_creator: "Creator view",
       perspective_reader: "Reader view",
       ready: "Static translations are ready",
+      untranslated: "Awaiting translation",
     },
   },
   fr: {
@@ -35,6 +36,7 @@ const resources = {
       perspective_creator: "Vue créateur",
       perspective_reader: "Vue lecteur",
       ready: "Les traductions statiques sont prêtes",
+      untranslated: "",
     },
   },
 } satisfies Record<Locale, Record<Namespace, TranslationResource>>;
@@ -63,6 +65,7 @@ describe("createStaticI18n", () => {
     expect(i18n.t("items", { count: 2 })).toBe("2 éléments");
     expect(i18n.t("perspective", { context: "reader" })).toBe("Vue lecteur");
     expect(i18n.t("fallback_only")).toBe("Source locale fallback");
+    expect(i18n.t("untranslated")).toBe("Awaiting translation");
     expect(i18n.t("account:title")).toBe("Compte");
   });
 });
