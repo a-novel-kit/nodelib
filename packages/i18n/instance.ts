@@ -67,6 +67,8 @@ export function createStaticI18n<Locale extends string, Namespace extends string
     lng: options.locale,
     ns: [...options.namespaces],
     resources: options.resources,
+    // Extraction writes untranslated keys as "", which must render the default locale.
+    returnEmptyString: false,
     returnNull: false,
   });
 
