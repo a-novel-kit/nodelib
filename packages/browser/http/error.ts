@@ -8,6 +8,8 @@ const ProblemSchema = z.object({
   tags: z.looseObject({
     /** invalidFields maps each rejected request field to the validation rule it broke. */
     invalidFields: z.record(z.string(), z.string()).optional(),
+    /** downtime marks a request refused because a planned downtime has started. */
+    downtime: z.literal(true).optional(),
   }),
 });
 
@@ -73,6 +75,14 @@ function problemTags(headers: Headers, text: string): ProblemTags {
  */
 export function isHttpError(error: unknown): error is HttpError {
   return error instanceof Error && error.name === "HttpError";
+}
+
+/**
+ * isDowntimeError reports whether the error is a 503 refused because a planned downtime has started,
+ * as opposed to an outage. The refusal lasts until operators clear the downtime.
+ */
+export function isDowntimeError(error: unknown): error is HttpError {
+  return isHttpError(error) && error.status === 503 && error.tags.downtime === true;
 }
 
 /**

@@ -61,3 +61,28 @@ requests use the same non-disclosing service-down response. Valid dependency map
 unchanged.
 
 Already-validated callers can instead provide an eager `services` registry and shared `timeoutMs`.
+
+## Planned downtime
+
+Operators publish the planned downtime as a public JSON document: its components, start and end, or
+`null` without one. Create one reader per process and call it wherever a page needs the downtime.
+
+```ts
+import { createDowntimeReader, isDowntimeStarted } from "@a-novel-kit/nodelib-server";
+
+const readDowntime = createDowntimeReader({ url: getConfig().downtimeUrl });
+
+const downtime = await readDowntime();
+if (isDowntimeStarted(downtime) && downtime.components.includes("service-json-keys.database")) {
+  // Render the downtime state instead of calling the service.
+}
+```
+
+The reader reuses a read for a minute by default, and concurrent callers share one request. A failed
+or malformed read keeps the last known value, so a network blip neither invents a downtime nor
+drops one in progress.
+
+A downtime has started from its `start` until operators clear it, even past its `end`: `end` is only
+what users were told. Use `isDowntimeStarted` rather than comparing dates, so no page reopens a
+feature early. In the browser, `isDowntimeError` from `@a-novel-kit/nodelib-browser/http` tells a
+refusal during a started downtime from an outage.
