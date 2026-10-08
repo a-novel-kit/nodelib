@@ -75,7 +75,7 @@
     "eslint-plugin-svelte": "^3.23.0",
     "estree-walker": "^3.0.3",
     "globals": "^17.13.0",
-    "i18next-cli": "^1.74.5",
+    "i18next-cli": "^1.74.6",
     "i18next-cli-plugin-svelte": "^2.4.1",
     "playwright": "^1.63.0",
     "prettier": "^3.9.9",
@@ -86,7 +86,7 @@
     "storybook": "^10.6.1",
     "svelte": "^5.57.1",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.71.0",
+    "typescript-eslint": "^8.71.1",
     "vite": "^8.3.2",
     "vitest": "^5.0.3"
   },
