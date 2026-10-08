@@ -9,10 +9,6 @@
   "license": "MIT",
   "type": "module",
   "exports": {
-    "./msw": {
-      "types": "./dist/mswHelpers/index.d.ts",
-      "import": "./dist/mswHelpers/index.es.js"
-    },
     "./http": {
       "types": "./dist/http/index.d.ts",
       "import": "./dist/http/index.es.js"
@@ -27,12 +23,8 @@
     "README.md",
     "LICENSE"
   ],
-  "dependencies": {
-    "lodash-es": "catalog:"
-  },
   "devDependencies": {
     "@types/jsdom": "catalog:",
-    "@types/lodash-es": "catalog:",
     "@types/node": "catalog:",
     "jsdom": "catalog:",
     "playwright": "catalog:",
@@ -43,7 +35,6 @@
   "peerDependencies": {
     "@a-novel-kit/nodelib-browser": "*",
     "jsdom": "^30.0.0",
-    "msw": "^2.10.4",
     "playwright": "^1.63.0"
   },
   "peerDependenciesMeta": {

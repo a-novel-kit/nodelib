@@ -46,7 +46,7 @@ pnpm add -D @a-novel-kit/nodelib-test
 | `@a-novel-kit/nodelib-config`  | Shared lint, formatting, SvelteKit, Vitest, Storybook, localization, and YAML build configuration without forcing optional tools onto every consumer. | `pnpm add -D @a-novel-kit/nodelib-config` |
 | `@a-novel-kit/nodelib-i18n`    | Request-isolated i18next runtime helpers and supported-locale negotiation that leave catalogs and product locale policy with each application.        | `pnpm add @a-novel-kit/nodelib-i18n`      |
 | `@a-novel-kit/nodelib-server`  | Server runtime primitives for private environment parsing and bounded downstream health aggregation in platform applications.                         | `pnpm add @a-novel-kit/nodelib-server`    |
-| `@a-novel-kit/nodelib-test`    | Testing helpers that keep request mocks and service fixtures consistent across frontend repositories.                                                 | `pnpm add -D @a-novel-kit/nodelib-test`   |
+| `@a-novel-kit/nodelib-test`    | HTTP status assertions for service clients and the shared helpers of platform end-to-end suites.                                                      | `pnpm add -D @a-novel-kit/nodelib-test`   |
 
 ## Contributing
 

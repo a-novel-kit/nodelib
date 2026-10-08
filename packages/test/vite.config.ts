@@ -16,7 +16,6 @@ export default defineConfig({
   build: {
     lib: {
       entry: {
-        mswHelpers: "packages/test/mswHelpers/index.ts",
         http: "packages/test/http/index.ts",
         playwright: "packages/test/playwright/index.ts",
       },
@@ -27,7 +26,6 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       input: {
-        mswHelpers: "packages/test/mswHelpers/index.ts",
         http: "packages/test/http/index.ts",
         playwright: "packages/test/playwright/index.ts",
       },
