@@ -1,6 +1,6 @@
 {
   "name": "@a-novel-kit/nodelib-i18n",
-  "version": "1.11.0",
+  "version": "1.12.0",
   "private": false,
   "description": "Scoped i18next runtime helpers for request-rendered applications",
   "repository": {
