@@ -16,6 +16,10 @@
     "./http": {
       "types": "./dist/http/index.d.ts",
       "import": "./dist/http/index.es.js"
+    },
+    "./playwright": {
+      "types": "./dist/playwright/index.d.ts",
+      "import": "./dist/playwright/index.es.js"
     }
   },
   "files": [
@@ -27,15 +31,28 @@
     "lodash-es": "catalog:"
   },
   "devDependencies": {
+    "@types/jsdom": "catalog:",
     "@types/lodash-es": "catalog:",
     "@types/node": "catalog:",
+    "jsdom": "catalog:",
+    "playwright": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"
   },
   "peerDependencies": {
     "@a-novel-kit/nodelib-browser": "*",
-    "msw": "^2.10.4"
+    "jsdom": "^30.0.0",
+    "msw": "^2.10.4",
+    "playwright": "^1.63.0"
+  },
+  "peerDependenciesMeta": {
+    "jsdom": {
+      "optional": true
+    },
+    "playwright": {
+      "optional": true
+    }
   },
   "packageManager": "pnpm@11.22.0",
   "engines": {

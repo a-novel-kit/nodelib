@@ -21,3 +21,27 @@ Then, install the package using pnpm:
 # pnpm config set auto-install-peers true --location project
 pnpm add @a-novel-kit/nodelib-test
 ```
+
+## Platform end-to-end helpers
+
+`@a-novel-kit/nodelib-test/playwright` holds the test side of the contract between a platform's
+Playwright suite and the shared `test-playwright` action, and pairs with
+`@a-novel-kit/nodelib-config/playwright`. It needs the optional `playwright` and `jsdom` peers.
+
+| Export          | Role                                                                                         |
+| --------------- | -------------------------------------------------------------------------------------------- |
+| `screenshot`    | Visual checkpoint, compared and annotated in CI and attached locally. Keep its name fixed.   |
+| `createCompose` | Compose runner for one file; `E2E_CONTAINER_ENGINE` picks the engine (default `docker`).     |
+| `composeSetup`  | Global setup that starts the services, waits for readiness, and logs them on teardown.       |
+| `emailLink`     | The link a Mailpit-delivered email carries to a path, rejected if it leaves the application. |
+
+```ts
+import { composeSetup, createCompose } from "@a-novel-kit/nodelib-test/playwright";
+
+export const compose = createCompose();
+
+export default composeSetup({
+  compose,
+  ready: async () => (await fetch("http://127.0.0.1:14100/v2/ping")).ok,
+});
+```
