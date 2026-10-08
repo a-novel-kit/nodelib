@@ -75,5 +75,8 @@ Components read the native context and translate each message where it is render
 <h1>{t("shell.home")}</h1>
 ```
 
+A shared component that must also render outside a provider checks `hasI18nContext()` first and
+falls back to its own messages.
+
 Use the same provider as a global Storybook decorator or test wrapper. The context belongs to the
 component tree, so concurrent server renders do not share mutable locale state.
