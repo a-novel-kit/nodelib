@@ -18,6 +18,7 @@ export default defineConfig({
       entry: {
         mswHelpers: "packages/test/mswHelpers/index.ts",
         http: "packages/test/http/index.ts",
+        playwright: "packages/test/playwright/index.ts",
       },
       name,
       formats: ["es"],
@@ -28,6 +29,7 @@ export default defineConfig({
       input: {
         mswHelpers: "packages/test/mswHelpers/index.ts",
         http: "packages/test/http/index.ts",
+        playwright: "packages/test/playwright/index.ts",
       },
       output: {
         format: "es",
@@ -36,7 +38,8 @@ export default defineConfig({
           return `${entryName}.es.js`;
         },
       },
-      external: Object.keys(peerDependencies),
+      // A package's subpath imports, such as `playwright/test`, stay external with the package.
+      external: (id) => Object.keys(peerDependencies).some((name) => id === name || id.startsWith(`${name}/`)),
     },
   },
 });

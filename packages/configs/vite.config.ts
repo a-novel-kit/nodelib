@@ -9,6 +9,7 @@ export default defineConfig({
         index: "packages/configs/index.ts",
         i18next: "packages/configs/i18next.ts",
         "i18n-changes": "packages/configs/i18n-changes-cli.ts",
+        playwright: "packages/configs/playwright.ts",
         sveltekit: "packages/configs/sveltekit.ts",
         "vitest-sveltekit": "packages/configs/vitest-sveltekit.ts",
         yaml: "packages/configs/yaml.ts",
@@ -23,6 +24,7 @@ export default defineConfig({
         index: "packages/configs/index.ts",
         i18next: "packages/configs/i18next.ts",
         "i18n-changes": "packages/configs/i18n-changes-cli.ts",
+        playwright: "packages/configs/playwright.ts",
         sveltekit: "packages/configs/sveltekit.ts",
         "vitest-sveltekit": "packages/configs/vitest-sveltekit.ts",
         yaml: "packages/configs/yaml.ts",
@@ -36,7 +38,11 @@ export default defineConfig({
           return `${entryName}.es.js`;
         },
       },
-      external: [...Object.keys(dependencies), ...Object.keys(peerDependencies)],
+      // A package's subpath imports, such as `playwright/test`, stay external with the package.
+      external: (id) =>
+        [...Object.keys(dependencies), ...Object.keys(peerDependencies)].some(
+          (name) => id === name || id.startsWith(`${name}/`)
+        ),
     },
   },
 });
