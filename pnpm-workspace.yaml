@@ -9,7 +9,7 @@ peerDependencyRules:
   allowedVersions:
     "@trivago/prettier-plugin-sort-imports@6>prettier-plugin-svelte": "4"
 overrides:
-  "brace-expansion@>=2.0.0 <2.1.4": 2.1.4
+  "brace-expansion@>=2.0.0 <2.1.4": 2.1.7
   "esbuild@>=0.27.3 <0.28.1": 0.28.2
 catalog:
   "@a-novel-kit/nodelib-config": "*"
