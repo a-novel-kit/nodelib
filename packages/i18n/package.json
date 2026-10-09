@@ -32,14 +32,14 @@
   },
   "peerDependencies": {
     "i18next": "^26.4.2",
-    "svelte": "^5.57.1"
+    "svelte": "^5.57.2"
   },
   "peerDependenciesMeta": {
     "svelte": {
       "optional": true
     }
   },
-  "packageManager": "pnpm@12.10.0",
+  "packageManager": "pnpm@12.10.1",
   "engines": {
     "node": ">=24.0.0",
     "npm": ">=10.9.2"
