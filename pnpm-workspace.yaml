@@ -49,6 +49,8 @@ allowBuilds:
   # Vitest's module mocker installs msw, whose install script must run.
   msw: true
 minimumReleaseAgeExclude:
+  - "@a-novel-kit/*"
+  - "@a-novel/*"
   - svelte@5.55.8
   - "@typescript-eslint/eslint-plugin@8.59.4"
   - "@typescript-eslint/parser@8.59.4"
