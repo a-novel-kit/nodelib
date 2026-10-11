@@ -37,6 +37,8 @@ export default defineConfig({
         "packages/i18n/dist",
         "packages/server/dist",
         "packages/test/dist",
+        // Build configuration runs under Vite, never under test.
+        "packages/*/vite.config.ts",
       ],
       allowExternal: true,
     },

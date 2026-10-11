@@ -1,4 +1,4 @@
-import { name } from "./package.json" with { type: "json" };
+import { name, peerDependencies } from "./package.json" with { type: "json" };
 
 import { defineConfig } from "vite";
 
@@ -7,6 +7,7 @@ export default defineConfig({
     lib: {
       entry: {
         index: "packages/server/index.ts",
+        telemetry: "packages/server/telemetry.ts",
       },
       name,
       formats: ["es"],
@@ -16,11 +17,16 @@ export default defineConfig({
     rollupOptions: {
       input: {
         index: "packages/server/index.ts",
+        telemetry: "packages/server/telemetry.ts",
       },
       output: {
         format: "es",
-        entryFileNames: "index.es.js",
+        entryFileNames: (chunkInfo) => {
+          const entryName = chunkInfo.name === "index" ? "index" : `${chunkInfo.name}/index`;
+          return `${entryName}.es.js`;
+        },
       },
+      external: Object.keys(peerDependencies),
     },
   },
 });
