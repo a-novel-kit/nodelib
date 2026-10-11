@@ -86,3 +86,37 @@ A downtime has started from its `start` until operators clear it, even past its 
 what users were told. Use `isDowntimeStarted` rather than comparing dates, so no page reopens a
 feature early. In the browser, `isDowntimeError` from `@a-novel-kit/nodelib-browser/http` tells a
 refusal during a started downtime from an outage.
+
+## Tracing
+
+`@a-novel-kit/nodelib-server/telemetry` traces a SvelteKit server and carries each trace into the
+services it calls. Its options mirror golib's OpenTelemetry presets, so a platform reads the same
+variables as the Go services:
+
+| `enabled` (`OTEL`) | `gcloudProjectId` (`GCLOUD_PROJECT_ID`) | Spans                              |
+| ------------------ | --------------------------------------- | ---------------------------------- |
+| `false`            | any                                     | not recorded                       |
+| `true`             | unset                                   | printed to standard output         |
+| `true`             | set                                     | exported to Google Cloud over OTLP |
+
+The export to Google Cloud authenticates with the Application Default Credentials.
+
+Install the OpenTelemetry peers, turn on SvelteKit's server spans with
+`sveltekit({ tracing: { server: true } })`, and start tracing from `src/instrumentation.server.ts`,
+which SvelteKit loads before the application:
+
+```ts
+import { GCLOUD_PROJECT_ID, OTEL } from "$app/env/private";
+
+import { startTelemetry } from "@a-novel-kit/nodelib-server/telemetry";
+
+const telemetry = startTelemetry({ serviceName: "platform-studio", enabled: OTEL, gcloudProjectId: GCLOUD_PROJECT_ID });
+
+// adapter-node emits this once the server has closed, so the buffered spans leave before the exit.
+process.on("sveltekit:shutdown", () => void telemetry.shutdown());
+```
+
+SvelteKit continues the trace named by an incoming `traceparent` header. A global `fetch` made while
+handling a request gets a client span and sends the trace context on, so the called service's spans
+join the same trace. Every trace is kept, as in the Go services. Recorded URLs keep their parameter
+names, but each query value becomes `REDACTED`, since links carry short codes and emails.
