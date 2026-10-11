@@ -8,8 +8,9 @@ import {
   BatchSpanProcessor,
   ConsoleSpanExporter,
   NodeTracerProvider,
+  NoopSpanProcessor,
+  type Span,
   type SpanExporter,
-  type SpanProcessor,
 } from "@opentelemetry/sdk-trace-node";
 import { GoogleAuth } from "google-auth-library";
 
@@ -56,7 +57,7 @@ export function startTelemetry(options: TelemetryOptions): Telemetry {
       ...(options.gcloudProjectId && { "gcp.project_id": options.gcloudProjectId }),
     }),
     sampler: new AlwaysOnSampler(),
-    spanProcessors: [redactUrls, new BatchSpanProcessor(spanExporter(options.gcloudProjectId))],
+    spanProcessors: [new UrlRedactor(), new BatchSpanProcessor(spanExporter(options.gcloudProjectId))],
   });
 
   provider.register();
@@ -91,14 +92,11 @@ function redactQuery(url: string): string {
 }
 
 /** Redacts URL attributes as each span starts, before any exporter can read them. */
-const redactUrls: SpanProcessor = {
-  onStart(span) {
+class UrlRedactor extends NoopSpanProcessor {
+  override onStart(span: Span): void {
     for (const name of urlAttributes) {
       const value = span.attributes[name];
       if (typeof value === "string") span.setAttribute(name, redactQuery(value));
     }
-  },
-  onEnd() {},
-  forceFlush: async () => {},
-  shutdown: async () => {},
-};
+  }
+}
