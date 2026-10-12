@@ -75,7 +75,7 @@
     "eslint-plugin-svelte": "^3.23.1",
     "estree-walker": "^3.0.3",
     "globals": "^17.13.0",
-    "i18next-cli": "^1.75.1",
+    "i18next-cli": "^1.75.2",
     "i18next-cli-plugin-svelte": "^2.4.1",
     "playwright": "^1.64.0",
     "prettier": "^3.9.9",
@@ -137,7 +137,7 @@
       "optional": true
     }
   },
-  "packageManager": "pnpm@12.11.0",
+  "packageManager": "pnpm@12.11.2",
   "engines": {
     "node": ">=24.0.0",
     "npm": ">=10.9.2"
