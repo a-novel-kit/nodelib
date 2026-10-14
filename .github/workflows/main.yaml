@@ -20,8 +20,6 @@ jobs:
       - uses: a-novel-kit/workflows/node-actions/lint-node@v1.56.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          app_private_key: ${{ secrets.DEPENDENCY_BOT_PRIVATE_KEY }}
-          client_id: ${{ vars.DEPENDENCY_BOT_CLIENT_ID }}
           lint_action: "lint:ci"
 
   # Structural conventions golangci-lint cannot express.
@@ -78,8 +76,6 @@ jobs:
       - uses: a-novel-kit/workflows/node-actions/test-node@v1.56.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          app_private_key: ${{ secrets.DEPENDENCY_BOT_PRIVATE_KEY }}
-          client_id: ${{ vars.DEPENDENCY_BOT_CLIENT_ID }}
           test_action: "test:ci"
 
   report-codecov:
@@ -102,5 +98,3 @@ jobs:
       - uses: a-novel-kit/workflows/node-actions/build-node@v1.56.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          app_private_key: ${{ secrets.DEPENDENCY_BOT_PRIVATE_KEY }}
-          client_id: ${{ vars.DEPENDENCY_BOT_CLIENT_ID }}
