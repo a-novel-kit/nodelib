@@ -29,7 +29,7 @@
     "vitest": "catalog:"
   },
   "peerDependencies": {
-    "zod": "^4.6.5"
+    "zod": "^4.6.6"
   },
   "packageManager": "pnpm@12.11.2",
   "engines": {
