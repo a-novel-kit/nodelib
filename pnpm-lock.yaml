@@ -388,7 +388,7 @@ importers:
         specifier: ^10.1.8
         version: 10.1.8(eslint@10.12.0(jiti@2.7.0))
       eslint-plugin-storybook:
-        specifier: ^10.6.1
+        specifier: ^10.6.2
         version: 10.6.2(eslint@10.12.0(jiti@2.7.0))(typescript@6.0.3)
       eslint-plugin-svelte:
         specifier: ^3.23.1
@@ -412,7 +412,7 @@ importers:
         specifier: ^4.1.1
         version: 4.1.1(prettier@3.9.10)(svelte@5.57.2(@typescript-eslint/types@8.71.2))
       storybook:
-        specifier: ^10.6.1
+        specifier: ^10.6.2
         version: 10.6.2(prettier@3.9.10)(react@19.3.0)
       svelte:
         specifier: ^5.57.2
@@ -421,7 +421,7 @@ importers:
         specifier: ^6.0.3
         version: 6.0.3
       typescript-eslint:
-        specifier: ^8.71.1
+        specifier: ^8.71.2
         version: 8.71.2(eslint@10.12.0(jiti@2.7.0))(typescript@6.0.3)
       yaml:
         specifier: 'catalog:'
