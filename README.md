@@ -50,4 +50,4 @@ pnpm add -D @a-novel-kit/nodelib-test
 
 ## Contributing
 
-Start with the [developer onboarding guide](https://github.com/a-novel-kit/.github/blob/master/README.md), then read the [nodelib contribution guide](./CONTRIBUTING.md).
+Start with the [developer guide](https://a-novel-kit.github.io/stack/), then read the [nodelib contribution guide](./CONTRIBUTING.md).
