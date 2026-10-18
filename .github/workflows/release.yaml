@@ -86,6 +86,10 @@ jobs:
     needs: [build]
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
+    # The Agent key is a secret of the governance environment, which no feature branch opens.
+    environment:
+      name: governance
+      deployment: false
     permissions:
       contents: read
     steps:
