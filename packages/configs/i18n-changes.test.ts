@@ -20,40 +20,42 @@ const pluralTranslation = {
   "common:items_other": "{{count}} éléments",
 };
 
+const gapCases: { name: string; translation: [Messages, Messages]; gaps: string[] }[] = [
+  {
+    name: "reports a new key left empty",
+    translation: [{}, { "common:home": "" }],
+    gaps: ["common:home"],
+  },
+  {
+    name: "reports a translation the branch emptied",
+    translation: [{ "common:home": "Revenir à l’accueil" }, { "common:home": "" }],
+    gaps: ["common:home"],
+  },
+  {
+    name: "leaves a gap already on the base branch as existing debt",
+    translation: [{ "common:home": "" }, { "common:home": "" }],
+    gaps: [],
+  },
+  {
+    name: "accepts a translated key",
+    translation: [{}, { "common:home": "Revenir à l’accueil" }],
+    gaps: [],
+  },
+  {
+    name: "accepts a plural group with any translated form",
+    translation: [{}, { "common:items_one": "{{count}} élément", "common:items_many": "", "common:items_other": "" }],
+    gaps: [],
+  },
+];
+
 describe("findGaps", () => {
-  it.each<{ name: string; translation: [Messages, Messages]; gaps: string[] }>([
-    {
-      name: "reports a new key left empty",
-      translation: [{}, { "common:home": "" }],
-      gaps: ["common:home"],
-    },
-    {
-      name: "reports a translation the branch emptied",
-      translation: [{ "common:home": "Revenir à l’accueil" }, { "common:home": "" }],
-      gaps: ["common:home"],
-    },
-    {
-      name: "leaves a gap already on the base branch as existing debt",
-      translation: [{ "common:home": "" }, { "common:home": "" }],
-      gaps: [],
-    },
-    {
-      name: "accepts a translated key",
-      translation: [{}, { "common:home": "Revenir à l’accueil" }],
-      gaps: [],
-    },
-    {
-      name: "accepts a plural group with any translated form",
-      translation: [{}, { "common:items_one": "{{count}} élément", "common:items_many": "", "common:items_other": "" }],
-      gaps: [],
-    },
-  ])("$name", ({ translation, gaps }) => {
+  it.each(gapCases)("$name", ({ translation, gaps }) => {
     expect(findGaps(revision(...translation))).toEqual(gaps);
   });
 });
 
-describe("findDrift", () => {
-  it.each<{ name: string; source: [Messages, Messages]; translation: [Messages, Messages]; drift: string[] }>([
+const driftCases: { name: string; source: [Messages, Messages]; translation: [Messages, Messages]; drift: string[] }[] =
+  [
     {
       name: "reports a changed source whose translation kept its value",
       source: [{ "common:home": "Back to home" }, { "common:home": "Return home" }],
@@ -102,7 +104,10 @@ describe("findDrift", () => {
       translation: [pluralTranslation, { ...pluralTranslation, "common:items_other": "{{count}} entrées" }],
       drift: [],
     },
-  ])("$name", ({ source, translation, drift }) => {
+  ];
+
+describe("findDrift", () => {
+  it.each(driftCases)("$name", ({ source, translation, drift }) => {
     expect(findDrift(revision(...source), revision(...translation))).toEqual(drift);
   });
 });
