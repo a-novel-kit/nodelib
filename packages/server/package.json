@@ -2,7 +2,7 @@
   "name": "@a-novel-kit/nodelib-server",
   "version": "1.14.0",
   "private": false,
-  "description": "Framework-independent server runtime primitives for A-Novel platform applications",
+  "description": "Framework-independent server runtime primitives for a-novel platform applications",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/a-novel-kit/nodelib.git"
