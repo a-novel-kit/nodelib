@@ -20,6 +20,21 @@ function response(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), { status });
 }
 
+const failedReads = [
+  { name: "a request that fails", fetch: async () => Promise.reject(new TypeError("fetch failed")) },
+  { name: "an error status", fetch: async () => response("not found", 404) },
+  { name: "a malformed document", fetch: async () => response({ ...document, start: "soon" }) },
+  { name: "a document without components", fetch: async () => response({ start: document.start, end: document.end }) },
+];
+
+const startedCases = [
+  { name: "none is planned", downtime: null, now: downtime.start, expected: false },
+  { name: "before the start", downtime, now: new Date("2026-10-12T05:59:59Z"), expected: false },
+  { name: "at the start", downtime, now: downtime.start, expected: true },
+  // Only clearing ends a downtime, whatever end was announced.
+  { name: "long past the end", downtime, now: new Date("2026-11-12T00:00:00Z"), expected: true },
+];
+
 describe("createDowntimeReader", () => {
   afterEach(() => {
     vi.useRealTimers();
@@ -38,15 +53,7 @@ describe("createDowntimeReader", () => {
     });
   });
 
-  it.each([
-    { name: "a request that fails", fetch: async () => Promise.reject(new TypeError("fetch failed")) },
-    { name: "an error status", fetch: async () => response("not found", 404) },
-    { name: "a malformed document", fetch: async () => response({ ...document, start: "soon" }) },
-    {
-      name: "a document without components",
-      fetch: async () => response({ start: document.start, end: document.end }),
-    },
-  ])("keeps the last known downtime after $name", async ({ fetch }) => {
+  it.each(failedReads)("keeps the last known downtime after $name", async ({ fetch }) => {
     const fetchImplementation = vi
       .fn<typeof globalThis.fetch>(fetch)
       .mockImplementationOnce(async () => response(document));
@@ -90,13 +97,7 @@ describe("createDowntimeReader", () => {
 });
 
 describe("isDowntimeStarted", () => {
-  it.each([
-    { name: "none is planned", downtime: null, now: downtime.start, expected: false },
-    { name: "before the start", downtime, now: new Date("2026-10-12T05:59:59Z"), expected: false },
-    { name: "at the start", downtime, now: downtime.start, expected: true },
-    // Only clearing ends a downtime, whatever end was announced.
-    { name: "long past the end", downtime, now: new Date("2026-11-12T00:00:00Z"), expected: true },
-  ])("returns $expected when $name", ({ downtime, now, expected }) => {
+  it.each(startedCases)("returns $expected when $name", ({ downtime, now, expected }) => {
     expect(isDowntimeStarted(downtime, now)).toBe(expected);
   });
 });

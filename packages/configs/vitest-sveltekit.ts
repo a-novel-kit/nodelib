@@ -29,11 +29,21 @@ export interface SvelteKitVitestOptions {
   vitePlugins?: () => readonly PluginOption[];
 }
 
+/** Runs a project's tests in headless Chromium, with a provider of its own. */
+function headlessChromium() {
+  return {
+    enabled: true,
+    headless: true,
+    instances: [{ browser: "chromium" as const }],
+    provider: playwright({}),
+  };
+}
+
 /** Builds the standard unit, browser-component, and Storybook Vitest projects for a SvelteKit app. */
 export function SvelteKitVitest(options: SvelteKitVitestOptions): ViteUserConfig {
   const rootUrl = typeof options.rootUrl === "string" ? new URL(options.rootUrl) : options.rootUrl;
   const storybookConfigDirectory = options.storybookConfigDirectory ?? fileURLToPath(new URL("./.storybook", rootUrl));
-  const vitePlugins = (): PluginOption[] => [...(options.vitePlugins?.() ?? [])];
+  const plugins = (): PluginOption[] => [sveltekit(), ...(options.vitePlugins?.() ?? [])];
 
   return defineConfig({
     test: {
@@ -50,7 +60,7 @@ export function SvelteKitVitest(options: SvelteKitVitestOptions): ViteUserConfig
       },
       projects: [
         defineProject({
-          plugins: [sveltekit(), ...vitePlugins()],
+          plugins: plugins(),
           test: {
             name: "unit",
             environment: "node",
@@ -59,22 +69,16 @@ export function SvelteKitVitest(options: SvelteKitVitestOptions): ViteUserConfig
           },
         }),
         defineProject({
-          plugins: [sveltekit(), ...vitePlugins()],
+          plugins: plugins(),
           test: {
             name: "browser",
             include: [...(options.browserInclude ?? ["src/**/*.svelte.test.ts"])],
-            browser: {
-              enabled: true,
-              headless: true,
-              instances: [{ browser: "chromium" }],
-              provider: playwright({}),
-            },
+            browser: headlessChromium(),
           },
         }),
         defineProject({
           plugins: [
-            sveltekit(),
-            ...vitePlugins(),
+            ...plugins(),
             storybookTest({
               configDir: storybookConfigDirectory,
               storybookScript: options.storybookScript ?? "pnpm storybook",
@@ -83,12 +87,7 @@ export function SvelteKitVitest(options: SvelteKitVitestOptions): ViteUserConfig
           ],
           test: {
             name: "storybook",
-            browser: {
-              enabled: true,
-              headless: true,
-              instances: [{ browser: "chromium" }],
-              provider: playwright({}),
-            },
+            browser: headlessChromium(),
           },
         }),
       ],

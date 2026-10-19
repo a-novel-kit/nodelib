@@ -2,6 +2,33 @@ import { isDowntimeError, isHttpError, isHttpStatusError, newHttpError } from ".
 
 import { describe, expect, it } from "vitest";
 
+const problemCases = [
+  {
+    name: "reads the tags of a problem details body",
+    contentType: "application/problem+json",
+    body: { type: "about:blank", status: 422, tags: { invalidFields: { email: "email" }, accountExists: true } },
+    expectTags: { invalidFields: { email: "email" }, accountExists: true },
+  },
+  {
+    name: "ignores a JSON body that is not problem details",
+    contentType: "application/json",
+    body: { tags: { accountExists: true } },
+    expectTags: {},
+  },
+  {
+    name: "ignores a problem details body without tags",
+    contentType: "application/problem+json",
+    body: { type: "about:blank", status: 400 },
+    expectTags: {},
+  },
+  {
+    name: "ignores invalid fields of the wrong shape",
+    contentType: "application/problem+json",
+    body: { tags: { invalidFields: ["email"] } },
+    expectTags: {},
+  },
+];
+
 describe("HttpError", () => {
   describe("newHttpError", () => {
     it("returns new error from response", async () => {
@@ -29,32 +56,7 @@ describe("HttpError", () => {
       expect(err.tags).toEqual({});
     });
 
-    it.each([
-      {
-        name: "reads the tags of a problem details body",
-        contentType: "application/problem+json",
-        body: { type: "about:blank", status: 422, tags: { invalidFields: { email: "email" }, accountExists: true } },
-        expectTags: { invalidFields: { email: "email" }, accountExists: true },
-      },
-      {
-        name: "ignores a JSON body that is not problem details",
-        contentType: "application/json",
-        body: { tags: { accountExists: true } },
-        expectTags: {},
-      },
-      {
-        name: "ignores a problem details body without tags",
-        contentType: "application/problem+json",
-        body: { type: "about:blank", status: 400 },
-        expectTags: {},
-      },
-      {
-        name: "ignores invalid fields of the wrong shape",
-        contentType: "application/problem+json",
-        body: { tags: { invalidFields: ["email"] } },
-        expectTags: {},
-      },
-    ])("$name", async ({ contentType, body, expectTags }) => {
+    it.each(problemCases)("$name", async ({ contentType, body, expectTags }) => {
       const response = new Response(JSON.stringify(body), { status: 422, headers: { "Content-Type": contentType } });
       const err = await newHttpError(response);
 

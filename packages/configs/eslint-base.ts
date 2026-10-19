@@ -12,9 +12,11 @@ import ts from "typescript-eslint";
 export interface EslintOptions {
   /** Treats the package as a reusable library, relaxing rules that assume a deployed app with a fixed route table. */
   isLib?: boolean;
-  /** Svelte config; when provided, enables Svelte parsing and its recommended and Prettier rule sets. */
+  /** Svelte config. When provided, it enables Svelte parsing and its recommended and Prettier rule sets. */
   svelte?: object;
+  /** Enables the recommended Storybook rules. */
   storybook?: boolean;
+  /** Extra glob patterns ESLint skips, beside `dist` and dot directories. */
   ignores?: string[];
   /** Path to a .gitignore file whose patterns are converted into ESLint ignores. */
   gitIgnorePath?: string;
@@ -23,8 +25,8 @@ export interface EslintOptions {
 }
 
 /**
- * Builds the shared flat ESLint config for a-novel Node and Svelte packages. The returned array is
- * ready to spread into a package's eslint.config; pass {@link EslintOptions} to enable Svelte,
+ * Builds the shared flat ESLint config for A-Novel Node and Svelte packages. The returned array is
+ * ready to spread into a package's eslint.config. Pass {@link EslintOptions} to enable Svelte,
  * Storybook, or library-specific rules.
  */
 export function Eslint(opts: EslintOptions = {}): Parameters<typeof defineConfig> {

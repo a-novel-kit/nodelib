@@ -1,7 +1,6 @@
 /**
- * Debounce collapses a burst of rapid calls into at most one execution per quiet period. The first
- * call in a burst runs immediately, keeping the response snappy; each further call supersedes the
- * last, and only the final one runs, fired once the calls stop.
+ * Debounce collapses a burst of rapid calls into its first and last call. The first call runs at
+ * once. Each later call replaces the pending one, and the last runs once the calls stop.
  */
 export class Debounce {
   private _immediate: boolean;

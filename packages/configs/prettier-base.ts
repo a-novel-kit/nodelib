@@ -8,12 +8,14 @@ interface SqlPrettierConfig {
 
 /** Options for {@link Prettier}, enabling the Svelte and SQL plugin chains a package needs. */
 export interface PrettierOptions {
+  /** Formats Svelte components and orders CSS properties. */
   svelte?: boolean;
+  /** Formats SQL files as PostgreSQL. */
   sql?: boolean;
 }
 
 /**
- * Builds the shared Prettier config for a-novel packages, wiring in import sorting and package.json
+ * Builds the shared Prettier config for A-Novel packages, with import sorting and package.json
  * formatting. Pass {@link PrettierOptions} to add Svelte or SQL formatting.
  */
 export function Prettier(opts: PrettierOptions = {}): Config & SortImportsConfig & SqlPrettierConfig {

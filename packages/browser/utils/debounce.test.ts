@@ -33,7 +33,7 @@ describe("debounce", () => {
     await new Promise((resolve) => setTimeout(resolve, 5));
     debouncer.call(callback); // This call is delayed for debouncing.
     expect(callback).toHaveBeenCalledTimes(1);
-    debouncer.cancel(); // Cancels the pending call.
+    debouncer.cancel();
     await new Promise((resolve) => setTimeout(resolve, 20));
 
     expect(callback).toHaveBeenCalledTimes(1);

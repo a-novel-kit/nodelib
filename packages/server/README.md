@@ -1,11 +1,12 @@
 # @a-novel-kit/nodelib-server
 
-Framework-independent runtime primitives for server-rendered a-novel platforms.
+Framework-independent runtime primitives for server-rendered A-Novel platforms.
 
 ## Installation
 
-GitHub Packages requires a token with `read:packages` even for public packages. Configure the
-`@a-novel-kit` registry, then install the package:
+GitHub Packages needs a token with `read:packages`, even for public packages. Configure the
+`@a-novel-kit` registry as the [nodelib README](https://github.com/a-novel-kit/nodelib#installation)
+shows, then add the package:
 
 ```bash
 pnpm add @a-novel-kit/nodelib-server
@@ -55,10 +56,9 @@ const health = await aggregateHealth({
 });
 ```
 
-Configuration resolution happens inside `aggregateHealth`. When it fails, every service named by
-`config` is returned as down without an exception string or fabricated dependency map. Failed
-requests use the same non-disclosing service-down response. Valid dependency maps pass through
-unchanged.
+`aggregateHealth` resolves the configuration itself. When resolution fails, every service named by
+`config` reports down, with no exception string or invented dependency map. A failed request reports
+the same way. Valid dependency maps pass through unchanged.
 
 Already-validated callers can instead provide an eager `services` registry and shared `timeoutMs`.
 
@@ -82,10 +82,10 @@ The reader reuses a read for a minute by default, and concurrent callers share o
 or malformed read keeps the last known value, so a network blip neither invents a downtime nor
 drops one in progress.
 
-A downtime has started from its `start` until operators clear it, even past its `end`: `end` is only
-what users were told. Use `isDowntimeStarted` rather than comparing dates, so no page reopens a
-feature early. In the browser, `isDowntimeError` from `@a-novel-kit/nodelib-browser/http` tells a
-refusal during a started downtime from an outage.
+A downtime runs from its `start` until operators clear it, even past its `end`. The `end` only tells
+users when to expect the service back. Call `isDowntimeStarted` instead of comparing dates, so no
+page reopens a feature early. In the browser, `isDowntimeError` from
+`@a-novel-kit/nodelib-browser/http` tells a refusal during a started downtime from an outage.
 
 ## Tracing
 

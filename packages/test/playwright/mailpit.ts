@@ -25,19 +25,9 @@ export async function emailLink(
   await expect
     .poll(
       async () => {
-        const query = new URLSearchParams({ query: `to:"${email}"`, limit: "10" });
-        const search = await read(`${mailpit}/api/v1/search?${query}`);
-        for (const id of messageIds(search)) {
-          const href = links(messageHtml(await read(`${mailpit}/api/v1/message/${id}`))).find(
-            (candidate) => new URL(candidate).pathname === pathname
-          );
-          if (href) {
-            expect(new URL(href).origin).toBe(origin);
-            link = href;
-            return true;
-          }
-        }
-        return false;
+        link = await deliveredLink(mailpit, email, pathname);
+        if (link) expect(new URL(link).origin).toBe(origin);
+        return link !== undefined;
       },
       { timeout, message: `Email containing ${pathname} delivered to ${email}` }
     )
@@ -45,6 +35,17 @@ export async function emailLink(
 
   if (!link) throw new Error(`No link to ${pathname} delivered to ${email}`);
   return link;
+}
+
+/** Finds a link to `pathname` in the latest emails Mailpit holds for `email`. */
+async function deliveredLink(mailpit: string, email: string, pathname: string): Promise<string | undefined> {
+  const query = new URLSearchParams({ query: `to:"${email}"`, limit: "10" });
+  for (const id of messageIds(await read(`${mailpit}/api/v1/search?${query}`))) {
+    const html = messageHtml(await read(`${mailpit}/api/v1/message/${id}`));
+    const href = links(html).find((candidate) => new URL(candidate).pathname === pathname);
+    if (href) return href;
+  }
+  return undefined;
 }
 
 async function read(url: string): Promise<unknown> {
@@ -56,10 +57,12 @@ async function read(url: string): Promise<unknown> {
 function messageIds(search: unknown): string[] {
   const messages = (search as { messages?: unknown }).messages;
   if (!Array.isArray(messages)) throw new TypeError("Mailpit search has no messages list");
-  return messages.map((message: { ID?: unknown }) => {
-    if (typeof message.ID !== "string") throw new TypeError("Mailpit message has no ID");
-    return message.ID;
-  });
+  return messages.map(messageId);
+}
+
+function messageId(message: { ID?: unknown }): string {
+  if (typeof message.ID !== "string") throw new TypeError("Mailpit message has no ID");
+  return message.ID;
 }
 
 function messageHtml(message: unknown): string {

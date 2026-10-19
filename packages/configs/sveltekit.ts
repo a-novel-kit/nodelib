@@ -6,8 +6,8 @@ import { type Config, sveltekit } from "@sveltejs/kit/vite";
 /**
  * Builds a Vite configuration with SvelteKit first in the plugin chain.
  *
- * SvelteKit reads its options from the plugin, so `kit` carries them; it deploys with the Node
- * adapter unless `kit` names another.
+ * SvelteKit reads its options from the plugin, so `kit` carries them. The application deploys with
+ * the Node adapter unless `kit` names another.
  */
 export function SvelteKitVite(config: UserConfig = {}, kit: Config = {}): UserConfig {
   return defineConfig({

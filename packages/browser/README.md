@@ -1,29 +1,31 @@
-# Node (browser)
+# @a-novel-kit/nodelib-browser
 
-Browser-side helpers for the A-Novel frontends: `fetch` response handling — turning failed
-responses into typed errors and validating JSON bodies against a Zod schema — under
-`@a-novel-kit/nodelib-browser/http`, and standalone utilities (debounce, retry) under
-`@a-novel-kit/nodelib-browser/utils`.
+Browser helpers that handle `fetch` responses and shared async behavior one way everywhere.
 
 ## Installation
 
-> ⚠️ **Warning**: Even though the package is public, GitHub Packages requires a Personal Access Token
-> with the `read:packages` scope to pull it into your project. See
-> [this issue](https://github.com/orgs/community/discussions/23386#discussioncomment-3240193) for more information.
-
-Create a `.npmrc` file at the root of your project if it doesn't exist, and make sure it contains the following:
-
-```ini
-@a-novel-kit:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${YOUR_PERSONAL_ACCESS_TOKEN}
-```
-
-Then install the package with pnpm. It declares `zod` as a peer dependency, so enable
-`auto-install-peers` if your setup does not resolve peers on its own:
+GitHub Packages needs a token with `read:packages`, even for public packages. Configure the
+`@a-novel-kit` registry as the [nodelib README](https://github.com/a-novel-kit/nodelib#installation)
+shows, then add the package with its Zod peer:
 
 ```bash
-# pnpm config set auto-install-peers true
-#  Or
-# pnpm config set auto-install-peers true --location project
-pnpm add @a-novel-kit/nodelib-browser
+pnpm add @a-novel-kit/nodelib-browser zod
 ```
+
+## Usage
+
+`@a-novel-kit/nodelib-browser/http` turns a failed response into an `HttpError` and validates a JSON
+body against a Zod schema:
+
+```ts
+import { decodeHttpResponse, handleHttpResponse } from "@a-novel-kit/nodelib-browser/http";
+
+import { z } from "zod";
+
+const UserSchema = z.object({ id: z.string() });
+
+const user = await fetch("/api/user").then(handleHttpResponse).then(decodeHttpResponse(UserSchema));
+```
+
+`isHttpStatusError` and `isDowntimeError` sort a caught error by status, or by a refusal during a
+planned downtime. `@a-novel-kit/nodelib-browser/utils` holds the `Debounce` and `retry` helpers.

@@ -23,14 +23,19 @@ interface Group {
   translated: boolean;
 }
 
+/** A key's group at HEAD, and at the merge base when the key existed there. */
+interface Change {
+  base?: Group;
+  head: Group;
+}
+
 /**
  * Lists the keys whose translation the branch left empty: new keys and emptied translations. A gap
  * already present at the merge base is existing debt and is not reported again.
  */
 export function findGaps(translation: Revision): string[] {
-  const base = groupPluralForms(translation.base);
-  return [...groupPluralForms(translation.head)]
-    .filter(([key, group]) => !group.translated && (base.get(key)?.translated ?? true))
+  return [...changes(translation)]
+    .filter(([, { base, head }]) => !head.translated && (base?.translated ?? true))
     .map(([key]) => key);
 }
 
@@ -39,39 +44,33 @@ export function findGaps(translation: Revision): string[] {
  * value. A new key or an empty translation is a gap instead.
  */
 export function findDrift(source: Revision, translation: Revision): string[] {
-  const sourceBase = groupPluralForms(source.base);
-  const translationBase = groupPluralForms(translation.base);
-  const translationHead = groupPluralForms(translation.head);
-
-  return [...groupPluralForms(source.head)]
-    .filter(([key, group]) => {
-      const previous = sourceBase.get(key);
-      const translated = translationHead.get(key);
-      return (
-        previous !== undefined &&
-        previous.forms !== group.forms &&
-        translated?.translated === true &&
-        translated.forms === translationBase.get(key)?.forms
-      );
-    })
+  const translations = changes(translation);
+  return [...changes(source)]
+    .filter(([key, { base, head }]) => base !== undefined && base.forms !== head.forms && kept(translations.get(key)))
     .map(([key]) => key);
 }
 
+/** Reports whether a translation exists and kept its value since the merge base. */
+function kept(change: Change | undefined): boolean {
+  return change?.head.translated === true && change.head.forms === change.base?.forms;
+}
+
+/** Pairs each key at HEAD with its group at the merge base. */
+function changes(revision: Revision): Map<string, Change> {
+  const base = groupPluralForms(revision.base);
+  return new Map([...groupPluralForms(revision.head)].map(([key, head]) => [key, { base: base.get(key), head }]));
+}
+
 function groupPluralForms(catalog: Catalog): Map<string, Group> {
-  const groups = new Map<string, [string, string][]>();
-  for (const [key, message] of catalog) {
-    const name = key.replace(pluralSuffix, "");
-    groups.set(name, [...(groups.get(name) ?? []), [key, message]]);
-  }
-  return new Map(
-    [...groups].map(([name, forms]) => [
-      name,
-      {
-        forms: JSON.stringify(forms.toSorted(([a], [b]) => a.localeCompare(b))),
-        translated: forms.some(([, message]) => message !== ""),
-      },
-    ])
-  );
+  const groups = Map.groupBy(catalog, ([key]) => key.replace(pluralSuffix, ""));
+  return new Map([...groups].map(([name, forms]) => [name, group(forms)]));
+}
+
+function group(forms: [string, string][]): Group {
+  return {
+    forms: JSON.stringify(forms.toSorted(([a], [b]) => a.localeCompare(b))),
+    translated: forms.some(([, message]) => message !== ""),
+  };
 }
 
 function flatten(value: unknown, prefix: string, into: Map<string, string>): void {

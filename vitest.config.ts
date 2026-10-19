@@ -2,22 +2,17 @@ import { builtinModules } from "node:module";
 
 import { defineConfig } from "vitest/config";
 
-const NODE_BUILT_IN_MODULES = builtinModules.filter((m) => !m.startsWith("_"));
-NODE_BUILT_IN_MODULES.push(...NODE_BUILT_IN_MODULES.map((m) => `node:${m}`));
+const NODE_BUILT_IN_MODULES = builtinModules
+  .filter((name) => !name.startsWith("_"))
+  .flatMap((name) => [name, `node:${name}`]);
 
 export default defineConfig({
   optimizeDeps: {
     exclude: NODE_BUILT_IN_MODULES,
   },
-  build: {
-    minify: false,
-  },
   test: {
     globals: true,
     environment: "jsdom",
-    provide: {
-      globalConfigValue: true,
-    },
     coverage: {
       enabled: true,
       clean: true,
