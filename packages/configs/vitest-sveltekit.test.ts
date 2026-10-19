@@ -1,6 +1,6 @@
 import { SvelteKitVitest } from "./vitest-sveltekit";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   storybookTest: vi.fn(() => ({ name: "storybook-test" })),
@@ -13,6 +13,10 @@ vi.mock("@storybook/addon-vitest/vitest-plugin", () => ({
 describe("SvelteKitVitest", () => {
   beforeEach(() => {
     mocks.storybookTest.mockClear();
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it("builds the standard project matrix from consumer policy", () => {
@@ -85,7 +89,5 @@ describe("SvelteKitVitest", () => {
       storybookScript: "pnpm storybook",
       storybookUrl: "http://storybook.internal",
     });
-
-    vi.unstubAllEnvs();
   });
 });
