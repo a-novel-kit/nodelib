@@ -20,6 +20,13 @@ class FlakyCallback {
   }
 }
 
+/** Builds a callback attempt that throws an error with the given message. */
+function fail(message: string) {
+  return () => {
+    throw new Error(message);
+  };
+}
+
 describe("retry", () => {
   it("returns immediately on success", async () => {
     const callback = new FlakyCallback(() => "success");
@@ -30,15 +37,7 @@ describe("retry", () => {
   });
 
   it("retries on failure", async () => {
-    const callback = new FlakyCallback(
-      () => {
-        throw new Error("fail 1");
-      },
-      () => {
-        throw new Error("fail 2");
-      },
-      () => "success"
-    );
+    const callback = new FlakyCallback(fail("fail 1"), fail("fail 2"), () => "success");
     const retried = retry(callback.call.bind(callback), {
       retries: 3,
       delay: 10,
@@ -49,17 +48,7 @@ describe("retry", () => {
   });
 
   it("fails after max retries", async () => {
-    const callback = new FlakyCallback(
-      () => {
-        throw new Error("fail 1");
-      },
-      () => {
-        throw new Error("fail 2");
-      },
-      () => {
-        throw new Error("fail 3");
-      }
-    );
+    const callback = new FlakyCallback(fail("fail 1"), fail("fail 2"), fail("fail 3"));
     const retried = retry(callback.call.bind(callback));
 
     await expect(retried()).rejects.toThrow("fail 3");
@@ -69,15 +58,7 @@ describe("retry", () => {
   describe("options", () => {
     it("respects retries option", async () => {
       function factory() {
-        return new FlakyCallback(
-          () => {
-            throw new Error("fail 1");
-          },
-          () => {
-            throw new Error("fail 2");
-          },
-          () => "success"
-        );
+        return new FlakyCallback(fail("fail 1"), fail("fail 2"), () => "success");
       }
 
       const callback = factory();
@@ -100,17 +81,7 @@ describe("retry", () => {
     });
 
     it("calls onFailure option on failure", async () => {
-      const callback = new FlakyCallback(
-        () => {
-          throw new Error("fail 1");
-        },
-        () => {
-          throw new Error("fail 2");
-        },
-        () => {
-          throw new Error("fail 3");
-        }
-      );
+      const callback = new FlakyCallback(fail("fail 1"), fail("fail 2"), fail("fail 3"));
       const onFailure = vi.fn((err: unknown) => `failed: ${(err as Error).message}`);
       const retried = retry(callback.call.bind(callback), {
         retries: 2,
@@ -125,15 +96,7 @@ describe("retry", () => {
     });
 
     it("respects condition", async () => {
-      const callback = new FlakyCallback(
-        () => {
-          throw new Error("fail 1");
-        },
-        () => {
-          throw new Error("fail 2");
-        },
-        () => "success"
-      );
+      const callback = new FlakyCallback(fail("fail 1"), fail("fail 2"), () => "success");
       const retried = retry(callback.call.bind(callback), {
         retries: 3,
         delay: 10,

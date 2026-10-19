@@ -36,16 +36,9 @@ describe("parseEnvironment", () => {
 
   it("reports stable field names without retaining private values", () => {
     const privateValue = "https://user:password@service.example.test";
+    const parse = () => parseEnvironment({ SERVICE_URL: privateValue, TIMEOUT_MS: "99" }, schema);
 
-    expect(() =>
-      parseEnvironment(
-        {
-          SERVICE_URL: privateValue,
-          TIMEOUT_MS: "99",
-        },
-        schema
-      )
-    ).toThrowError(
+    expect(parse).toThrowError(
       expect.objectContaining<Partial<EnvironmentValidationError>>({
         fields: ["SERVICE_URL", "TIMEOUT_MS"],
         message: "Invalid server environment: SERVICE_URL, TIMEOUT_MS",
@@ -53,7 +46,7 @@ describe("parseEnvironment", () => {
     );
 
     try {
-      parseEnvironment({ SERVICE_URL: privateValue, TIMEOUT_MS: "99" }, schema);
+      parse();
     } catch (error) {
       expect(JSON.stringify(error)).not.toContain(privateValue);
     }

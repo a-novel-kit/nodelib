@@ -10,6 +10,10 @@ function configsFor(options: Parameters<typeof Eslint>[0] = {}): ConfigWithExten
   return Eslint(options) as ConfigWithExtends[];
 }
 
+function svelteConfigOf(config: ConfigWithExtends): unknown {
+  return (config.languageOptions?.parserOptions as Record<string, unknown> | undefined)?.svelteConfig;
+}
+
 describe("Eslint", () => {
   it("layers ignores and consumer rules over the language defaults", () => {
     const configs = configsFor({
@@ -64,11 +68,7 @@ describe("Eslint", () => {
       "svelte/no-navigation-without-resolve": ["error", { ignoreLinks: true }],
     });
 
-    const parserConfig = configs.find((config) => {
-      const parserOptions = config.languageOptions?.parserOptions as Record<string, unknown> | undefined;
-      return parserOptions?.svelteConfig === svelteConfig;
-    });
-    expect(parserConfig).toMatchObject({
+    expect(configs.find((config) => svelteConfigOf(config) === svelteConfig)).toMatchObject({
       files: ["**/*.svelte", "**/*.svelte.ts", "**/*.svelte.js"],
       languageOptions: {
         parserOptions: {
