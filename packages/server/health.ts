@@ -118,6 +118,21 @@ function result<Registry extends Readonly<Record<string, unknown>>>(
   };
 }
 
+/** Probes every service in parallel, each with the deadline `timeoutMs` gives it. */
+async function probeAll<Service extends HealthService>(
+  fetchImplementation: typeof globalThis.fetch,
+  services: Readonly<Record<string, Service>>,
+  timeoutMs: (service: Service) => number
+): Promise<AggregatedHealth<Readonly<Record<string, unknown>>>> {
+  const entries = await Promise.all(
+    Object.entries(services).map(
+      async ([name, service]) => [name, await probeService(fetchImplementation, service, timeoutMs(service))] as const
+    )
+  );
+
+  return result(Object.fromEntries(entries));
+}
+
 /** Probes configured services and converts private configuration failures into stable down results. */
 export function aggregateHealth<const Config extends HealthConfig>(
   options: AggregateHealthConfigOptions<Config>
@@ -138,24 +153,12 @@ export async function aggregateHealth(
       );
       for (const service of Object.values(configured)) assertTimeout(service.timeoutMs);
 
-      const entries = await Promise.all(
-        Object.entries(configured).map(
-          async ([name, service]) => [name, await probeService(options.fetch, service, service.timeoutMs)] as const
-        )
-      );
-
-      return result(Object.fromEntries(entries));
+      return await probeAll(options.fetch, configured, (service) => service.timeoutMs);
     } catch {
       return result(Object.fromEntries(names.map((name) => [name, { status: "down" }] as const)));
     }
   }
 
   assertTimeout(options.timeoutMs);
-  const entries = await Promise.all(
-    Object.entries(options.services).map(
-      async ([name, service]) => [name, await probeService(options.fetch, service, options.timeoutMs)] as const
-    )
-  );
-
-  return result(Object.fromEntries(entries));
+  return probeAll(options.fetch, options.services, () => options.timeoutMs);
 }

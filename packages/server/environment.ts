@@ -97,31 +97,22 @@ export function environmentInteger(name: string, options: IntegerEnvironmentOpti
   validateIntegerOption(options.minimum, "minimum");
   validateIntegerOption(options.maximum, "maximum");
 
-  if (options.minimum !== undefined && options.maximum !== undefined && options.minimum > options.maximum) {
+  const { defaultValue, minimum = -Infinity, maximum = Infinity } = options;
+  const inBounds = (value: number) => value >= minimum && value <= maximum;
+
+  if (minimum > maximum) {
     throw new RangeError("minimum cannot exceed maximum");
   }
-  if (
-    options.defaultValue !== undefined &&
-    ((options.minimum !== undefined && options.defaultValue < options.minimum) ||
-      (options.maximum !== undefined && options.defaultValue > options.maximum))
-  ) {
+  if (defaultValue !== undefined && !inBounds(defaultValue)) {
     throw new RangeError("defaultValue must satisfy the configured bounds");
   }
 
   return field(name, (rawValue) => {
-    if (rawValue === undefined && options.defaultValue !== undefined) return options.defaultValue;
+    if (rawValue === undefined && defaultValue !== undefined) return defaultValue;
     if (rawValue === undefined || !/^-?\d+$/.test(rawValue)) return invalidValue();
 
     const value = Number(rawValue);
-    if (
-      !Number.isSafeInteger(value) ||
-      (options.minimum !== undefined && value < options.minimum) ||
-      (options.maximum !== undefined && value > options.maximum)
-    ) {
-      return invalidValue();
-    }
-
-    return value;
+    return Number.isSafeInteger(value) && inBounds(value) ? value : invalidValue();
   });
 }
 
