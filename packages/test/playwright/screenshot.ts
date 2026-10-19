@@ -21,9 +21,7 @@ export async function screenshot(page: Page, info: TestInfo, name: string, mask:
   const filename = `${name}.png`;
   info.annotations.push({
     type: "visual-snapshot",
-    description: relative(resolve(root), info.snapshotPath(filename, { kind: "screenshot" }))
-      .split("\\")
-      .join("/"),
+    description: relative(resolve(root), info.snapshotPath(filename, { kind: "screenshot" })).replaceAll("\\", "/"),
   });
   await expect.soft(page).toHaveScreenshot(filename, options);
 }

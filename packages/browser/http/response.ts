@@ -19,7 +19,6 @@ export async function handleHttpResponse(response: Response): Promise<Response> 
  */
 export function decodeHttpResponse<T>(validator: ZodType<T>) {
   return async function (response: Response): Promise<T> {
-    const data = await response.json();
-    return validator.parseAsync(data);
+    return validator.parseAsync(await response.json());
   };
 }

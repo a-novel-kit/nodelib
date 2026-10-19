@@ -55,7 +55,6 @@ export interface I18nextOptions {
 /** Builds the static i18next CLI configuration shared by Svelte applications. */
 export function I18next(options: I18nextOptions): I18nextToolkitConfig {
   const catalogFormat = options.catalogFormat ?? "json";
-  const catalogExtension = catalogFormat === "yaml" ? "yaml" : "json";
   const defaultNamespace = options.defaultNamespace ?? "common";
   const rootDirectory = options.rootDirectory ?? "src/lib/i18n";
   const localeDirectory = `${rootDirectory}/locales`;
@@ -75,7 +74,7 @@ export function I18next(options: I18nextOptions): I18nextToolkitConfig {
       indentation: 2,
       input: options.input ?? ["src/**/*.{svelte,ts}"],
       mergeNamespaces: false,
-      output: `${localeDirectory}/{{language}}/{{namespace}}.${catalogExtension}`,
+      output: `${localeDirectory}/{{language}}/{{namespace}}.${catalogFormat}`,
       outputFormat: catalogFormat,
       primaryLanguage: options.primaryLanguage,
       removeUnusedKeys: true,
@@ -91,7 +90,7 @@ export function I18next(options: I18nextOptions): I18nextToolkitConfig {
     },
     types: {
       basePath: `${localeDirectory}/${options.primaryLanguage}`,
-      input: [`${localeDirectory}/${options.primaryLanguage}/**/*.${catalogExtension}`],
+      input: [`${localeDirectory}/${options.primaryLanguage}/**/*.${catalogFormat}`],
       output: `${generatedDirectory}/i18next.d.ts`,
       resourcesFile: `${generatedDirectory}/resources.d.ts`,
       ...options.types,
