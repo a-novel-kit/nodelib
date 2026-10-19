@@ -19,8 +19,8 @@ const ProblemSchema = z.object({
 export type ProblemTags = z.infer<typeof ProblemSchema>["tags"];
 
 /**
- * HttpError represents a non-2xx HTTP response, keeping the status code and body text
- * so callers can inspect them after the request has failed.
+ * HttpError represents a non-2xx HTTP response. It keeps the status code and the problem details
+ * tags for callers to inspect, and its message carries the body text.
  */
 export class HttpError extends Error {
   private readonly _status: number;
@@ -48,7 +48,7 @@ export class HttpError extends Error {
 
 /**
  * newHttpError builds an HttpError from a failed response, reading its body as text. It always
- * resolves: a body that cannot be decoded is replaced with the decode error message.
+ * resolves. A body that cannot be decoded is replaced with the decode error message.
  */
 export async function newHttpError(response: Response): Promise<HttpError> {
   const text = await response.text().catch((err) => `failed to decode response: ${err.message}`);

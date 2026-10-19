@@ -17,10 +17,12 @@ export interface SvelteKitPlaywrightOptions {
 }
 
 /**
- * Builds the Playwright configuration shared by SvelteKit platforms. It owns the configuration side
- * of the contract with the `test-playwright` action: screenshots resolve under
- * `PLAYWRIGHT_SNAPSHOT_DIR` as `{projectName}/{testFilePath}/{arg}{ext}`, and the HTML report lands in
- * `playwright-report/`. The suite runs the production build, served by its Node adapter.
+ * Builds the Playwright configuration shared by SvelteKit platforms. The suite runs the production
+ * build, served by its Node adapter.
+ *
+ * The configuration holds its side of the contract with the `test-playwright` action. Screenshots
+ * resolve under `PLAYWRIGHT_SNAPSHOT_DIR` as `{projectName}/{testFilePath}/{arg}{ext}`, and the HTML
+ * report lands in `playwright-report/`.
  */
 export function SvelteKitPlaywright(options: SvelteKitPlaywrightOptions): PlaywrightTestConfig {
   const baseURL = `http://127.0.0.1:${options.port}`;

@@ -8,7 +8,7 @@ function defaultRetryFailureFn<T, Params extends unknown[]>(err: unknown, ..._: 
   throw err;
 }
 
-/** RetryParams tunes {@link retry}: the attempt budget, the pause between attempts, and how a terminal failure is handled. */
+/** RetryParams tunes how {@link retry} attempts a callback and settles its final failure. */
 export interface RetryParams<T, Params extends unknown[]> {
   /**
    * Total number of attempts (including the initial attempt) before failing.
@@ -58,7 +58,6 @@ export function retry<T, Params extends unknown[]>(
         }
 
         err = error;
-        // Don't delay after final attempt.
         if (i < retries - 1) {
           await new Promise((resolve) => setTimeout(resolve, delay));
         }

@@ -51,8 +51,8 @@ function parseDowntime(value: unknown): Downtime | null {
  * createDowntimeReader returns a function resolving to the planned downtime, or null without one.
  * Reads are reused for `ttlMs`, and concurrent callers share one request.
  *
- * A failed or malformed read keeps the last known value: a network blip neither invents a downtime
- * nor drops one in progress. Before any read succeeds, it resolves to null.
+ * A failed or malformed read keeps the last known value, so a network blip neither invents a
+ * downtime nor drops one in progress. Before any read succeeds, the reader resolves to null.
  */
 export function createDowntimeReader({
   url,
