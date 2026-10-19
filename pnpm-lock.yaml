@@ -504,7 +504,7 @@ importers:
         specifier: ^2.12.0
         version: 2.12.0(@opentelemetry/api@1.9.1)
       google-auth-library:
-        specifier: ^11.3.0
+        specifier: ^11.3.1
         version: 11.3.1
     devDependencies:
       typescript:
