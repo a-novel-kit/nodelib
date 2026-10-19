@@ -4,8 +4,9 @@ Scoped localization runtime helpers for request-rendered applications.
 
 ## Installation
 
-GitHub Packages requires a token with `read:packages` even for public packages. Configure the
-`@a-novel-kit` registry, then install the package with its i18next peer:
+GitHub Packages needs a token with `read:packages`, even for public packages. Configure the
+`@a-novel-kit` registry as the [nodelib README](https://github.com/a-novel-kit/nodelib#installation)
+shows, then add the package with its i18next peer:
 
 ```bash
 pnpm add @a-novel-kit/nodelib-i18n i18next

@@ -1,32 +1,33 @@
-# Node lib (tests)
+# @a-novel-kit/nodelib-test
+
+Test helpers for service clients and platform end-to-end suites.
 
 ## Installation
 
-> ⚠️ **Warning**: Even though the package is public, GitHub registry requires you to have a Personal Access Token
-> with `repo` and `read:packages` scopes to pull it in your project. See
-> [this issue](https://github.com/orgs/community/discussions/23386#discussioncomment-3240193) for more information.
-
-Create a `.npmrc` file in the root of your project if it doesn't exist, and make sure it contains the following:
-
-```ini
-@a-novel:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${YOUR_PERSONAL_ACCESS_TOKEN}
-```
-
-Then, install the package using pnpm:
+GitHub Packages needs a token with `read:packages`, even for public packages. Configure the
+`@a-novel-kit` registry as the [nodelib README](https://github.com/a-novel-kit/nodelib#installation)
+shows, then add the package:
 
 ```bash
-# pnpm config set auto-install-peers true
-#  Or
-# pnpm config set auto-install-peers true --location project
-pnpm add @a-novel-kit/nodelib-test
+pnpm add -D @a-novel-kit/nodelib-test
+```
+
+## HTTP status assertions
+
+`expectStatus` from `@a-novel-kit/nodelib-test/http` asserts that a client call rejects with a
+given HTTP status. It recognizes the `HttpError` that `@a-novel-kit/nodelib-browser/http` throws.
+
+```ts
+import { expectStatus } from "@a-novel-kit/nodelib-test/http";
+
+await expectStatus(itemGet(api, "not-a-uuid"), 400);
 ```
 
 ## Platform end-to-end helpers
 
 `@a-novel-kit/nodelib-test/playwright` holds the test side of the contract between a platform's
-Playwright suite and the shared `test-playwright` action, and pairs with
-`@a-novel-kit/nodelib-config/playwright`. It needs the optional `playwright` and `jsdom` peers.
+Playwright suite and the shared `test-playwright` action. It pairs with
+`@a-novel-kit/nodelib-config/playwright` and needs the optional `playwright` and `jsdom` peers.
 
 | Export          | Role                                                                                         |
 | --------------- | -------------------------------------------------------------------------------------------- |
