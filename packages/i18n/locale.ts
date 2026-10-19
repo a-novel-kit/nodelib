@@ -4,21 +4,23 @@ interface LanguagePreference {
   tag: string;
 }
 
+/** Reads one Accept-Language entry. An unreadable quality weighs 0, which drops the entry. */
+function parsePreference(entry: string, index: number): LanguagePreference {
+  const [tag = "", ...parameters] = entry.trim().split(";");
+  const qualityParameter = parameters.find((parameter) => parameter.trim().toLowerCase().startsWith("q="));
+  const quality = qualityParameter ? Number.parseFloat(qualityParameter.trim().slice(2)) : 1;
+
+  return {
+    index,
+    quality: quality >= 0 && quality <= 1 ? quality : 0,
+    tag: tag.toLowerCase(),
+  };
+}
+
 function parsePreferences(acceptLanguage: string): LanguagePreference[] {
   return acceptLanguage
     .split(",")
-    .map((entry, index) => {
-      const [rawTag = "", ...parameters] = entry.trim().split(";");
-      const qualityParameter = parameters.find((parameter) => parameter.trim().toLowerCase().startsWith("q="));
-      const parsedQuality = qualityParameter ? Number.parseFloat(qualityParameter.trim().slice(2)) : 1;
-      const quality = Number.isFinite(parsedQuality) && parsedQuality >= 0 && parsedQuality <= 1 ? parsedQuality : 0;
-
-      return {
-        index,
-        quality,
-        tag: rawTag.toLowerCase(),
-      };
-    })
+    .map(parsePreference)
     .filter(({ quality, tag }) => quality > 0 && tag.length > 0 && tag !== "*")
     .sort((left, right) => right.quality - left.quality || left.index - right.index);
 }
