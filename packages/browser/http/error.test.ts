@@ -1,4 +1,4 @@
-import { isDowntimeError, isHttpError, isHttpStatusError, newHttpError } from "./error";
+import { HttpError, isDowntimeError, isHttpError, isHttpStatusError, newHttpError } from "./error";
 
 import { describe, expect, it } from "vitest";
 
@@ -30,6 +30,12 @@ const problemCases = [
 ];
 
 describe("HttpError", () => {
+  it("serializes its status and tags", () => {
+    const err = new HttpError(503, "down", { downtime: true });
+
+    expect(JSON.parse(JSON.stringify(err))).toEqual({ name: "HttpError", status: 503, tags: { downtime: true } });
+  });
+
   describe("newHttpError", () => {
     it("returns new error from response", async () => {
       const response = new Response("badaboom", { status: 404 });

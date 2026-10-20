@@ -23,26 +23,18 @@ export type ProblemTags = z.infer<typeof ProblemSchema>["tags"];
  * tags for callers to inspect, and its message carries the body text.
  */
 export class HttpError extends Error {
-  private readonly _status: number;
-  private readonly _tags: ProblemTags;
+  readonly status: number;
+  /**
+   * tags holds the tags of a problem details body, and is empty for any other body.
+   */
+  readonly tags: ProblemTags;
 
   constructor(status: number, text: string, tags: ProblemTags = {}) {
     super(`request failed with status ${status}: ${text}`);
 
     this.name = "HttpError";
-    this._status = status;
-    this._tags = tags;
-  }
-
-  get status() {
-    return this._status;
-  }
-
-  /**
-   * tags holds the tags of a problem details body, and is empty for any other body.
-   */
-  get tags() {
-    return this._tags;
+    this.status = status;
+    this.tags = tags;
   }
 }
 
