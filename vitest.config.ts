@@ -19,22 +19,9 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "json", "html", "lcov"],
       reportsDirectory: "coverage",
-      include: [
-        "packages/browser/**/*.{ts,tsx}",
-        "packages/configs/**/*.ts",
-        "packages/i18n/**/*.ts",
-        "packages/server/**/*.ts",
-        "packages/test/**/*.{ts,tsx}",
-      ],
-      exclude: [
-        "packages/browser/dist",
-        "packages/configs/dist",
-        "packages/i18n/dist",
-        "packages/server/dist",
-        "packages/test/dist",
-        // Build configuration runs under Vite, never under test.
-        "packages/*/vite.config.ts",
-      ],
+      include: ["packages/**/*.ts"],
+      // Neither the build output nor the build configuration runs under test.
+      exclude: ["packages/*/dist", "packages/*/vite.config.ts"],
       allowExternal: true,
     },
     // Every package holding tests needs an entry here. Vitest collects only from registered
