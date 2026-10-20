@@ -20,6 +20,7 @@ export function createCompose(file = "builds/compose.e2e.yaml"): Compose {
 
 /** Services a global setup starts and the check that tells when they accept requests. */
 export interface ComposeSetupOptions {
+  /** Runs the suite's services, as {@link createCompose} binds it. */
   compose: Compose;
   /** Resolves `true` once the services are ready; a rejection counts as not ready yet. */
   ready: () => Promise<boolean>;
@@ -36,25 +37,26 @@ export function composeSetup({ compose, ready, timeout = 60_000 }: ComposeSetupO
   return async function setup(): Promise<() => Promise<void>> {
     process.env.COMPOSE_PROJECT_NAME ??= `e2e-${process.pid}`;
 
-    const cleanup = async () => {
-      try {
-        const { stdout } = await compose("logs", "--no-color");
-        await writeFile("integration-services.log", stdout);
-      } finally {
-        await compose("down", "--volumes", "--remove-orphans");
-      }
-    };
-
     try {
       await compose("up", "--detach");
       await expect
         .poll(() => ready().catch(() => false), { timeout, message: "Integration services are ready" })
         .toBe(true);
     } catch (error) {
-      await cleanup();
+      await removeServices(compose);
       throw error;
     }
 
-    return cleanup;
+    return () => removeServices(compose);
   };
+}
+
+/** Saves the services' logs, then removes the services and their volumes. */
+async function removeServices(compose: Compose): Promise<void> {
+  try {
+    const { stdout } = await compose("logs", "--no-color");
+    await writeFile("integration-services.log", stdout);
+  } finally {
+    await compose("down", "--volumes", "--remove-orphans");
+  }
 }
