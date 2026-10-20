@@ -37,6 +37,7 @@ export interface StaticI18nOptions<Locale extends string, Namespace extends stri
   resources: Resource;
 }
 
+/** Rejects a namespace set that is empty or lacks the default namespace. */
 function validateNamespaces<Namespace extends string>(
   defaultNamespace: Namespace,
   namespaces: readonly Namespace[]
@@ -75,6 +76,7 @@ export function createStaticI18n<Locale extends string, Namespace extends string
   return instance;
 }
 
+/** Loads every namespace of one locale, keyed by namespace. */
 async function loadLanguage<Locale extends string, Namespace extends string>(
   locale: Locale,
   namespaces: readonly Namespace[],
@@ -93,23 +95,10 @@ export async function createRequestI18n<Locale extends string, Namespace extends
 ): Promise<i18n> {
   validateNamespaces(options.defaultNamespace, options.namespaces);
 
-  const resources: Resource = {
-    [options.locale]: await loadLanguage(options.locale, options.namespaces, options.loadNamespace),
-  };
-
-  if (options.locale !== options.defaultLocale) {
-    resources[options.defaultLocale] = await loadLanguage(
-      options.defaultLocale,
-      options.namespaces,
-      options.loadNamespace
-    );
+  const resources: Resource = {};
+  for (const locale of new Set([options.locale, options.defaultLocale])) {
+    resources[locale] = await loadLanguage(locale, options.namespaces, options.loadNamespace);
   }
 
-  return createStaticI18n({
-    defaultLocale: options.defaultLocale,
-    defaultNamespace: options.defaultNamespace,
-    locale: options.locale,
-    namespaces: options.namespaces,
-    resources,
-  });
+  return createStaticI18n({ ...options, resources });
 }

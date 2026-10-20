@@ -1,14 +1,14 @@
 name: release
 
-# Releases are cut from the GitHub UI (Actions ▸ release ▸ pick a type ▸ Run) or
-# by the release train, through workflow_call's identical inputs. `plan`
-# rehearses with no credential; `cut` runs in the protected `release` environment,
-# the "who can publish" gate whose key only it reads, and pushes the version
-# commit, the tags and the GitHub Release as the release App.
+# Releases are cut from the GitHub UI (Actions ▸ release ▸ pick a type ▸ Run), or
+# by the release train through the same inputs of workflow_call. `plan` rehearses
+# the release with no credential. `cut` runs in the protected `release`
+# environment, which decides who can release and holds the key only `cut` reads.
+# It pushes the version commit, the tags and the GitHub Release as the release App.
 #
-# The tag then runs this workflow again, and that run publishes the npm package
-# from the tag. Only the release App and admins can create a tag, so one
-# approval covers the release, and a hotfix tag publishes its line the same way.
+# The tag then runs this workflow again, and that run publishes the packages from
+# the tag. Only the release App and admins can create a tag, so one approval
+# covers the release, and a hotfix tag publishes its line the same way.
 on:
   workflow_dispatch:
     inputs:
@@ -69,7 +69,7 @@ jobs:
           client_id: ${{ vars.RELEASE_BOT_CLIENT_ID }}
           app_private_key: ${{ secrets.RELEASE_BOT_PRIVATE_KEY }}
 
-  # Publish the npm package from the checked-out release tag.
+  # Publishes every package from the release tag.
   build:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
@@ -81,7 +81,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
-  # Everything shipped — clear this repo's awaiting-release board items.
+  # Clears this repo's awaiting-release items off the board once the packages ship.
   archive:
     needs: [build]
     if: github.event_name == 'push'

@@ -4,9 +4,8 @@ Framework-independent runtime primitives for server-rendered A-Novel platforms.
 
 ## Installation
 
-GitHub Packages needs a token with `read:packages`, even for public packages. Configure the
-`@a-novel-kit` registry as the [nodelib README](https://github.com/a-novel-kit/nodelib#installation)
-shows, then add the package:
+Configure the `@a-novel-kit` registry as the
+[nodelib README](https://github.com/a-novel-kit/nodelib#installation) shows, then add the package:
 
 ```bash
 pnpm add @a-novel-kit/nodelib-server
@@ -14,8 +13,8 @@ pnpm add @a-novel-kit/nodelib-server
 
 ## Runtime configuration
 
-The environment schema maps private variable names into a typed application config. Validation
-errors contain field names only.
+The environment schema maps private variable names into a typed application config. A validation
+error names the invalid variables and never carries their values.
 
 ```ts
 import { environmentHttpUrl, environmentInteger, parseEnvironment } from "@a-novel-kit/nodelib-server";
@@ -57,8 +56,9 @@ const health = await aggregateHealth({
 ```
 
 `aggregateHealth` resolves the configuration itself. When resolution fails, every service named by
-`config` reports down, with no exception string or invented dependency map. A failed request reports
-the same way. Valid dependency maps pass through unchanged.
+`config` reports down, with no exception string or invented dependency map. A service whose request
+fails, or whose answer breaks the health contract, reports down the same way. Valid dependency maps
+pass through unchanged.
 
 Already-validated callers can instead provide an eager `services` registry and shared `timeoutMs`.
 

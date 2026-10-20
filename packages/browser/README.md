@@ -4,9 +4,9 @@ Browser helpers that handle `fetch` responses and shared async behavior one way 
 
 ## Installation
 
-GitHub Packages needs a token with `read:packages`, even for public packages. Configure the
-`@a-novel-kit` registry as the [nodelib README](https://github.com/a-novel-kit/nodelib#installation)
-shows, then add the package with its Zod peer:
+Configure the `@a-novel-kit` registry as the
+[nodelib README](https://github.com/a-novel-kit/nodelib#installation) shows, then add the package
+with its Zod peer:
 
 ```bash
 pnpm add @a-novel-kit/nodelib-browser zod

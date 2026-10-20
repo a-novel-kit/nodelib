@@ -4,9 +4,8 @@ Test helpers for service clients and platform end-to-end suites.
 
 ## Installation
 
-GitHub Packages needs a token with `read:packages`, even for public packages. Configure the
-`@a-novel-kit` registry as the [nodelib README](https://github.com/a-novel-kit/nodelib#installation)
-shows, then add the package:
+Configure the `@a-novel-kit` registry as the
+[nodelib README](https://github.com/a-novel-kit/nodelib#installation) shows, then add the package:
 
 ```bash
 pnpm add -D @a-novel-kit/nodelib-test

@@ -1,6 +1,6 @@
 import { retry } from "./retry";
 
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 class FlakyCallback {
   calls: (() => unknown)[];
@@ -28,6 +28,10 @@ function fail(message: string) {
 }
 
 describe("retry", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it("returns immediately on success", async () => {
     const callback = new FlakyCallback(() => "success");
     const retried = retry(callback.call.bind(callback));
@@ -47,11 +51,18 @@ describe("retry", () => {
     expect(callback.calledTimes).toBe(3);
   });
 
-  it("fails after max retries", async () => {
+  it("fails after max retries, waiting a second between attempts by default", async () => {
+    vi.useFakeTimers();
     const callback = new FlakyCallback(fail("fail 1"), fail("fail 2"), fail("fail 3"));
-    const retried = retry(callback.call.bind(callback));
+    const result = expect(retry(callback.call.bind(callback))()).rejects.toThrow("fail 3");
 
-    await expect(retried()).rejects.toThrow("fail 3");
+    await vi.advanceTimersByTimeAsync(999);
+    expect(callback.calledTimes).toBe(1);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(callback.calledTimes).toBe(2);
+    await vi.advanceTimersByTimeAsync(1_000);
+
+    await result;
     expect(callback.calledTimes).toBe(3);
   });
 

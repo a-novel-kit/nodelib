@@ -4,26 +4,28 @@ Shared tool configuration for A-Novel TypeScript packages and SvelteKit applicat
 
 ## Installation
 
-Install the config package with the peer tools your project uses. The root entry point needs the
-ESLint and Prettier peers. Each framework entry point adds optional peers, which platform
-applications install: SvelteKit, Vitest, Storybook and i18next.
+Configure the `@a-novel-kit` registry as the
+[nodelib README](https://github.com/a-novel-kit/nodelib#installation) shows, then add the package:
 
 ```bash
 pnpm add --save-dev @a-novel-kit/nodelib-config
 ```
 
+The root entry point needs the ESLint and Prettier peers. The other entry points add optional peers,
+which only a project importing them installs.
+
 ## Entry points
 
-| Import                                         | Role                                                    |
-| ---------------------------------------------- | ------------------------------------------------------- |
-| `@a-novel-kit/nodelib-config`                  | ESLint and Prettier factories                           |
-| `@a-novel-kit/nodelib-config/i18next`          | Static JSON or YAML extraction, status, and type policy |
-| `@a-novel-kit/nodelib-config/playwright`       | End-to-end suite of a platform's production build       |
-| `@a-novel-kit/nodelib-config/sveltekit`        | Vite config with SvelteKit and the Node adapter         |
-| `@a-novel-kit/nodelib-config/vitest-sveltekit` | Unit, browser-component, and Storybook test projects    |
-| `@a-novel-kit/nodelib-config/yaml`             | Build-time JSON-compatible YAML modules for Vite        |
+| Import                                         | Role                                                    | Optional peers                                                                             |
+| ---------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `@a-novel-kit/nodelib-config`                  | ESLint and Prettier factories                           | `prettier-plugin-svelte` and `prettier-plugin-css-order` for Svelte, `prettier-plugin-sql` |
+| `@a-novel-kit/nodelib-config/i18next`          | Static JSON or YAML extraction, status, and type policy | `i18next-cli`, `i18next-cli-plugin-svelte`                                                 |
+| `@a-novel-kit/nodelib-config/playwright`       | End-to-end suite of a platform's production build       | `playwright`                                                                               |
+| `@a-novel-kit/nodelib-config/sveltekit`        | Vite config with SvelteKit and the Node adapter         | `vite`, `@sveltejs/kit`, `@sveltejs/adapter-node`                                          |
+| `@a-novel-kit/nodelib-config/vitest-sveltekit` | Unit, browser-component, and Storybook test projects    | `vitest`, `@vitest/browser-playwright`, `@storybook/addon-vitest`, `@sveltejs/kit`         |
+| `@a-novel-kit/nodelib-config/yaml`             | Build-time JSON-compatible YAML modules for Vite        | `vite`                                                                                     |
 
-Each framework entrypoint accepts product-specific paths or policy and keeps the shared defaults.
+Each framework entry point accepts product-specific paths or policy and keeps the shared defaults.
 
 Source formats that need an extra Vite transformer supply a plugin factory to the Vitest matrix. The
 matrix calls it once per project, so the unit, browser-component and Storybook projects never share

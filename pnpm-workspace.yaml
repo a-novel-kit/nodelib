@@ -46,28 +46,6 @@ catalog:
 allowBuilds:
   "@swc/core": true
   esbuild: true
-  # Vitest's module mocker installs msw, whose install script must run.
-  msw: true
 minimumReleaseAgeExclude:
   - "@a-novel-kit/*"
   - "@a-novel/*"
-  - svelte@5.55.8
-  - "@typescript-eslint/eslint-plugin@8.59.4"
-  - "@typescript-eslint/parser@8.59.4"
-  - "@typescript-eslint/project-service@8.59.4"
-  - "@typescript-eslint/scope-manager@8.59.4"
-  - "@typescript-eslint/tsconfig-utils@8.59.4"
-  - "@typescript-eslint/type-utils@8.59.4"
-  - "@typescript-eslint/types@8.59.4"
-  - "@typescript-eslint/typescript-estree@8.59.4"
-  - "@typescript-eslint/utils@8.59.4"
-  - "@typescript-eslint/visitor-keys@8.59.4"
-  - typescript-eslint@8.59.4
-  - prettier-plugin-svelte@4.0.0
-  - eslint-plugin-storybook@10.4.1
-  - storybook@10.4.1
-  - "@sveltejs/kit@2.61.1"
-  - eslint-plugin-svelte@3.18.0
-  - eslint-plugin-svelte@3.19.0
-  - svelte-eslint-parser@1.7.0
-  - "@types/node@24.13.0"

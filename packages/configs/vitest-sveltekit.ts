@@ -29,7 +29,7 @@ export interface SvelteKitVitestOptions {
   vitePlugins?: () => readonly PluginOption[];
 }
 
-/** Runs a project's tests in headless Chromium, with a provider of its own. */
+/** Builds the browser options that run one project's tests in headless Chromium, with a provider of its own. */
 function headlessChromium() {
   return {
     enabled: true,

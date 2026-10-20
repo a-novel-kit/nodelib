@@ -37,10 +37,12 @@ export class EnvironmentValidationError extends Error {
   }
 }
 
+/** Rejects the value a field parser reads, so parseEnvironment reports the field as invalid. */
 function invalidValue(): never {
   throw invalidEnvironmentValue;
 }
 
+/** Pairs a parser with the variable name parseEnvironment reads it from and reports on failure. */
 function field<Value>(name: string, parse: (value: string | undefined) => Value): EnvironmentField<Value> {
   if (name.length === 0) {
     throw new RangeError("An environment variable name is required");
@@ -49,30 +51,28 @@ function field<Value>(name: string, parse: (value: string | undefined) => Value)
   return { name, parse } as EnvironmentFieldDefinition<Value>;
 }
 
-/** Defines a required HTTP or HTTPS base URL that excludes credentials, query parameters, and fragments. */
+/**
+ * Defines a required HTTP or HTTPS base URL that excludes credentials, query parameters, and
+ * fragments. The value drops its trailing slashes, so a path appends to it after a `/`.
+ */
 export function environmentHttpUrl(name: string): EnvironmentField<string> {
-  return field(name, (value) => {
-    if (!value) return invalidValue();
+  return field(name, parseHttpUrl);
+}
 
-    let url: URL;
-    try {
-      url = new URL(value);
-    } catch {
-      return invalidValue();
-    }
+function parseHttpUrl(value: string | undefined): string {
+  const url = value ? URL.parse(value) : null;
+  if (
+    !url ||
+    !["http:", "https:"].includes(url.protocol) ||
+    url.username.length > 0 ||
+    url.password.length > 0 ||
+    url.search.length > 0 ||
+    url.hash.length > 0
+  ) {
+    return invalidValue();
+  }
 
-    if (
-      !["http:", "https:"].includes(url.protocol) ||
-      url.username.length > 0 ||
-      url.password.length > 0 ||
-      url.search.length > 0 ||
-      url.hash.length > 0
-    ) {
-      return invalidValue();
-    }
-
-    return url.toString().replace(/\/+$/, "");
-  });
+  return url.toString().replace(/\/+$/, "");
 }
 
 /** IntegerEnvironmentOptions bounds an integer variable and supplies its optional default. */

@@ -73,6 +73,7 @@ function group(forms: [string, string][]): Group {
   };
 }
 
+/** Adds every message nested under `value` to `into`, keyed as `namespace:dotted.path`. */
 function flatten(value: unknown, prefix: string, into: Map<string, string>): void {
   if (typeof value === "string") into.set(prefix, value);
   else if (value !== null && typeof value === "object") {
@@ -82,6 +83,7 @@ function flatten(value: unknown, prefix: string, into: Map<string, string>): voi
   }
 }
 
+/** Reads one locale's messages from its catalog files, skipping a file `read` finds no content for. */
 function readCatalog(files: readonly string[], read: (file: string) => string | undefined): Catalog {
   const messages = new Map<string, string>();
   for (const file of files) {
@@ -92,12 +94,36 @@ function readCatalog(files: readonly string[], read: (file: string) => string | 
   return messages;
 }
 
+/** Returns what `read` returns, or undefined when it fails, as for a file one revision lacks. */
 function attempt(read: () => string): string | undefined {
   try {
     return read();
   } catch {
     return undefined;
   }
+}
+
+/** Runs git in `cwd` and returns its standard output. */
+function git(cwd: string, ...args: string[]): string {
+  return execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
+}
+
+/** Locates the catalogs one run compares: the source locale's files under `catalogs`, in `cwd` and at `mergeBase`. */
+interface CatalogFiles {
+  cwd: string;
+  catalogs: string;
+  mergeBase: string;
+  files: readonly string[];
+}
+
+/** Reads one locale's catalogs at the merge base and in the working tree. */
+function readRevision(locale: string, { cwd, catalogs, files, mergeBase }: CatalogFiles): Revision {
+  return {
+    base: readCatalog(files, (file) =>
+      attempt(() => git(cwd, "show", `${mergeBase}:./${posix.join(catalogs, locale, file)}`))
+    ),
+    head: readCatalog(files, (file) => attempt(() => readFileSync(join(cwd, catalogs, locale, file), "utf8"))),
+  };
 }
 
 const checks = {
@@ -140,21 +166,19 @@ export function runI18nChanges(args: readonly string[], options: I18nChangesOpti
   const check = checks[name];
   const { source: sourceLocale, catalogs, base } = values;
 
-  const git = (...gitArgs: string[]) =>
-    execFileSync("git", gitArgs, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
-  const mergeBase = git("merge-base", "HEAD", base).trim();
-  const files = readdirSync(join(cwd, catalogs, sourceLocale)).filter((file) => catalogFile.test(file));
-  const revision = (locale: string): Revision => ({
-    base: readCatalog(files, (file) =>
-      attempt(() => git("show", `${mergeBase}:./${posix.join(catalogs, locale, file)}`))
-    ),
-    head: readCatalog(files, (file) => attempt(() => readFileSync(join(cwd, catalogs, locale, file), "utf8"))),
-  });
+  const catalogFiles: CatalogFiles = {
+    cwd,
+    catalogs,
+    mergeBase: git(cwd, "merge-base", "HEAD", base).trim(),
+    files: readdirSync(join(cwd, catalogs, sourceLocale)).filter((file) => catalogFile.test(file)),
+  };
 
-  const source = revision(sourceLocale);
+  const source = readRevision(sourceLocale, catalogFiles);
   const problems = readdirSync(join(cwd, catalogs), { withFileTypes: true })
     .filter((entry) => entry.isDirectory() && entry.name !== sourceLocale)
-    .flatMap(({ name: locale }) => check.find(source, revision(locale)).map((key) => `  ${locale} ${key}`));
+    .flatMap(({ name: locale }) =>
+      check.find(source, readRevision(locale, catalogFiles)).map((key) => `  ${locale} ${key}`)
+    );
 
   if (problems.length === 0) return 0;
   write(`${check.problem}:\n${problems.join("\n")}\n${check.fix}\n`);

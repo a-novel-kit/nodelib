@@ -1,10 +1,4 @@
-import { libraryConfig } from "../../vite.library";
+import { libraryConfig } from "../../vite.library.ts";
 import manifest from "./package.json" with { type: "json" };
 
-export default libraryConfig(
-  {
-    index: "packages/i18n/index.ts",
-    svelte: "packages/i18n/svelte.ts",
-  },
-  manifest
-);
+export default libraryConfig(import.meta.dirname, { index: "index.ts", svelte: "svelte.ts" }, manifest);

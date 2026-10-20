@@ -1,55 +1,59 @@
 import { Debounce } from "./debounce";
 
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-describe("debounce", () => {
-  it("calls the function", async () => {
+describe("Debounce", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("calls the function", () => {
     const callback = vi.fn();
 
-    const debouncer = new Debounce(10);
-
-    debouncer.call(callback);
+    new Debounce(10).call(callback);
 
     expect(callback).toHaveBeenCalledOnce();
   });
 
-  it("calls the function multiple times", async () => {
+  it("calls the function multiple times", () => {
     const callback = vi.fn();
-
     const debouncer = new Debounce(10);
 
     debouncer.call(callback);
-    await new Promise((resolve) => setTimeout(resolve, 20));
+    vi.advanceTimersByTime(20);
     debouncer.call(callback);
 
     expect(callback).toHaveBeenCalledTimes(2);
   });
 
-  it("cancels the call", async () => {
+  it("cancels the call", () => {
     const callback = vi.fn();
-
     const debouncer = new Debounce(10);
+
     debouncer.call(callback);
-    await new Promise((resolve) => setTimeout(resolve, 5));
+    vi.advanceTimersByTime(5);
     debouncer.call(callback); // This call is delayed for debouncing.
     expect(callback).toHaveBeenCalledTimes(1);
     debouncer.cancel();
-    await new Promise((resolve) => setTimeout(resolve, 20));
+    vi.advanceTimersByTime(20);
 
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
-  it("ignores calls that are too close", async () => {
+  it("ignores calls that are too close", () => {
     const callback = vi.fn();
-
     const debouncer = new Debounce(10);
 
     debouncer.call(callback);
-    debouncer.call(callback); // This call is ignored, because of the one that comes right after.
-    await new Promise((resolve) => setTimeout(resolve, 5));
+    debouncer.call(callback); // The next call supersedes this one.
+    vi.advanceTimersByTime(5);
     debouncer.call(callback); // This call is delayed for debouncing.
     expect(callback).toHaveBeenCalledTimes(1);
-    await new Promise((resolve) => setTimeout(resolve, 20));
+    vi.advanceTimersByTime(20);
 
     expect(callback).toHaveBeenCalledTimes(2);
   });

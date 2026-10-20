@@ -1,10 +1,8 @@
-import { libraryConfig } from "../../vite.library";
+import { libraryConfig } from "../../vite.library.ts";
 import manifest from "./package.json" with { type: "json" };
 
 export default libraryConfig(
-  {
-    http: "packages/test/http/index.ts",
-    playwright: "packages/test/playwright/index.ts",
-  },
+  import.meta.dirname,
+  { http: "http/index.ts", playwright: "playwright/index.ts" },
   manifest
 );
