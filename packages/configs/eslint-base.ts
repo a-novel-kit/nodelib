@@ -20,8 +20,27 @@ export interface EslintOptions {
   ignores?: string[];
   /** Path to a .gitignore file whose patterns are converted into ESLint ignores. */
   gitIgnorePath?: string;
-  /** Extra flat-config block deep-merged over the defaults, so a package can add or override rules. */
+  /**
+   * Extra flat-config block merged into the default rules block, so a package can add or override
+   * rules. Its `rules` and `languageOptions` extend the defaults one level deep. With `svelte` set, the
+   * Svelte exemptions still win over its rules.
+   */
   customRules?: ConfigWithExtends;
+}
+
+/** Parses Svelte components, and the modules their runes live in, with TypeScript's project service. */
+function svelteParser(svelteConfig: object): ConfigWithExtends {
+  return {
+    files: ["**/*.svelte", "**/*.svelte.ts", "**/*.svelte.js"],
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        extraFileExtensions: [".svelte"],
+        parser: ts.parser,
+        svelteConfig,
+      },
+    },
+  };
 }
 
 /**
@@ -30,9 +49,11 @@ export interface EslintOptions {
  * Storybook, or library-specific rules.
  */
 export function Eslint(opts: EslintOptions = {}): Parameters<typeof defineConfig> {
-  let customRules: ConfigWithExtends = {
+  const rulesBlock: ConfigWithExtends = {
+    ...opts.customRules,
     languageOptions: {
       globals: { ...globals.browser, ...globals.node },
+      ...opts.customRules?.languageOptions,
     },
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
@@ -47,70 +68,29 @@ export function Eslint(opts: EslintOptions = {}): Parameters<typeof defineConfig
           caughtErrorsIgnorePattern: "^_",
         },
       ],
+      // A library's links stay generic, with no route table of its own to resolve them against.
+      ...(opts.svelte && opts.isLib && { "svelte/no-navigation-without-resolve": ["error", { ignoreLinks: true }] }),
+      ...opts.customRules?.rules,
+      ...(opts.svelte && {
+        "@typescript-eslint/no-empty-object-type": "off",
+        // Consuming packages render only internal content through {@html}.
+        "svelte/no-at-html-tags": "off",
+      }),
     },
   };
 
-  // In library mode links can be generic and reusable, with no concrete route table to resolve against.
-  if (opts.svelte && opts.isLib) {
-    customRules.rules!["svelte/no-navigation-without-resolve"] = ["error", { ignoreLinks: true }];
-  }
-
-  if (opts.customRules) {
-    customRules = {
-      ...opts.customRules,
-      languageOptions: {
-        ...customRules.languageOptions,
-        ...opts.customRules.languageOptions,
-      },
-      rules: {
-        ...customRules.rules,
-        ...opts.customRules.rules,
-      },
-    };
-  }
-
-  // Flat config lets later blocks override earlier ones, so blocks are grouped by precedence and
-  // the Prettier style block goes last, where it can switch off formatting rules the others enable.
-  const sortedRules: Record<string, ConfigWithExtends[]> = {
-    ignoreRules: [globalIgnores(["**/dist/**", "**/.*/**", ...(opts.ignores ?? [])])],
-    langRules: [js.configs.recommended, ...ts.configs.recommended],
-    frameworkRules: [],
-    customRules: [customRules],
-    styleRules: [prettier],
-  };
-
-  if (opts.svelte) {
-    sortedRules.langRules.push(...svelte.configs.recommended);
-    sortedRules.styleRules.push(...svelte.configs.prettier);
-    sortedRules.customRules.push({
-      files: ["**/*.svelte", "**/*.svelte.ts", "**/*.svelte.js"],
-      languageOptions: {
-        parserOptions: {
-          projectService: true,
-          extraFileExtensions: [".svelte"],
-          parser: ts.parser,
-          svelteConfig: opts.svelte,
-        },
-      },
-    });
-    customRules.rules!["@typescript-eslint/no-empty-object-type"] = "off";
-    // Consuming packages render only internal content through {@html}.
-    customRules.rules!["svelte/no-at-html-tags"] = "off";
-  }
-
-  if (opts.gitIgnorePath) {
-    sortedRules.ignoreRules.push(includeIgnoreFile(opts.gitIgnorePath));
-  }
-
-  if (opts.storybook) {
-    sortedRules.frameworkRules.push(...(storybook.configs["flat/recommended"] as ConfigWithExtends[]));
-  }
-
+  // A later block overrides an earlier one, so Prettier's blocks go last, where they switch off the
+  // formatting rules the others enable.
   return [
-    ...sortedRules.ignoreRules,
-    ...sortedRules.langRules,
-    ...sortedRules.frameworkRules,
-    ...sortedRules.customRules,
-    ...sortedRules.styleRules,
+    globalIgnores(["**/dist/**", "**/.*/**", ...(opts.ignores ?? [])]),
+    ...(opts.gitIgnorePath ? [includeIgnoreFile(opts.gitIgnorePath)] : []),
+    js.configs.recommended,
+    ...ts.configs.recommended,
+    ...(opts.svelte ? svelte.configs.recommended : []),
+    ...(opts.storybook ? (storybook.configs["flat/recommended"] as ConfigWithExtends[]) : []),
+    rulesBlock,
+    ...(opts.svelte ? [svelteParser(opts.svelte)] : []),
+    prettier,
+    ...(opts.svelte ? svelte.configs.prettier : []),
   ];
 }

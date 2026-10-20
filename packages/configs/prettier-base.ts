@@ -19,7 +19,15 @@ export interface PrettierOptions {
  * formatting. Pass {@link PrettierOptions} to add Svelte or SQL formatting.
  */
 export function Prettier(opts: PrettierOptions = {}): Config & SortImportsConfig & SqlPrettierConfig {
-  const baseConfig: Config & SortImportsConfig & SqlPrettierConfig = {
+  const svelteOverride = {
+    files: "*.svelte",
+    options: {
+      parser: "svelte",
+      plugins: ["prettier-plugin-svelte", "@trivago/prettier-plugin-sort-imports", "prettier-plugin-css-order"],
+    },
+  };
+
+  return {
     useTabs: false,
     tabWidth: 2,
     trailingComma: "es5",
@@ -39,28 +47,15 @@ export function Prettier(opts: PrettierOptions = {}): Config & SortImportsConfig
     ],
     importOrderSeparation: true,
     importOrderSortSpecifiers: true,
-    plugins: ["@trivago/prettier-plugin-sort-imports", "prettier-plugin-packagejson"],
-    overrides: [],
+    plugins: [
+      ...(opts.svelte ? ["prettier-plugin-svelte"] : []),
+      "@trivago/prettier-plugin-sort-imports",
+      "prettier-plugin-packagejson",
+      ...(opts.svelte ? ["prettier-plugin-css-order"] : []),
+      ...(opts.sql ? ["prettier-plugin-sql"] : []),
+    ],
+    overrides: opts.svelte ? [svelteOverride] : [],
     htmlWhitespaceSensitivity: "strict",
+    ...(opts.sql && { language: "postgresql", paramTypes: `{ numbered: ["?"] }` }),
   };
-
-  if (opts.svelte) {
-    baseConfig.plugins!.unshift("prettier-plugin-svelte");
-    baseConfig.plugins!.push("prettier-plugin-css-order");
-    baseConfig.overrides!.push({
-      files: "*.svelte",
-      options: {
-        parser: "svelte",
-        plugins: ["prettier-plugin-svelte", "@trivago/prettier-plugin-sort-imports", "prettier-plugin-css-order"],
-      },
-    });
-  }
-
-  if (opts.sql) {
-    baseConfig.plugins!.push("prettier-plugin-sql");
-    baseConfig.language = "postgresql";
-    baseConfig.paramTypes = `{ numbered: ["?"] }`;
-  }
-
-  return baseConfig;
 }
