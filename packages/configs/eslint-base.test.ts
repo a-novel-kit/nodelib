@@ -14,6 +14,11 @@ function svelteConfigOf(config: ConfigWithExtends): unknown {
   return (config.languageOptions?.parserOptions as Record<string, unknown> | undefined)?.svelteConfig;
 }
 
+/** Reads a rule's setting from the last block declaring it, which wins for every file that block matches. */
+function effectiveRule(configs: ConfigWithExtends[], name: string): unknown {
+  return configs.findLast((config) => config.rules?.[name] !== undefined)?.rules?.[name];
+}
+
 describe("Eslint", () => {
   it("layers ignores and consumer rules over the language defaults", () => {
     const configs = configsFor({
@@ -78,5 +83,20 @@ describe("Eslint", () => {
         },
       },
     });
+  });
+
+  it("lets consumer rules re-enable the Svelte exemptions", () => {
+    const configs = configsFor({
+      svelte: {},
+      customRules: {
+        rules: {
+          "@typescript-eslint/no-empty-object-type": "error",
+          "svelte/no-at-html-tags": "error",
+        },
+      },
+    });
+
+    expect(effectiveRule(configs, "@typescript-eslint/no-empty-object-type")).toBe("error");
+    expect(effectiveRule(configs, "svelte/no-at-html-tags")).toBe("error");
   });
 });
