@@ -213,8 +213,8 @@ catalogs:
       specifier: 26.4.7
       version: 26.4.7
     i18next-cli:
-      specifier: 1.75.3
-      version: 1.75.3
+      specifier: 1.76.0
+      version: 1.76.0
     i18next-cli-plugin-svelte:
       specifier: 2.4.1
       version: 2.4.1
@@ -313,10 +313,10 @@ importers:
         version: 26.4.7(typescript@6.0.3)
       i18next-cli:
         specifier: 'catalog:'
-        version: 1.75.3(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3)
+        version: 1.76.0(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3)
       i18next-cli-plugin-svelte:
         specifier: 'catalog:'
-        version: 2.4.1(estree-walker@3.0.3)(i18next-cli@1.75.3(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3))(svelte@5.57.2(@typescript-eslint/types@8.71.2))
+        version: 2.4.1(estree-walker@3.0.3)(i18next-cli@1.76.0(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3))(svelte@5.57.2(@typescript-eslint/types@8.71.2))
       jiti:
         specifier: 'catalog:'
         version: 2.7.0
@@ -447,10 +447,10 @@ importers:
         version: 3.0.3
       i18next-cli:
         specifier: 'catalog:'
-        version: 1.75.3(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3)
+        version: 1.76.0(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3)
       i18next-cli-plugin-svelte:
         specifier: 'catalog:'
-        version: 2.4.1(estree-walker@3.0.3)(i18next-cli@1.75.3(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3))(svelte@5.57.2(@typescript-eslint/types@8.71.2))
+        version: 2.4.1(estree-walker@3.0.3)(i18next-cli@1.76.0(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3))(svelte@5.57.2(@typescript-eslint/types@8.71.2))
       jiti:
         specifier: 'catalog:'
         version: 2.7.0
@@ -888,6 +888,12 @@ packages:
     peerDependenciesMeta:
       '@noble/hashes':
         optional: true
+
+  '@formatjs/icu-messageformat-parser@3.5.21':
+    resolution: {integrity: sha512-Vnl7IOSyMRaP4Pjv48etkT2nlcIwzh4QWIa3hewzGlZZPBbft+TbMir4MijpDViOLN/1hvkGC10oYMuilsG+fw==}
+
+  '@formatjs/icu-skeleton-parser@2.1.12':
+    resolution: {integrity: sha512-ca7tZMLpfHX3sUD7hP6gE/qr6Iq89EDd3ZLeRhbsB7r0UD55DGJq+tmFLzrGrnx5StahUevQmQQVtbDRHsfDHA==}
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -2364,8 +2370,8 @@ packages:
       i18next-cli: ^1.51.6
       svelte: ^5.53.11
 
-  i18next-cli@1.75.3:
-    resolution: {integrity: sha512-JsQ9i0nVD2YhZEYpVcHAJuZ/jUjfiX5iD8JbIwb8OnzMNWeXySv1TKvTigsGBrfJ4Q6AVh1pNVOMrwTXHAUzaw==}
+  i18next-cli@1.76.0:
+    resolution: {integrity: sha512-k6pbeJIr6uTgKDG66vdM4LfgDBA8/V3v5hqsvyPx5oERd7VT8w3f4zNSnJIxRsujXRJuYq+WaQXfvO8aKZk1rQ==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -2634,6 +2640,10 @@ packages:
 
   mdn-data@2.27.1:
     resolution: {integrity: sha512-9Yubnt3e8A0OKwxYSXyhLymGW4sCufcLG6VdiDdUGVkPhpqLxlvP5vl1983gQjJl3tqbrM731mjaZaP68AgosQ==}
+
+  messageformat@4.1.0:
+    resolution: {integrity: sha512-ZLId0BYfsNhC6/MRwVFw1yTLgG9cbJwfTsjYSS2C59PdfJWVRsX7hthADvsXefBtTg2FKso0VAJmMJJOtnJ75w==}
+    engines: {node: ^20.19 || ^22.12 || >=24}
 
   mimic-function@5.0.1:
     resolution: {integrity: sha512-VP79XUPxV2CigYP3jWwAUFSku2aKqBH7uTAapFWCBqutsbmDo96KY5o8uh6U+/YSIn5OxJnXp73beVkpqMIGhA==}
@@ -3602,6 +3612,12 @@ snapshots:
       levn: 0.4.1
 
   '@exodus/bytes@1.16.0': {}
+
+  '@formatjs/icu-messageformat-parser@3.5.21':
+    dependencies:
+      '@formatjs/icu-skeleton-parser': 2.1.12
+
+  '@formatjs/icu-skeleton-parser@2.1.12': {}
 
   '@humanfs/core@0.19.2':
     dependencies:
@@ -4950,16 +4966,17 @@ snapshots:
 
   human-signals@8.0.1: {}
 
-  i18next-cli-plugin-svelte@2.4.1(estree-walker@3.0.3)(i18next-cli@1.75.3(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3))(svelte@5.57.2(@typescript-eslint/types@8.71.2)):
+  i18next-cli-plugin-svelte@2.4.1(estree-walker@3.0.3)(i18next-cli@1.76.0(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3))(svelte@5.57.2(@typescript-eslint/types@8.71.2)):
     dependencies:
       estree-walker: 3.0.3
-      i18next-cli: 1.75.3(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3)
+      i18next-cli: 1.76.0(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3)
       recast: 0.23.21
       svelte: 5.57.2(@typescript-eslint/types@8.71.2)
 
-  i18next-cli@1.75.3(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3):
+  i18next-cli@1.76.0(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3):
     dependencies:
       '@croct/json5-parser': 0.2.2
+      '@formatjs/icu-messageformat-parser': 3.5.21
       '@swc/core': 1.16.18
       chokidar: 5.0.0
       commander: 15.0.0
@@ -4971,6 +4988,7 @@ snapshots:
       jiti: 2.7.0
       jsonc-parser: 3.3.1
       magic-string: 1.4.3
+      messageformat: 4.1.0
       minimatch: 10.2.6
       ora: 9.4.1
       react-i18next: 17.1.0(i18next@26.4.7(typescript@6.0.3))(react@19.3.1)(typescript@6.0.3)
@@ -5211,6 +5229,8 @@ snapshots:
       source-map-js: 1.2.2
 
   mdn-data@2.27.1: {}
+
+  messageformat@4.1.0: {}
 
   mimic-function@5.0.1: {}
 
