@@ -210,11 +210,11 @@ catalogs:
       specifier: ^17.0.0
       version: 17.13.0
     i18next:
-      specifier: 26.4.7
-      version: 26.4.7
+      specifier: 26.5.0
+      version: 26.5.0
     i18next-cli:
-      specifier: 1.76.0
-      version: 1.76.0
+      specifier: 1.77.0
+      version: 1.77.0
     i18next-cli-plugin-svelte:
       specifier: 2.4.1
       version: 2.4.1
@@ -310,13 +310,13 @@ importers:
         version: 17.13.0
       i18next:
         specifier: 'catalog:'
-        version: 26.4.7(typescript@6.0.3)
+        version: 26.5.0(typescript@6.0.3)
       i18next-cli:
         specifier: 'catalog:'
-        version: 1.76.0(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3)
+        version: 1.77.0(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3)
       i18next-cli-plugin-svelte:
         specifier: 'catalog:'
-        version: 2.4.1(estree-walker@3.0.3)(i18next-cli@1.76.0(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3))(svelte@5.57.2(@typescript-eslint/types@8.71.2))
+        version: 2.4.1(estree-walker@3.0.3)(i18next-cli@1.77.0(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3))(svelte@5.57.2(@typescript-eslint/types@8.71.2))
       jiti:
         specifier: 'catalog:'
         version: 2.7.0
@@ -447,10 +447,10 @@ importers:
         version: 3.0.3
       i18next-cli:
         specifier: 'catalog:'
-        version: 1.76.0(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3)
+        version: 1.77.0(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3)
       i18next-cli-plugin-svelte:
         specifier: 'catalog:'
-        version: 2.4.1(estree-walker@3.0.3)(i18next-cli@1.76.0(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3))(svelte@5.57.2(@typescript-eslint/types@8.71.2))
+        version: 2.4.1(estree-walker@3.0.3)(i18next-cli@1.77.0(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3))(svelte@5.57.2(@typescript-eslint/types@8.71.2))
       jiti:
         specifier: 'catalog:'
         version: 2.7.0
@@ -467,8 +467,8 @@ importers:
   packages/i18n:
     dependencies:
       i18next:
-        specifier: ^26.4.7
-        version: 26.4.7(typescript@6.0.3)
+        specifier: ^26.5.0
+        version: 26.5.0(typescript@6.0.3)
       svelte:
         specifier: ^5.57.2
         version: 5.57.2(@typescript-eslint/types@8.71.2)
@@ -1152,12 +1152,14 @@ packages:
   '@opentelemetry/sdk-trace-base@2.12.0':
     resolution: {integrity: sha512-JOERgZCxRM06FEJ5kEWxlSRChah6MmXDx3KwCruqEv/iEyLkTokCSemf2y1w8oIHtfrr8EVTpzebq/31vn2Cpg==}
     engines: {node: ^18.19.0 || >=20.6.0}
+    deprecated: Use @opentelemetry/sdk-trace package
     peerDependencies:
       '@opentelemetry/api': '>=1.3.0 <1.10.0'
 
   '@opentelemetry/sdk-trace-node@2.12.0':
     resolution: {integrity: sha512-9DufH1IlmQMoKAfot5y/FhTP1RnmhLb5K6eKmJO/bvzPjYwPAazoiAUbTZFdPbqxOXN0FEbhZx/e6SB1Og4jmg==}
     engines: {node: ^18.19.0 || >=20.6.0}
+    deprecated: Use @opentelemetry/sdk-trace package
     peerDependencies:
       '@opentelemetry/api': '>=1.0.0 <1.10.0'
 
@@ -2370,8 +2372,8 @@ packages:
       i18next-cli: ^1.51.6
       svelte: ^5.53.11
 
-  i18next-cli@1.76.0:
-    resolution: {integrity: sha512-k6pbeJIr6uTgKDG66vdM4LfgDBA8/V3v5hqsvyPx5oERd7VT8w3f4zNSnJIxRsujXRJuYq+WaQXfvO8aKZk1rQ==}
+  i18next-cli@1.77.0:
+    resolution: {integrity: sha512-7gn/2P4QFm7pb/sWvBg9Qr7r8fZyoozhJ9MvgYuBPX/aPUrniMKnhAT2iZHAv++Yg6wRJqnP7KIJsiHcP3Mt8A==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -2379,8 +2381,8 @@ packages:
     resolution: {integrity: sha512-Xhz8S8dtNIPawzeWdmssnsII1JYsbvPWOLmstJakNcgKSFLCneA+xN7qajj/zlk5nf9sx1KGDTx8RNZ73h68tw==}
     hasBin: true
 
-  i18next@26.4.7:
-    resolution: {integrity: sha512-p/3hqy6EcuqRs6wNwBYwGGC1fzBJSMxV9zMuN814ab/7QjdZbXfjXwuPZdQbngX6KDOTxM01uUiZyqmMB8ghZg==}
+  i18next@26.5.0:
+    resolution: {integrity: sha512-OwFFD3ER/BSWsv40teDtkhG7fwgncd7cq1CX7el02IENW9ZiwfWLnMjsQGD/q3SExrxp0+QxwUqXL8F9BKu5+w==}
     peerDependencies:
       typescript: ^5 || ^6 || ^7
     peerDependenciesMeta:
@@ -4966,14 +4968,14 @@ snapshots:
 
   human-signals@8.0.1: {}
 
-  i18next-cli-plugin-svelte@2.4.1(estree-walker@3.0.3)(i18next-cli@1.76.0(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3))(svelte@5.57.2(@typescript-eslint/types@8.71.2)):
+  i18next-cli-plugin-svelte@2.4.1(estree-walker@3.0.3)(i18next-cli@1.77.0(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3))(svelte@5.57.2(@typescript-eslint/types@8.71.2)):
     dependencies:
       estree-walker: 3.0.3
-      i18next-cli: 1.76.0(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3)
+      i18next-cli: 1.77.0(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3)
       recast: 0.23.21
       svelte: 5.57.2(@typescript-eslint/types@8.71.2)
 
-  i18next-cli@1.76.0(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3):
+  i18next-cli@1.77.0(@types/node@24.19.2)(react@19.3.1)(typescript@6.0.3):
     dependencies:
       '@croct/json5-parser': 0.2.2
       '@formatjs/icu-messageformat-parser': 3.5.21
@@ -4982,7 +4984,7 @@ snapshots:
       commander: 15.0.0
       execa: 10.2.0
       glob: 13.0.6
-      i18next: 26.4.7(typescript@6.0.3)
+      i18next: 26.5.0(typescript@6.0.3)
       i18next-resources-for-ts: 2.1.1
       inquirer: 14.2.3(@types/node@24.19.2)
       jiti: 2.7.0
@@ -4991,7 +4993,7 @@ snapshots:
       messageformat: 4.1.0
       minimatch: 10.2.6
       ora: 9.4.1
-      react-i18next: 17.1.0(i18next@26.4.7(typescript@6.0.3))(react@19.3.1)(typescript@6.0.3)
+      react-i18next: 17.1.0(i18next@26.5.0(typescript@6.0.3))(react@19.3.1)(typescript@6.0.3)
       yaml: 2.9.1
     transitivePeerDependencies:
       - '@swc/helpers'
@@ -5010,7 +5012,7 @@ snapshots:
     transitivePeerDependencies:
       - '@swc/helpers'
 
-  i18next@26.4.7(typescript@6.0.3):
+  i18next@26.5.0(typescript@6.0.3):
     optionalDependencies:
       typescript: 6.0.3
 
@@ -5499,11 +5501,11 @@ snapshots:
       discontinuous-range: 1.0.0
       ret: 0.1.15
 
-  react-i18next@17.1.0(i18next@26.4.7(typescript@6.0.3))(react@19.3.1)(typescript@6.0.3):
+  react-i18next@17.1.0(i18next@26.5.0(typescript@6.0.3))(react@19.3.1)(typescript@6.0.3):
     dependencies:
       '@babel/runtime': 7.29.10
       html-parse-stringify: 4.0.1
-      i18next: 26.4.7(typescript@6.0.3)
+      i18next: 26.5.0(typescript@6.0.3)
       react: 19.3.1
       use-sync-external-store: 1.7.0(react@19.3.1)
     optionalDependencies:
