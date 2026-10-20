@@ -22,8 +22,8 @@ export interface EslintOptions {
   gitIgnorePath?: string;
   /**
    * Extra flat-config block merged into the default rules block, so a package can add or override
-   * rules. Its `rules` and `languageOptions` extend the defaults one level deep. With `svelte` set, the
-   * Svelte exemptions still win over its rules.
+   * rules. Its `rules` and `languageOptions` extend the defaults one level deep. Its rules win over
+   * every rule in that block, the Svelte exemptions included.
    */
   customRules?: ConfigWithExtends;
 }
@@ -70,12 +70,12 @@ export function Eslint(opts: EslintOptions = {}): Parameters<typeof defineConfig
       ],
       // A library's links stay generic, with no route table of its own to resolve them against.
       ...(opts.svelte && opts.isLib && { "svelte/no-navigation-without-resolve": ["error", { ignoreLinks: true }] }),
-      ...opts.customRules?.rules,
       ...(opts.svelte && {
         "@typescript-eslint/no-empty-object-type": "off",
         // Consuming packages render only internal content through {@html}.
         "svelte/no-at-html-tags": "off",
       }),
+      ...opts.customRules?.rules,
     },
   };
 
