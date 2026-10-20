@@ -19,6 +19,7 @@ which only a project importing them installs.
 | Import                                         | Role                                                    | Optional peers                                                                             |
 | ---------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
 | `@a-novel-kit/nodelib-config`                  | ESLint and Prettier factories                           | `prettier-plugin-svelte` and `prettier-plugin-css-order` for Svelte, `prettier-plugin-sql` |
+| `@a-novel-kit/nodelib-config/eslint-svelte`    | ESLint config with the Svelte and Storybook rules       | `eslint-plugin-svelte`, `eslint-plugin-storybook`                                          |
 | `@a-novel-kit/nodelib-config/i18next`          | Static JSON or YAML extraction, status, and type policy | `i18next-cli`, `i18next-cli-plugin-svelte`                                                 |
 | `@a-novel-kit/nodelib-config/playwright`       | End-to-end suite of a platform's production build       | `playwright`                                                                               |
 | `@a-novel-kit/nodelib-config/sveltekit`        | Vite config with SvelteKit and the Node adapter         | `vite`, `@sveltejs/kit`, `@sveltejs/adapter-node`                                          |

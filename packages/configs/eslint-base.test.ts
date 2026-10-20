@@ -5,18 +5,12 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import type { ConfigWithExtends } from "@eslint/config-helpers";
+import js from "@eslint/js";
+import prettier from "eslint-config-prettier";
+import ts from "typescript-eslint";
 
 function configsFor(options: Parameters<typeof Eslint>[0] = {}): ConfigWithExtends[] {
   return Eslint(options) as ConfigWithExtends[];
-}
-
-function svelteConfigOf(config: ConfigWithExtends): unknown {
-  return (config.languageOptions?.parserOptions as Record<string, unknown> | undefined)?.svelteConfig;
-}
-
-/** Reads a rule's setting from the last block declaring it, which wins for every file that block matches. */
-function effectiveRule(configs: ConfigWithExtends[], name: string): unknown {
-  return configs.findLast((config) => config.rules?.[name] !== undefined)?.rules?.[name];
 }
 
 describe("Eslint", () => {
@@ -55,48 +49,13 @@ describe("Eslint", () => {
     });
   });
 
-  it("enables the Svelte, library, and Storybook policy together", () => {
-    const svelteConfig = {};
-    const configs = configsFor({ isLib: true, storybook: true, svelte: svelteConfig });
-
-    expect(configs).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ name: "svelte:recommended:rules" }),
-        expect.objectContaining({ name: "storybook:recommended:stories-rules" }),
-      ])
-    );
-
-    const sharedRules = configs.find((config) => config.rules?.["@typescript-eslint/no-empty-object-type"] === "off");
-    expect(sharedRules?.rules).toMatchObject({
-      "@typescript-eslint/no-empty-object-type": "off",
-      "svelte/no-at-html-tags": "off",
-      "svelte/no-navigation-without-resolve": ["error", { ignoreLinks: true }],
-    });
-
-    expect(configs.find((config) => svelteConfigOf(config) === svelteConfig)).toMatchObject({
-      files: ["**/*.svelte", "**/*.svelte.ts", "**/*.svelte.js"],
-      languageOptions: {
-        parserOptions: {
-          extraFileExtensions: [".svelte"],
-          projectService: true,
-          svelteConfig,
-        },
-      },
-    });
-  });
-
-  it("lets consumer rules re-enable the Svelte exemptions", () => {
-    const configs = configsFor({
-      svelte: {},
-      customRules: {
-        rules: {
-          "@typescript-eslint/no-empty-object-type": "error",
-          "svelte/no-at-html-tags": "error",
-        },
-      },
-    });
-
-    expect(effectiveRule(configs, "@typescript-eslint/no-empty-object-type")).toBe("error");
-    expect(effectiveRule(configs, "svelte/no-at-html-tags")).toBe("error");
+  it("orders the language presets, the default rules block, then Prettier's block", () => {
+    expect(configsFor()).toEqual([
+      expect.objectContaining({ ignores: ["**/dist/**", "**/.*/**"] }),
+      js.configs.recommended,
+      ...ts.configs.recommended,
+      expect.objectContaining({ rules: expect.objectContaining({ "@typescript-eslint/no-explicit-any": "off" }) }),
+      prettier,
+    ]);
   });
 });

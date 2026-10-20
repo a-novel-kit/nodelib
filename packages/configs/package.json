@@ -13,6 +13,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.es.js"
     },
+    "./eslint-svelte": {
+      "types": "./dist/eslint-svelte.d.ts",
+      "import": "./dist/eslint-svelte/index.es.js"
+    },
     "./i18next": {
       "types": "./dist/i18next.d.ts",
       "import": "./dist/i18next/index.es.js"
@@ -104,6 +108,12 @@
       "optional": true
     },
     "@vitest/browser-playwright": {
+      "optional": true
+    },
+    "eslint-plugin-storybook": {
+      "optional": true
+    },
+    "eslint-plugin-svelte": {
       "optional": true
     },
     "estree-walker": {
