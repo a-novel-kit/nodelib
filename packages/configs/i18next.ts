@@ -8,6 +8,7 @@ type TypesConfig = NonNullable<I18nextToolkitConfig["types"]>;
 /** CatalogFormat selects the repository format used for source messages and generated updates. */
 export type CatalogFormat = "json" | "yaml";
 
+/** The extraction options the shared catalog contract fixes, which {@link I18nextOptions.extract} cannot override. */
 type SharedExtractOption =
   | "defaultNS"
   | "extractFromComments"

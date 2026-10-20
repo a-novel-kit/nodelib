@@ -25,4 +25,4 @@ Provide the following, when applicable.
 - **OS**: [ Linux | Windows | macOS | iOS | Android ]
   - **OS Version**: For Linux users, also provide your distro
 - **Node version**: The result of running `node -v`
-- **NPM version**: which release / commit sha you tested on.
+- **Package version**: the nodelib release or commit SHA you tested.

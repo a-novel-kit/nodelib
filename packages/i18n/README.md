@@ -4,9 +4,9 @@ Scoped localization runtime helpers for request-rendered applications.
 
 ## Installation
 
-GitHub Packages needs a token with `read:packages`, even for public packages. Configure the
-`@a-novel-kit` registry as the [nodelib README](https://github.com/a-novel-kit/nodelib#installation)
-shows, then add the package with its i18next peer:
+Configure the `@a-novel-kit` registry as the
+[nodelib README](https://github.com/a-novel-kit/nodelib#installation) shows, then add the package
+with its i18next peer:
 
 ```bash
 pnpm add @a-novel-kit/nodelib-i18n i18next
@@ -14,8 +14,8 @@ pnpm add @a-novel-kit/nodelib-i18n i18next
 
 ## Usage
 
-The caller owns its supported locales, namespaces, and static catalog loaders. A new i18next
-instance is returned for each request, so changing one instance cannot leak locale state to another.
+The caller owns its supported locales, namespaces, and static catalog loaders. Each request gets a
+new i18next instance, so changing one cannot leak locale state to another.
 
 ```ts
 import { createRequestI18n, resolveAcceptLanguage } from "@a-novel-kit/nodelib-i18n";

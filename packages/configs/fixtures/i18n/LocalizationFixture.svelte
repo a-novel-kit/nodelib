@@ -11,6 +11,7 @@
 
   let { count = 2, perspective = "creator", t }: Props = $props();
 
+  // Each context is spelled out, so static extraction finds the key of every variant.
   const perspectiveLabel = $derived(
     perspective === "creator"
       ? t("fixture.perspective", { context: "creator" })
