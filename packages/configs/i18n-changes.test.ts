@@ -9,6 +9,22 @@ import { afterEach, describe, expect, it } from "vitest";
 
 type Messages = Record<string, string>;
 
+/** A catalog pair at the merge base and at HEAD. */
+type Catalogs = [base: Messages, head: Messages];
+
+interface GapCase {
+  name: string;
+  translation: Catalogs;
+  gaps: string[];
+}
+
+interface DriftCase {
+  name: string;
+  source: Catalogs;
+  translation: Catalogs;
+  drift: string[];
+}
+
 function revision(base: Messages, head: Messages) {
   return { base: new Map(Object.entries(base)), head: new Map(Object.entries(head)) };
 }
@@ -20,7 +36,7 @@ const pluralTranslation = {
   "common:items_other": "{{count}} éléments",
 };
 
-const gapCases: { name: string; translation: [Messages, Messages]; gaps: string[] }[] = [
+const gapCases: GapCase[] = [
   {
     name: "reports a new key left empty",
     translation: [{}, { "common:home": "" }],
@@ -54,57 +70,56 @@ describe("findGaps", () => {
   });
 });
 
-const driftCases: { name: string; source: [Messages, Messages]; translation: [Messages, Messages]; drift: string[] }[] =
-  [
-    {
-      name: "reports a changed source whose translation kept its value",
-      source: [{ "common:home": "Back to home" }, { "common:home": "Return home" }],
-      translation: [{ "common:home": "Retour à l’accueil" }, { "common:home": "Retour à l’accueil" }],
-      drift: ["common:home"],
-    },
-    {
-      name: "accepts a translation updated with its source",
-      source: [{ "common:home": "Back to home" }, { "common:home": "Return home" }],
-      translation: [{ "common:home": "Retour à l’accueil" }, { "common:home": "Revenir à l’accueil" }],
-      drift: [],
-    },
-    {
-      name: "ignores an unchanged source",
-      source: [{ "common:home": "Return home" }, { "common:home": "Return home" }],
-      translation: [{ "common:home": "Revenir à l’accueil" }, { "common:home": "Revenir à l’accueil" }],
-      drift: [],
-    },
-    {
-      name: "leaves a new source key to the gap check",
-      source: [{}, { "common:home": "Return home" }],
-      translation: [{}, { "common:home": "" }],
-      drift: [],
-    },
-    {
-      name: "leaves an empty translation to the gap check",
-      source: [{ "common:home": "Back to home" }, { "common:home": "Return home" }],
-      translation: [{ "common:home": "" }, { "common:home": "" }],
-      drift: [],
-    },
-    {
-      name: "ignores a removed source key",
-      source: [{ "common:home": "Back to home" }, {}],
-      translation: [{ "common:home": "Retour à l’accueil" }, { "common:home": "Retour à l’accueil" }],
-      drift: [],
-    },
-    {
-      name: "reports a plural group once when its translation forms all kept their values",
-      source: [pluralSource, { ...pluralSource, "common:items_other": "{{count}} entries" }],
-      translation: [pluralTranslation, pluralTranslation],
-      drift: ["common:items"],
-    },
-    {
-      name: "accepts a plural group whose translation updated any form",
-      source: [pluralSource, { ...pluralSource, "common:items_other": "{{count}} entries" }],
-      translation: [pluralTranslation, { ...pluralTranslation, "common:items_other": "{{count}} entrées" }],
-      drift: [],
-    },
-  ];
+const driftCases: DriftCase[] = [
+  {
+    name: "reports a changed source whose translation kept its value",
+    source: [{ "common:home": "Back to home" }, { "common:home": "Return home" }],
+    translation: [{ "common:home": "Retour à l’accueil" }, { "common:home": "Retour à l’accueil" }],
+    drift: ["common:home"],
+  },
+  {
+    name: "accepts a translation updated with its source",
+    source: [{ "common:home": "Back to home" }, { "common:home": "Return home" }],
+    translation: [{ "common:home": "Retour à l’accueil" }, { "common:home": "Revenir à l’accueil" }],
+    drift: [],
+  },
+  {
+    name: "ignores an unchanged source",
+    source: [{ "common:home": "Return home" }, { "common:home": "Return home" }],
+    translation: [{ "common:home": "Revenir à l’accueil" }, { "common:home": "Revenir à l’accueil" }],
+    drift: [],
+  },
+  {
+    name: "leaves a new source key to the gap check",
+    source: [{}, { "common:home": "Return home" }],
+    translation: [{}, { "common:home": "" }],
+    drift: [],
+  },
+  {
+    name: "leaves an empty translation to the gap check",
+    source: [{ "common:home": "Back to home" }, { "common:home": "Return home" }],
+    translation: [{ "common:home": "" }, { "common:home": "" }],
+    drift: [],
+  },
+  {
+    name: "ignores a removed source key",
+    source: [{ "common:home": "Back to home" }, {}],
+    translation: [{ "common:home": "Retour à l’accueil" }, { "common:home": "Retour à l’accueil" }],
+    drift: [],
+  },
+  {
+    name: "reports a plural group once when its translation forms all kept their values",
+    source: [pluralSource, { ...pluralSource, "common:items_other": "{{count}} entries" }],
+    translation: [pluralTranslation, pluralTranslation],
+    drift: ["common:items"],
+  },
+  {
+    name: "accepts a plural group whose translation updated any form",
+    source: [pluralSource, { ...pluralSource, "common:items_other": "{{count}} entries" }],
+    translation: [pluralTranslation, { ...pluralTranslation, "common:items_other": "{{count}} entrées" }],
+    drift: [],
+  },
+];
 
 describe("findDrift", () => {
   it.each(driftCases)("$name", ({ source, translation, drift }) => {
