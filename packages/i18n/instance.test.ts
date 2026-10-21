@@ -98,6 +98,18 @@ describe("createRequestI18n", () => {
     expect(english.t("ready")).toBe("Static translations are ready");
   });
 
+  it("requests the selected and source locales together", () => {
+    const input = options("fr");
+    input.loadNamespace.mockReturnValue(new Promise(() => {}));
+
+    void createRequestI18n(input);
+
+    expect(input.loadNamespace.mock.calls).toEqual([
+      ["fr", "common"],
+      ["en", "common"],
+    ]);
+  });
+
   it("loads the source locale only once when it is selected", async () => {
     const input = options("en");
 
