@@ -96,7 +96,11 @@ async function probeService(
       },
       signal: AbortSignal.timeout(timeoutMs),
     });
-    if (!response.ok) return { status: "down" };
+    if (!response.ok) {
+      // An unread body holds its connection until the deadline aborts it.
+      await response.body?.cancel();
+      return { status: "down" };
+    }
 
     const dependencies = readDependencies(await response.json());
     return dependencies ? { status: "up", dependencies } : { status: "down" };
