@@ -23,10 +23,14 @@ which only a project importing them installs.
 | `@a-novel-kit/nodelib-config/i18next`          | Static JSON or YAML extraction, status, and type policy | `i18next-cli`, `i18next-cli-plugin-svelte`                                                 |
 | `@a-novel-kit/nodelib-config/playwright`       | End-to-end suite of a platform's production build       | `playwright`                                                                               |
 | `@a-novel-kit/nodelib-config/sveltekit`        | Vite config with SvelteKit and the Node adapter         | `vite`, `@sveltejs/kit`, `@sveltejs/adapter-node`                                          |
+| `@a-novel-kit/nodelib-config/vitest-offline`   | Vitest setup file that rejects every unstubbed `fetch`  | None                                                                                       |
 | `@a-novel-kit/nodelib-config/vitest-sveltekit` | Unit, browser-component, and Storybook test projects    | `vitest`, `@vitest/browser-playwright`, `@storybook/addon-vitest`, `@sveltejs/kit`         |
 | `@a-novel-kit/nodelib-config/yaml`             | Build-time JSON-compatible YAML modules for Vite        | `vite`                                                                                     |
 
 Each framework entry point accepts product-specific paths or policy and keeps the shared defaults.
+
+The Vitest matrix runs unit tests offline through `vitest-offline`: the global `fetch` rejects every
+request a test does not stub. A test answers its requests with `vi.stubGlobal("fetch", …)`.
 
 Source formats that need an extra Vite transformer supply a plugin factory to the Vitest matrix. The
 matrix calls it once per project, so the unit, browser-component and Storybook projects never share

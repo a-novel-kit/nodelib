@@ -10,6 +10,7 @@ const entries = {
   "i18n-changes": "i18n-changes-cli.ts",
   playwright: "playwright.ts",
   sveltekit: "sveltekit.ts",
+  "vitest-offline": "vitest-offline.ts",
   "vitest-sveltekit": "vitest-sveltekit.ts",
   yaml: "yaml.ts",
 };

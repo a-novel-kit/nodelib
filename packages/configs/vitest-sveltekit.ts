@@ -39,7 +39,10 @@ function headlessChromium() {
   };
 }
 
-/** Builds the standard unit, browser-component, and Storybook Vitest projects for a SvelteKit app. */
+/**
+ * Builds the standard unit, browser-component, and Storybook Vitest projects for a SvelteKit app.
+ * Unit tests run offline: the global `fetch` rejects every request a test does not stub.
+ */
 export function SvelteKitVitest(options: SvelteKitVitestOptions): ViteUserConfig {
   const rootUrl = typeof options.rootUrl === "string" ? new URL(options.rootUrl) : options.rootUrl;
   const storybookConfigDirectory = options.storybookConfigDirectory ?? fileURLToPath(new URL("./.storybook", rootUrl));
@@ -66,6 +69,7 @@ export function SvelteKitVitest(options: SvelteKitVitestOptions): ViteUserConfig
             environment: "node",
             include: [...(options.unitInclude ?? ["src/**/*.test.ts", "scripts/**/*.test.ts"])],
             exclude: [...(options.unitExclude ?? ["src/**/*.svelte.test.ts"])],
+            setupFiles: ["@a-novel-kit/nodelib-config/vitest-offline"],
           },
         }),
         defineProject({
