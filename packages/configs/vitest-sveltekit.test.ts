@@ -77,6 +77,7 @@ describe("SvelteKitVitest", () => {
             name: "unit",
             include: ["src/**/*.test.ts", "scripts/**/*.test.ts"],
             exclude: ["src/**/*.svelte.test.ts"],
+            setupFiles: ["@a-novel-kit/nodelib-config/vitest-offline"],
           }),
         }),
         expect.objectContaining({
