@@ -9,9 +9,9 @@ interface Manifest {
 }
 
 /**
- * Builds the Vite configuration of the workspace package in `directory`. Each entry, a path relative
- * to `directory`, becomes an ES module at `dist/<entry>/index.es.js`, except `index`, which lands at
- * `dist/index.es.js`. Each build empties `dist` first.
+ * Builds the Vite configuration of the workspace package in `directory`. Each entry maps a name to a
+ * path relative to `directory`. The entry becomes an ES module at `dist/<name>/index.es.js`, and the
+ * `index` entry lands at `dist/index.es.js`. Each build empties `dist` first.
  *
  * Every dependency and peer stays external, subpath imports included, so the consumer resolves one
  * copy of each.

@@ -33,9 +33,9 @@ export interface RetryParams<T, Params extends unknown[]> {
 }
 
 /**
- * Wraps a callback so failed invocations are transparently retried. The returned function retries
- * on each thrown error until the callback succeeds, the attempt budget runs out, or an error is
- * marked non-retryable, at which point it defers to the failure handler.
+ * Wraps a callback so a failed call runs again. The returned function retries after each thrown
+ * error until the callback succeeds, the attempts run out, or `condition` rejects the error. It then
+ * defers to `onFailure`.
  */
 export function retry<T, Params extends unknown[]>(
   callback: (...params: Params) => T | Promise<T>,
