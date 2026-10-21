@@ -3,11 +3,13 @@ import { relative, resolve } from "node:path";
 import { type Locator, type Page, type TestInfo, expect } from "playwright/test";
 
 /**
- * Captures a named visual checkpoint. With `PLAYWRIGHT_SNAPSHOT_DIR` set, as the `test-playwright`
- * action does, it compares against the reference and records a `visual-snapshot` annotation with the
- * snapshot's relative path, from which the action detects removed checkpoints. Without it, the
- * screenshot is attached for local diagnosis. Keep `name` fixed. A name that changes with the page's
- * copy reads as a removed checkpoint instead of a reviewable diff.
+ * Captures a named visual checkpoint. Keep `name` fixed. A name that changes with the page's copy
+ * reads as a removed checkpoint instead of a reviewable diff.
+ *
+ * The `test-playwright` action sets `PLAYWRIGHT_SNAPSHOT_DIR`. The checkpoint then compares against
+ * its reference and records a `visual-snapshot` annotation with the snapshot's relative path. The
+ * action reads these annotations to detect removed checkpoints. Without the variable, the screenshot
+ * is attached for local diagnosis.
  */
 export async function screenshot(page: Page, info: TestInfo, name: string, mask: Locator[] = []): Promise<void> {
   await page.evaluate(() => document.fonts.ready);

@@ -95,10 +95,12 @@ export async function createRequestI18n<Locale extends string, Namespace extends
 ): Promise<i18n> {
   validateNamespaces(options.defaultNamespace, options.namespaces);
 
-  const resources: Resource = {};
-  for (const locale of new Set([options.locale, options.defaultLocale])) {
-    resources[locale] = await loadLanguage(locale, options.namespaces, options.loadNamespace);
-  }
+  const locales = new Set([options.locale, options.defaultLocale]);
+  const entries = await Promise.all(
+    [...locales].map(
+      async (locale) => [locale, await loadLanguage(locale, options.namespaces, options.loadNamespace)] as const
+    )
+  );
 
-  return createStaticI18n({ ...options, resources });
+  return createStaticI18n({ ...options, resources: Object.fromEntries(entries) });
 }

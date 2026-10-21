@@ -70,7 +70,9 @@ export function createDowntimeReader({
         headers: { accept: "application/json" },
         signal: AbortSignal.timeout(timeoutMs),
       });
+      // An unread body holds its connection until the deadline aborts it.
       if (response.ok) downtime = parseDowntime(await response.json());
+      else await response.body?.cancel();
     } catch {
       // Keep the last known value.
     } finally {

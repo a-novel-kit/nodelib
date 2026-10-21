@@ -29,9 +29,9 @@ export interface ComposeSetupOptions {
 }
 
 /**
- * Builds a Playwright global setup that owns fresh services for one run. Its teardown writes
- * `integration-services.log`, which the `test-playwright` action uploads, then removes the
- * services and their volumes, including when the services never became ready.
+ * Builds a Playwright global setup that owns fresh services for one run. Its teardown saves the
+ * services' logs to `integration-services.log`, which the `test-playwright` action uploads. It then
+ * removes the services and their volumes. The teardown also runs when the services never become ready.
  */
 export function composeSetup({ compose, ready, timeout = 60_000 }: ComposeSetupOptions) {
   return async function setup(): Promise<() => Promise<void>> {

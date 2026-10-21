@@ -64,6 +64,13 @@ describe("createDowntimeReader", () => {
     expect(fetchImplementation).toHaveBeenCalledTimes(2);
   });
 
+  it("releases the body of an error status", async () => {
+    const failure = response("not found", 404);
+
+    await createDowntimeReader({ url, fetch: async () => failure })();
+    expect(failure.bodyUsed).toBe(true);
+  });
+
   it("resolves to null before any read succeeds", async () => {
     const fetchImplementation = vi.fn<typeof globalThis.fetch>(async () =>
       Promise.reject(new TypeError("fetch failed"))

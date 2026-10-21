@@ -112,6 +112,13 @@ describe("aggregateHealth", () => {
     });
   });
 
+  it("releases the body of a non-success response", async () => {
+    const failure = response({ "client:postgres": { status: "up" } }, 503);
+
+    await aggregateHealth({ fetch: async () => failure, services, timeoutMs: 500 });
+    expect(failure.bodyUsed).toBe(true);
+  });
+
   it("rejects an invalid deadline before sending requests for an eager registry", async () => {
     const fetchImplementation = vi.fn<typeof globalThis.fetch>();
 

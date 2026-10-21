@@ -101,20 +101,27 @@ variables as the Go services:
 
 The export to Google Cloud authenticates with the Application Default Credentials.
 
-Install the OpenTelemetry peers, turn on SvelteKit's server spans with
-`sveltekit({ tracing: { server: true } })`, and start tracing from `src/instrumentation.server.ts`,
-which SvelteKit loads before the application:
+A platform sets up tracing in three steps:
 
-```ts
-import { GCLOUD_PROJECT_ID, OTEL } from "$app/env/private";
+1. Install the OpenTelemetry peers.
+2. Turn on SvelteKit's server spans with `sveltekit({ tracing: { server: true } })`.
+3. Start tracing from `src/instrumentation.server.ts`. SvelteKit loads that file before the
+   application:
 
-import { startTelemetry } from "@a-novel-kit/nodelib-server/telemetry";
+   ```ts
+   import { GCLOUD_PROJECT_ID, OTEL } from "$app/env/private";
 
-const telemetry = startTelemetry({ serviceName: "platform-studio", enabled: OTEL, gcloudProjectId: GCLOUD_PROJECT_ID });
+   import { startTelemetry } from "@a-novel-kit/nodelib-server/telemetry";
 
-// adapter-node emits this once the server has closed, so the buffered spans leave before the exit.
-process.on("sveltekit:shutdown", () => void telemetry.shutdown());
-```
+   const telemetry = startTelemetry({
+     serviceName: "platform-studio",
+     enabled: OTEL,
+     gcloudProjectId: GCLOUD_PROJECT_ID,
+   });
+
+   // adapter-node emits this once the server has closed, so the buffered spans leave before the exit.
+   process.on("sveltekit:shutdown", () => void telemetry.shutdown());
+   ```
 
 SvelteKit continues the trace named by an incoming `traceparent` header. A global `fetch` made while
 handling a request gets a client span and sends the trace context on, so the called service's spans
