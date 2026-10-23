@@ -33,7 +33,7 @@
     "@opentelemetry/api": "^1.10.0",
     "@opentelemetry/exporter-trace-otlp-proto": "^0.300.0",
     "@opentelemetry/instrumentation": "^0.300.0",
-    "@opentelemetry/instrumentation-undici": "^0.33.0",
+    "@opentelemetry/instrumentation-undici": "^0.34.0",
     "@opentelemetry/resources": "^2.12.0",
     "@opentelemetry/sdk-trace-node": "^2.12.0",
     "google-auth-library": "^11.3.1"
