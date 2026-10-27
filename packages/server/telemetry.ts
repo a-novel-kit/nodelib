@@ -1,33 +1,39 @@
-import { DiagConsoleLogger, DiagLogLevel, diag } from "@opentelemetry/api";
+import {
+  type Attributes,
+  type Context,
+  DiagConsoleLogger,
+  DiagLogLevel,
+  type SpanKind,
+  diag,
+} from "@opentelemetry/api";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-proto";
 import { registerInstrumentations } from "@opentelemetry/instrumentation";
 import { UndiciInstrumentation } from "@opentelemetry/instrumentation-undici";
 import { resourceFromAttributes } from "@opentelemetry/resources";
 import {
-  AlwaysOnSampler,
   BatchSpanProcessor,
   ConsoleSpanExporter,
   NodeTracerProvider,
   NoopSpanProcessor,
+  ParentBasedSampler,
+  type Sampler,
+  SamplingDecision,
+  type SamplingResult,
   type Span,
   type SpanExporter,
 } from "@opentelemetry/sdk-trace-node";
-import { GoogleAuth } from "google-auth-library";
-
-/** The OTLP traces endpoint of Google Cloud's Telemetry API. */
-const gcloudTracesUrl = "https://telemetry.googleapis.com/v1/traces";
 
 /** Span attributes that hold a URL or its query string. */
 const urlAttributes = ["http.url", "url.full", "url.query"];
 
-/** TelemetryOptions selects whether a platform server traces, and where its spans go. */
+/** TelemetryOptions selects whether a platform server traces, and which requests it leaves out. */
 export interface TelemetryOptions {
   /** Names the platform on every span, as the `service.name` resource attribute. */
   serviceName: string;
   /** Records and exports spans. When false, nothing is installed and every span is a no-op. */
   enabled: boolean;
-  /** Exports to this Google Cloud project. Without it, spans print to standard output. */
-  gcloudProjectId?: string;
+  /** Lists the routes whose requests produce no span, such as a liveness probe's `/ping`. */
+  untracedRoutes?: string[];
 }
 
 /** Telemetry is the tracing setup started by {@link startTelemetry}. */
@@ -40,10 +46,11 @@ export interface Telemetry {
  * Starts tracing for a platform server. Call it from `src/instrumentation.server.ts`, which SvelteKit
  * loads before the application.
  *
- * Every trace is kept, since Cloud Run stamps its own sampling decision on each request. A global
- * `fetch` made while handling a request gets a client span and sends the trace context to the server
- * it calls. Recorded URLs keep their parameter names, but every query value becomes `REDACTED`,
- * because links carry credentials.
+ * Spans export over OTLP/HTTP once `OTEL_EXPORTER_OTLP_ENDPOINT` is set, and print to standard output
+ * otherwise. Every trace is kept, even one its caller did not sample, except the requests to an
+ * untraced route. A global `fetch` made while handling a request gets a client span and sends the
+ * trace context to the server it calls. Recorded URLs keep their parameter names, but every query
+ * value becomes `REDACTED`, because links carry credentials.
  */
 export function startTelemetry(options: TelemetryOptions): Telemetry {
   if (!options.enabled) return { shutdown: async () => {} };
@@ -52,12 +59,9 @@ export function startTelemetry(options: TelemetryOptions): Telemetry {
   diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ERROR);
 
   const provider = new NodeTracerProvider({
-    resource: resourceFromAttributes({
-      "service.name": options.serviceName,
-      ...(options.gcloudProjectId && { "gcp.project_id": options.gcloudProjectId }),
-    }),
-    sampler: new AlwaysOnSampler(),
-    spanProcessors: [new UrlRedactor(), new BatchSpanProcessor(spanExporter(options.gcloudProjectId))],
+    resource: resourceFromAttributes({ "service.name": options.serviceName }),
+    sampler: keepEveryTrace(options.untracedRoutes ?? []),
+    spanProcessors: [new UrlRedactor(), new BatchSpanProcessor(spanExporter())],
   });
 
   provider.register();
@@ -75,16 +79,37 @@ export function startTelemetry(options: TelemetryOptions): Telemetry {
   };
 }
 
-function spanExporter(gcloudProjectId: string | undefined): SpanExporter {
-  if (!gcloudProjectId) return new ConsoleSpanExporter();
+/** The OTLP exporter reads its endpoint, headers and compression from the `OTEL_EXPORTER_OTLP_*` variables. */
+function spanExporter(): SpanExporter {
+  return process.env.OTEL_EXPORTER_OTLP_ENDPOINT ? new OTLPTraceExporter() : new ConsoleSpanExporter();
+}
 
-  const auth = new GoogleAuth({ scopes: "https://www.googleapis.com/auth/cloud-platform" });
+/**
+ * Samples every request, whatever its caller decided, except those to an untraced route. The spans
+ * under a dropped request follow it, as the parent-based default drops the children of an unsampled
+ * local parent.
+ */
+function keepEveryTrace(untracedRoutes: string[]): Sampler {
+  const sampler = new RouteSampler(new Set(untracedRoutes));
+  return new ParentBasedSampler({ root: sampler, remoteParentSampled: sampler, remoteParentNotSampled: sampler });
+}
 
-  return new OTLPTraceExporter({
-    url: gcloudTracesUrl,
-    // Access tokens expire, and the client refreshes them, so each export reads them again.
-    headers: async () => Object.fromEntries((await auth.getRequestHeaders()).entries()),
-  });
+/** Drops a span whose `http.route` is untraced, and records every other one. */
+class RouteSampler implements Sampler {
+  constructor(private readonly untracedRoutes: ReadonlySet<string>) {}
+
+  shouldSample(
+    _context: Context,
+    _traceId: string,
+    _name: string,
+    _kind: SpanKind,
+    attributes: Attributes
+  ): SamplingResult {
+    const route = attributes["http.route"];
+    const untraced = typeof route === "string" && this.untracedRoutes.has(route);
+
+    return { decision: untraced ? SamplingDecision.NOT_RECORD : SamplingDecision.RECORD_AND_SAMPLED };
+  }
 }
 
 function redactQuery(url: string): string {
