@@ -9,7 +9,7 @@ import {
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-proto";
 import { registerInstrumentations } from "@opentelemetry/instrumentation";
 import { UndiciInstrumentation } from "@opentelemetry/instrumentation-undici";
-import { resourceFromAttributes } from "@opentelemetry/resources";
+import { detectResources, envDetector, resourceFromAttributes } from "@opentelemetry/resources";
 import {
   BatchSpanProcessor,
   ConsoleSpanExporter,
@@ -28,7 +28,7 @@ const urlAttributes = ["http.url", "url.full", "url.query"];
 
 /** TelemetryOptions selects whether a platform server traces, and which requests it leaves out. */
 export interface TelemetryOptions {
-  /** Names the platform on every span, as the `service.name` resource attribute. */
+  /** Names the platform on every span, as the `service.name` resource attribute, unless `OTEL_SERVICE_NAME` is set. */
   serviceName: string;
   /** Records and exports spans. When false, nothing is installed and every span is a no-op. */
   enabled: boolean;
@@ -47,7 +47,8 @@ export interface Telemetry {
  * loads before the application.
  *
  * Spans export over OTLP/HTTP once `OTEL_EXPORTER_OTLP_ENDPOINT` is set, and print to standard output
- * otherwise. Every trace is kept, even one its caller did not sample, except the requests to an
+ * otherwise. `OTEL_RESOURCE_ATTRIBUTES` and `OTEL_SERVICE_NAME` label them, as in the Go services.
+ * Every trace is kept, even one its caller did not sample, except the requests to an
  * untraced route. A global `fetch` made while handling a request gets a client span and sends the
  * trace context to the server it calls. Recorded URLs keep their parameter names, but every query
  * value becomes `REDACTED`, because links carry credentials.
@@ -59,7 +60,10 @@ export function startTelemetry(options: TelemetryOptions): Telemetry {
   diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ERROR);
 
   const provider = new NodeTracerProvider({
-    resource: resourceFromAttributes({ "service.name": options.serviceName }),
+    // The environment's attributes win, as they do in the Go SDK.
+    resource: resourceFromAttributes({ "service.name": options.serviceName }).merge(
+      detectResources({ detectors: [envDetector] })
+    ),
     sampler: keepEveryTrace(options.untracedRoutes ?? []),
     spanProcessors: [new UrlRedactor(), new BatchSpanProcessor(spanExporter())],
   });

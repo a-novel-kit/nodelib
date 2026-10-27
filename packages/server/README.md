@@ -101,7 +101,8 @@ services:
 
 The OpenTelemetry SDK reads the standard `OTEL_EXPORTER_OTLP_*` variables itself:
 `OTEL_EXPORTER_OTLP_HEADERS` carries the backend's key, and `OTEL_EXPORTER_OTLP_COMPRESSION=gzip`
-compresses each export. `serviceName` names the platform on every span.
+compresses each export. `serviceName` names the platform on every span, and the standard
+`OTEL_SERVICE_NAME` and `OTEL_RESOURCE_ATTRIBUTES` label the spans as they do the Go services'.
 
 A platform sets up tracing in three steps:
 
