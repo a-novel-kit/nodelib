@@ -40,13 +40,13 @@ pnpm add -D @a-novel-kit/nodelib-test
 
 ## Packages
 
-| Package                                              | What it is for                                                                              |
-| ---------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| [`@a-novel-kit/nodelib-browser`](./packages/browser) | Browser helpers that handle `fetch` responses and shared async behavior one way everywhere. |
-| [`@a-novel-kit/nodelib-config`](./packages/configs)  | The shared lint, format, build and test presets.                                            |
-| [`@a-novel-kit/nodelib-i18n`](./packages/i18n)       | Isolated i18next instances and locale negotiation. Catalogs stay with each app.             |
-| [`@a-novel-kit/nodelib-server`](./packages/server)   | Framework-independent runtime primitives for platform servers.                              |
-| [`@a-novel-kit/nodelib-test`](./packages/test)       | HTTP status assertions and the helpers of platform end-to-end suites.                       |
+| Package                                              | What it is for                                                                                                   |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| [`@a-novel-kit/nodelib-browser`](./packages/browser) | Browser helpers that handle `fetch` responses, shared async behavior and consented telemetry one way everywhere. |
+| [`@a-novel-kit/nodelib-config`](./packages/configs)  | The shared lint, format, build and test presets.                                                                 |
+| [`@a-novel-kit/nodelib-i18n`](./packages/i18n)       | Isolated i18next instances and locale negotiation. Catalogs stay with each app.                                  |
+| [`@a-novel-kit/nodelib-server`](./packages/server)   | Framework-independent runtime primitives for platform servers.                                                   |
+| [`@a-novel-kit/nodelib-test`](./packages/test)       | HTTP status assertions and the helpers of platform end-to-end suites.                                            |
 
 ## Contributing
 

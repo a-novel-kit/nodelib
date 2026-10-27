@@ -16,6 +16,10 @@
     "./utils": {
       "types": "./dist/utils/index.d.ts",
       "import": "./dist/utils/index.es.js"
+    },
+    "./telemetry": {
+      "types": "./dist/telemetry/index.d.ts",
+      "import": "./dist/telemetry/index.es.js"
     }
   },
   "files": [
@@ -24,12 +28,19 @@
     "LICENSE"
   ],
   "devDependencies": {
+    "@sentry/browser": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"
   },
   "peerDependencies": {
+    "@sentry/browser": "^11.9.0",
     "zod": "^4.6.7"
+  },
+  "peerDependenciesMeta": {
+    "@sentry/browser": {
+      "optional": true
+    }
   },
   "packageManager": "pnpm@12.15.0",
   "engines": {

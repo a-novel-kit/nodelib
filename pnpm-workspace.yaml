@@ -15,6 +15,7 @@ catalog:
   "@a-novel-kit/nodelib-config": "*"
   "@eslint/config-helpers": ^0.7.0
   "@eslint/js": ^10.0.1
+  "@sentry/browser": ^11.9.0
   "@storybook/addon-vitest": ^10.5.8
   "@sveltejs/adapter-node": ^6.0.0
   "@sveltejs/kit": ^3.0.0
