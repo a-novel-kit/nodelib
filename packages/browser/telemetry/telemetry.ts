@@ -8,7 +8,7 @@ type Sentry = typeof import("@sentry/browser");
 export interface BrowserTelemetryOptions {
   /** Names the Sentry project that receives the telemetry. Without it, nothing reports and the visitor is never asked. */
   dsn?: string;
-  /** Names the release as `<repository>@<version>`, the name release CI gives it in Sentry. */
+  /** Names the release as `<repository>@<version>`, as the services name theirs. */
   release?: string;
 }
 
