@@ -90,16 +90,18 @@ page reopens a feature early. In the browser, `isDowntimeError` from
 ## Tracing
 
 `@a-novel-kit/nodelib-server/telemetry` traces a SvelteKit server and carries each trace into the
-services it calls. Its options mirror golib's OpenTelemetry presets, so a platform reads the same
-variables as the Go services:
+services it calls. It mirrors golib's OTLP preset, so a platform reads the same variables as the Go
+services:
 
-| `enabled` (`OTEL`) | `gcloudProjectId` (`GCLOUD_PROJECT_ID`) | Spans                              |
-| ------------------ | --------------------------------------- | ---------------------------------- |
-| `false`            | any                                     | not recorded                       |
-| `true`             | unset                                   | printed to standard output         |
-| `true`             | set                                     | exported to Google Cloud over OTLP |
+| `enabled` (`OTEL`) | `OTEL_EXPORTER_OTLP_ENDPOINT` | Spans                      |
+| ------------------ | ----------------------------- | -------------------------- |
+| `false`            | any                           | not recorded               |
+| `true`             | unset                         | printed to standard output |
+| `true`             | set                           | exported over OTLP/HTTP    |
 
-The export to Google Cloud authenticates with the Application Default Credentials.
+The OpenTelemetry SDK reads the standard `OTEL_EXPORTER_OTLP_*` variables itself:
+`OTEL_EXPORTER_OTLP_HEADERS` carries the backend's key, and `OTEL_EXPORTER_OTLP_COMPRESSION=gzip`
+compresses each export. `serviceName` names the platform on every span.
 
 A platform sets up tracing in three steps:
 
@@ -109,15 +111,11 @@ A platform sets up tracing in three steps:
    application:
 
    ```ts
-   import { GCLOUD_PROJECT_ID, OTEL } from "$app/env/private";
+   import { OTEL } from "$app/env/private";
 
    import { startTelemetry } from "@a-novel-kit/nodelib-server/telemetry";
 
-   const telemetry = startTelemetry({
-     serviceName: "platform-studio",
-     enabled: OTEL,
-     gcloudProjectId: GCLOUD_PROJECT_ID,
-   });
+   const telemetry = startTelemetry({ serviceName: "platform-studio", enabled: OTEL, untracedRoutes: ["/ping"] });
 
    // adapter-node emits this once the server has closed, so the buffered spans leave before the exit.
    process.on("sveltekit:shutdown", () => void telemetry.shutdown());
@@ -125,5 +123,7 @@ A platform sets up tracing in three steps:
 
 SvelteKit continues the trace named by an incoming `traceparent` header. A global `fetch` made while
 handling a request gets a client span and sends the trace context on, so the called service's spans
-join the same trace. Every trace is kept, as in the Go services. Recorded URLs keep their parameter
-names, but each query value becomes `REDACTED`, since links carry short codes and emails.
+join the same trace. Every trace is kept, even one the caller did not sample, as in the Go services.
+The requests to `untracedRoutes`, matched on the route ID SvelteKit records as `http.route`, produce
+no span, so a liveness probe spends no span quota. Recorded URLs keep their parameter names, but each
+query value becomes `REDACTED`, since links carry short codes and emails.
