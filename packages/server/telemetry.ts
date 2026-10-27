@@ -110,10 +110,6 @@ class RouteSampler implements Sampler {
 
     return { decision: untraced ? SamplingDecision.NOT_RECORD : SamplingDecision.RECORD_AND_SAMPLED };
   }
-
-  toString(): string {
-    return "RouteSampler";
-  }
 }
 
 function redactQuery(url: string): string {
