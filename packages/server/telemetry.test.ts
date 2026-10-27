@@ -123,6 +123,18 @@ describe("startTelemetry", () => {
     expect(spans.map((span) => span.name)).toEqual(["request"]);
   });
 
+  it("labels spans with the standard resource variables", async () => {
+    vi.stubEnv("OTEL_RESOURCE_ATTRIBUTES", "a_novel.workload=api");
+    const dir = vi.spyOn(console, "dir").mockImplementation(() => {});
+
+    const telemetry = startTelemetry({ serviceName: "platform", enabled: true });
+    trace.getTracer("test").startSpan("operation").end();
+    await telemetry.shutdown();
+
+    const [span] = dir.mock.calls.map(([printed]) => printed as { resource: { attributes: Record<string, unknown> } });
+    expect(span?.resource.attributes).toEqual({ "service.name": "platform", "a_novel.workload": "api" });
+  });
+
   it("drops the requests to an untraced route with the spans under them", async () => {
     const spans = await printedSpans(
       async () => {
