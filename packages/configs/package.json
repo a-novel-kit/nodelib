@@ -75,7 +75,7 @@
     "@sveltejs/adapter-node": "^6.0.0",
     "@sveltejs/kit": "^3.1.0",
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
-    "@types/node": "^24.19.2",
+    "@types/node": "^26.6.5",
     "@vitest/browser-playwright": "^5.0.5",
     "eslint": "^10.13.0",
     "eslint-config-prettier": "^10.1.8",
