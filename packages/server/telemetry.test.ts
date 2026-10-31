@@ -7,7 +7,7 @@ import { gunzipSync } from "node:zlib";
 
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { ROOT_CONTEXT, TraceFlags, context, propagation, trace } from "@opentelemetry/api";
+import { ROOT_CONTEXT, SpanKind, TraceFlags, context, propagation, trace } from "@opentelemetry/api";
 
 afterEach(() => {
   trace.disable();
@@ -21,14 +21,14 @@ afterEach(() => {
 async function printedSpans(
   fn: () => Promise<void>,
   options: Partial<TelemetryOptions> = {}
-): Promise<{ name: string; attributes: Record<string, unknown> }[]> {
+): Promise<{ name: string; kind: SpanKind; attributes: Record<string, unknown> }[]> {
   const dir = vi.spyOn(console, "dir").mockImplementation(() => {});
   const telemetry = startTelemetry({ serviceName: "platform", enabled: true, ...options });
 
   await fn();
   await telemetry.shutdown();
 
-  return dir.mock.calls.map(([span]) => span as { name: string; attributes: Record<string, unknown> });
+  return dir.mock.calls.map(([span]) => span as { name: string; kind: SpanKind; attributes: Record<string, unknown> });
 }
 
 /** Starts a server that records each request it receives, with its full body. */
@@ -106,6 +106,20 @@ describe("startTelemetry", () => {
     expect(server.requests).toHaveLength(2);
     expect(server.requests[0]?.request.headers.traceparent).toContain(traceId);
     expect(spans.map((span) => span.name)).toEqual(["GET", "request"]);
+  });
+
+  it("makes SvelteKit's span for each request a server span", async () => {
+    const spans = await printedSpans(async () => {
+      trace.getTracer("sveltekit").startActiveSpan("sveltekit.handle.root", (span) => {
+        trace.getTracer("sveltekit").startSpan("sveltekit.resolve").end();
+        span.end();
+      });
+    });
+
+    expect(spans.map(({ name, kind }) => ({ name, kind }))).toEqual([
+      { name: "sveltekit.resolve", kind: SpanKind.INTERNAL },
+      { name: "sveltekit.handle.root", kind: SpanKind.SERVER },
+    ]);
   });
 
   it("keeps a trace its caller did not sample", async () => {
