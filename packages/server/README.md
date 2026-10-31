@@ -122,7 +122,9 @@ A platform sets up tracing in three steps:
    process.on("sveltekit:shutdown", () => void telemetry.shutdown());
    ```
 
-SvelteKit continues the trace named by an incoming `traceparent` header. A global `fetch` made while
+SvelteKit continues the trace named by an incoming `traceparent` header. Its span for each request,
+`sveltekit.handle.root`, becomes the request's server span, so span metrics still count the request
+once the browser's `traceparent` gives that span a parent. A global `fetch` made while
 handling a request gets a client span and sends the trace context on, so the called service's spans
 join the same trace. Every trace is kept, even one the caller did not sample, as in the Go services.
 The requests to `untracedRoutes`, matched on the route ID SvelteKit records as `http.route`, produce

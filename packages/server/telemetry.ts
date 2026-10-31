@@ -1,11 +1,4 @@
-import {
-  type Attributes,
-  type Context,
-  DiagConsoleLogger,
-  DiagLogLevel,
-  type SpanKind,
-  diag,
-} from "@opentelemetry/api";
+import { type Attributes, type Context, DiagConsoleLogger, DiagLogLevel, SpanKind, diag } from "@opentelemetry/api";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-proto";
 import { registerInstrumentations } from "@opentelemetry/instrumentation";
 import { UndiciInstrumentation } from "@opentelemetry/instrumentation-undici";
@@ -25,6 +18,9 @@ import {
 
 /** Span attributes that hold a URL or its query string. */
 const urlAttributes = ["http.url", "url.full", "url.query"];
+
+/** The span SvelteKit opens for each request it handles. */
+const requestSpan = "sveltekit.handle.root";
 
 /** TelemetryOptions selects whether a platform server traces, and which requests it leaves out. */
 export interface TelemetryOptions {
@@ -51,7 +47,8 @@ export interface Telemetry {
  * Every trace is kept, even one its caller did not sample, except the requests to an
  * untraced route. A global `fetch` made while handling a request gets a client span and sends the
  * trace context to the server it calls. Recorded URLs keep their parameter names, but every query
- * value becomes `REDACTED`, because links carry credentials.
+ * value becomes `REDACTED`, because links carry credentials. SvelteKit's span for each request is
+ * the request's server span.
  */
 export function startTelemetry(options: TelemetryOptions): Telemetry {
   if (!options.enabled) return { shutdown: async () => {} };
@@ -65,7 +62,7 @@ export function startTelemetry(options: TelemetryOptions): Telemetry {
       detectResources({ detectors: [envDetector] })
     ),
     sampler: keepEveryTrace(options.untracedRoutes ?? []),
-    spanProcessors: [new UrlRedactor(), new BatchSpanProcessor(spanExporter())],
+    spanProcessors: [new UrlRedactor(), new RequestSpanKind(), new BatchSpanProcessor(spanExporter())],
   });
 
   provider.register();
@@ -127,5 +124,17 @@ class UrlRedactor extends NoopSpanProcessor {
       const value = span.attributes[name];
       if (typeof value === "string") span.setAttribute(name, redactQuery(value));
     }
+  }
+}
+
+/**
+ * Makes SvelteKit's span for each request a server span, which SvelteKit opens as an internal one.
+ * Span metrics keep the server spans and the roots, so a request whose `traceparent` names a parent
+ * in the browser would otherwise drop out of them. Remove it once SvelteKit sets the kind itself.
+ */
+class RequestSpanKind extends NoopSpanProcessor {
+  override onStart(span: Span): void {
+    // The API takes a kind only when a span opens, so this sets the field the export reads.
+    if (span.name === requestSpan) (span as { kind: SpanKind }).kind = SpanKind.SERVER;
   }
 }
