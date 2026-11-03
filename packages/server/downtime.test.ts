@@ -16,15 +16,14 @@ const downtime = {
   end: new Date("2026-10-12T07:00:00Z"),
 };
 
-function response(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), { status });
-}
-
 const failedReads = [
   { name: "a request that fails", fetch: async () => Promise.reject(new TypeError("fetch failed")) },
-  { name: "an error status", fetch: async () => response("not found", 404) },
-  { name: "a malformed document", fetch: async () => response({ ...document, start: "soon" }) },
-  { name: "a document without components", fetch: async () => response({ start: document.start, end: document.end }) },
+  { name: "an error status", fetch: async () => Response.json("not found", { status: 404 }) },
+  { name: "a malformed document", fetch: async () => Response.json({ ...document, start: "soon" }) },
+  {
+    name: "a document without components",
+    fetch: async () => Response.json({ start: document.start, end: document.end }),
+  },
 ];
 
 const startedCases = [
@@ -44,7 +43,7 @@ describe("createDowntimeReader", () => {
     { name: "reads a planned downtime", body: document, expected: downtime },
     { name: "reads that none is planned", body: null, expected: null },
   ])("$name", async ({ body, expected }) => {
-    const fetchImplementation = vi.fn<typeof globalThis.fetch>(async () => response(body));
+    const fetchImplementation = vi.fn<typeof globalThis.fetch>(async () => Response.json(body));
 
     await expect(createDowntimeReader({ url, fetch: fetchImplementation })()).resolves.toEqual(expected);
     expect(fetchImplementation).toHaveBeenCalledWith(new URL(url), {
@@ -56,7 +55,7 @@ describe("createDowntimeReader", () => {
   it.each(failedReads)("keeps the last known downtime after $name", async ({ fetch }) => {
     const fetchImplementation = vi
       .fn<typeof globalThis.fetch>(fetch)
-      .mockImplementationOnce(async () => response(document));
+      .mockImplementationOnce(async () => Response.json(document));
     const read = createDowntimeReader({ url, fetch: fetchImplementation, ttlMs: 0 });
 
     await expect(read()).resolves.toEqual(downtime);
@@ -65,7 +64,7 @@ describe("createDowntimeReader", () => {
   });
 
   it("releases the body of an error status", async () => {
-    const failure = response("not found", 404);
+    const failure = Response.json("not found", { status: 404 });
 
     await createDowntimeReader({ url, fetch: async () => failure })();
     expect(failure.bodyUsed).toBe(true);
@@ -81,7 +80,7 @@ describe("createDowntimeReader", () => {
 
   it("reuses a read until it expires", async () => {
     vi.useFakeTimers();
-    const fetchImplementation = vi.fn<typeof globalThis.fetch>(async () => response(document));
+    const fetchImplementation = vi.fn<typeof globalThis.fetch>(async () => Response.json(document));
     const read = createDowntimeReader({ url, fetch: fetchImplementation, ttlMs: 60_000 });
 
     await read();
@@ -95,7 +94,7 @@ describe("createDowntimeReader", () => {
   });
 
   it("shares one request between concurrent reads", async () => {
-    const fetchImplementation = vi.fn<typeof globalThis.fetch>(async () => response(document));
+    const fetchImplementation = vi.fn<typeof globalThis.fetch>(async () => Response.json(document));
     const read = createDowntimeReader({ url, fetch: fetchImplementation });
 
     await expect(Promise.all([read(), read()])).resolves.toEqual([downtime, downtime]);

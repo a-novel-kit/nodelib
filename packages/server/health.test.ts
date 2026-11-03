@@ -2,13 +2,6 @@ import { aggregateHealth } from "./health";
 
 import { describe, expect, it, vi } from "vitest";
 
-function response(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), {
-    headers: { "content-type": "application/json" },
-    status,
-  });
-}
-
 const services = {
   authentication: {
     url: "http://authentication:8080/healthcheck",
@@ -22,7 +15,7 @@ describe("aggregateHealth", () => {
       "client:postgres": { status: "up" as const },
       "client:smtp": { status: "up" as const },
     };
-    const fetchImplementation = vi.fn<typeof globalThis.fetch>(async () => response(dependencies));
+    const fetchImplementation = vi.fn<typeof globalThis.fetch>(async () => Response.json(dependencies));
 
     const health = await aggregateHealth({
       config: {
@@ -81,7 +74,7 @@ describe("aggregateHealth", () => {
       "client:postgres": { status: "down" as const, observedAt: "service-owned-field" },
       "client:smtp": { status: "up" as const },
     };
-    const fetchImplementation = vi.fn<typeof globalThis.fetch>(async () => response(dependencies));
+    const fetchImplementation = vi.fn<typeof globalThis.fetch>(async () => Response.json(dependencies));
 
     const health = await aggregateHealth({ fetch: fetchImplementation, services, timeoutMs: 500 });
 
@@ -99,8 +92,8 @@ describe("aggregateHealth", () => {
 
   it.each([
     ["network failure", async () => Promise.reject(new Error("private connection detail"))],
-    ["non-success response", async () => response({ "client:postgres": { status: "up" } }, 503)],
-    ["invalid contract", async () => response({ "client:postgres": { state: "healthy" } })],
+    ["non-success response", async () => Response.json({ "client:postgres": { status: "up" } }, { status: 503 })],
+    ["invalid contract", async () => Response.json({ "client:postgres": { state: "healthy" } })],
   ])("reports an unavailable service without fabricated dependencies for %s", async (_name, request) => {
     const fetchImplementation = vi.fn<typeof globalThis.fetch>(request);
 
@@ -113,7 +106,7 @@ describe("aggregateHealth", () => {
   });
 
   it("releases the body of a non-success response", async () => {
-    const failure = response({ "client:postgres": { status: "up" } }, 503);
+    const failure = Response.json({ "client:postgres": { status: "up" } }, { status: 503 });
 
     await aggregateHealth({ fetch: async () => failure, services, timeoutMs: 500 });
     expect(failure.bodyUsed).toBe(true);
