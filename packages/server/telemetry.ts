@@ -16,8 +16,14 @@ import {
   type SpanExporter,
 } from "@opentelemetry/sdk-trace-node";
 
-/** Span attributes that hold a URL or its query string. */
-const urlAttributes = ["http.url", "url.full", "url.query"];
+/** Span attributes that hold a whole URL. */
+const urlAttributes = ["http.url", "url.full"];
+
+/** Matches each query parameter of a URL. A parameter starts after `?` or `&`, since a path may hold `=`. */
+const urlQueryValue = /([?&][^=&#]*)=[^&#]*/g;
+
+/** Matches each value of `url.query`, which the semantic conventions record without its `?`. */
+const queryValue = /=[^&]*/g;
 
 /** The span SvelteKit opens for each request it handles. */
 const requestSpan = "sveltekit.handle.root";
@@ -113,17 +119,16 @@ class RouteSampler implements Sampler {
   }
 }
 
-function redactQuery(url: string): string {
-  return url.replace(/([?&][^=&#]*)=[^&#]*/g, "$1=REDACTED");
-}
-
-/** Redacts URL attributes as each span starts, before any exporter can read them. */
+/** Redacts query values as each span starts, before any exporter can read them. */
 class UrlRedactor extends NoopSpanProcessor {
   override onStart(span: Span): void {
     for (const name of urlAttributes) {
       const value = span.attributes[name];
-      if (typeof value === "string") span.setAttribute(name, redactQuery(value));
+      if (typeof value === "string") span.setAttribute(name, value.replace(urlQueryValue, "$1=REDACTED"));
     }
+
+    const query = span.attributes["url.query"];
+    if (typeof query === "string") span.setAttribute("url.query", query.replace(queryValue, "=REDACTED"));
   }
 }
 

@@ -88,6 +88,17 @@ describe("startTelemetry", () => {
     });
   });
 
+  it("redacts a url.query recorded without its question mark", async () => {
+    const spans = await printedSpans(async () => {
+      trace
+        .getTracer("test")
+        .startSpan("operation", { attributes: { "url.query": "email=user%40example.com&limit=10" } })
+        .end();
+    });
+
+    expect(spans[0]?.attributes).toEqual({ "url.query": "email=REDACTED&limit=REDACTED" });
+  });
+
   it("sends the trace context with a fetch made inside a span", async () => {
     const server = await recordingServer();
 
