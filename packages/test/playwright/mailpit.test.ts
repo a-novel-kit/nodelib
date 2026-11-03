@@ -4,7 +4,7 @@ import { emailLink } from "./mailpit";
 import { type Server, createServer } from "node:http";
 import type { AddressInfo } from "node:net";
 
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 const messages: Record<string, string> = {
   other: '<a href="http://app.test/account">Your account</a>',
@@ -34,6 +34,10 @@ afterAll(() => {
   server.close();
 });
 
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
 describe("emailLink", () => {
   it("returns the delivered link to the requested path, with its query decoded", async () => {
     await expect(
@@ -45,5 +49,21 @@ describe("emailLink", () => {
     await expect(
       emailLink("someone@example.test", "/ext/account/create", { mailpit, origin: "http://studio.test" })
     ).rejects.toThrow(/Expected: "http:\/\/studio\.test"[^]*Received: "http:\/\/app\.test"/);
+  });
+
+  it("releases the body of an error status", async () => {
+    const responses: Response[] = [];
+    vi.stubGlobal("fetch", async () => {
+      const response = new Response("unavailable", { status: 503 });
+      responses.push(response);
+      return response;
+    });
+
+    await expect(
+      emailLink("someone@example.test", "/ext/account/create", { mailpit, origin: "http://app.test", timeout: 100 })
+    ).rejects.toThrow();
+
+    expect(responses.length).toBeGreaterThan(0);
+    expect(responses.every((response) => response.bodyUsed)).toBe(true);
   });
 });

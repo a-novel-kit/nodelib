@@ -50,7 +50,12 @@ async function deliveredLink(mailpit: string, email: string, pathname: string): 
 
 async function read(url: string): Promise<unknown> {
   const response = await fetch(url);
-  if (!response.ok) throw new Error(`Mailpit answered ${response.status} for ${url}`);
+  if (!response.ok) {
+    // An unread body holds its connection until the server closes it.
+    await response.body?.cancel();
+    throw new Error(`Mailpit answered ${response.status} for ${url}`);
+  }
+
   return response.json();
 }
 
