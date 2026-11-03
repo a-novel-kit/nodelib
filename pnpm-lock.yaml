@@ -216,8 +216,8 @@ catalogs:
       specifier: 26.5.12
       version: 26.5.12
     i18next-cli:
-      specifier: 1.80.6
-      version: 1.80.6
+      specifier: 1.80.7
+      version: 1.80.7
     i18next-cli-plugin-svelte:
       specifier: 2.4.1
       version: 2.4.1
@@ -316,10 +316,10 @@ importers:
         version: 26.5.12(typescript@6.0.3)
       i18next-cli:
         specifier: 'catalog:'
-        version: 1.80.6(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3)
+        version: 1.80.7(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3)
       i18next-cli-plugin-svelte:
         specifier: 'catalog:'
-        version: 2.4.1(estree-walker@3.0.3)(i18next-cli@1.80.6(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3))(svelte@5.57.3(@typescript-eslint/types@8.72.1))
+        version: 2.4.1(estree-walker@3.0.3)(i18next-cli@1.80.7(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3))(svelte@5.57.3(@typescript-eslint/types@8.72.1))
       jiti:
         specifier: 'catalog:'
         version: 2.7.0
@@ -453,10 +453,10 @@ importers:
         version: 3.0.3
       i18next-cli:
         specifier: 'catalog:'
-        version: 1.80.6(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3)
+        version: 1.80.7(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3)
       i18next-cli-plugin-svelte:
         specifier: 'catalog:'
-        version: 2.4.1(estree-walker@3.0.3)(i18next-cli@1.80.6(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3))(svelte@5.57.3(@typescript-eslint/types@8.72.1))
+        version: 2.4.1(estree-walker@3.0.3)(i18next-cli@1.80.7(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3))(svelte@5.57.3(@typescript-eslint/types@8.72.1))
       jiti:
         specifier: 'catalog:'
         version: 2.7.0
@@ -2245,8 +2245,8 @@ packages:
       i18next-cli: ^1.51.6
       svelte: ^5.53.11
 
-  i18next-cli@1.80.6:
-    resolution: {integrity: sha512-RKkmIvkOxDzN6uYwrtH5fXn/1Q4W92BYEUKwELc5wOFmwliLDIX7b6oEzgRD4L8IOBduVX3niAB1HVcJo2+vTA==}
+  i18next-cli@1.80.7:
+    resolution: {integrity: sha512-lp1IniCrnxnfjr3XpO6tybbNI4TArl4+yttDeqdwdloC9Z+Q1y6qkHzmzJhIh5KWFAR6qQ6Bn6SiUDQFPhyxmQ==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -4607,14 +4607,14 @@ snapshots:
 
   html-parse-stringify@4.0.1: {}
 
-  i18next-cli-plugin-svelte@2.4.1(estree-walker@3.0.3)(i18next-cli@1.80.6(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3))(svelte@5.57.3(@typescript-eslint/types@8.72.1)):
+  i18next-cli-plugin-svelte@2.4.1(estree-walker@3.0.3)(i18next-cli@1.80.7(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3))(svelte@5.57.3(@typescript-eslint/types@8.72.1)):
     dependencies:
       estree-walker: 3.0.3
-      i18next-cli: 1.80.6(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3)
+      i18next-cli: 1.80.7(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3)
       recast: 0.23.21
       svelte: 5.57.3(@typescript-eslint/types@8.72.1)
 
-  i18next-cli@1.80.6(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3):
+  i18next-cli@1.80.7(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3):
     dependencies:
       '@croct/json5-parser': 0.2.2
       '@formatjs/icu-messageformat-parser': 3.5.22
