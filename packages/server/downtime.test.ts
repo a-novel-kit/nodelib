@@ -78,6 +78,17 @@ describe("createDowntimeReader", () => {
     await expect(createDowntimeReader({ url, fetch: fetchImplementation })()).resolves.toBeNull();
   });
 
+  it("reads again after a request that throws before it starts", async () => {
+    const fetchImplementation = vi.fn<typeof globalThis.fetch>(() => {
+      throw new TypeError("invalid request");
+    });
+    const read = createDowntimeReader({ url, fetch: fetchImplementation, ttlMs: 0 });
+
+    await read();
+    await read();
+    expect(fetchImplementation).toHaveBeenCalledTimes(2);
+  });
+
   it("reuses a read until it expires", async () => {
     vi.useFakeTimers();
     const fetchImplementation = vi.fn<typeof globalThis.fetch>(async () => Response.json(document));

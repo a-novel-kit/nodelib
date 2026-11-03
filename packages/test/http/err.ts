@@ -1,7 +1,13 @@
 import { isHttpStatusError } from "@a-novel-kit/nodelib-browser/http";
 
-/** Prints a settled value for a failure message, as JSON when it serializes. */
+/**
+ * Prints a settled value for a failure message: an error by its name and message, and any other
+ * value as JSON when it serializes.
+ */
 function prettyRes(res: unknown): string {
+  // An error keeps its message in a property JSON skips.
+  if (res instanceof Error) return String(res);
+
   try {
     return JSON.stringify(res, null, 2);
   } catch {

@@ -48,10 +48,13 @@ export async function newHttpError(response: Response): Promise<HttpError> {
 }
 
 /**
- * problemTags reads the tags of a problem details body, or returns none for any other body.
+ * problemTags reads the tags of a problem details body, which the `application/problem+json` media
+ * type marks (RFC 9457 §3), or returns none for any other body. A media type compares without its
+ * parameters and ignoring case (RFC 9110 §8.3.1).
  */
 function problemTags(headers: Headers, text: string): ProblemTags {
-  if (!headers.get("Content-Type")?.startsWith("application/problem+json")) {
+  const mediaType = headers.get("Content-Type")?.split(";", 1)[0].trim().toLowerCase();
+  if (mediaType !== "application/problem+json") {
     return {};
   }
 

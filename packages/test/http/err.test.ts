@@ -10,10 +10,18 @@ describe("expectStatus", () => {
   });
 
   it.each([
-    { name: "another status", settle: () => Promise.reject(new HttpError(500, "internal")) },
-    { name: "an error without a status", settle: () => Promise.reject(new TypeError("fetch failed")) },
-  ])("fails on $name", async ({ settle }) => {
-    await expect(expectStatus(settle(), 404)).rejects.toThrow("expected error with status 404, got: ");
+    {
+      name: "another status",
+      settle: () => Promise.reject(new HttpError(500, "internal")),
+      got: "HttpError: request failed with status 500: internal",
+    },
+    {
+      name: "an error without a status",
+      settle: () => Promise.reject(new TypeError("fetch failed")),
+      got: "TypeError: fetch failed",
+    },
+  ])("fails on $name", async ({ settle, got }) => {
+    await expect(expectStatus(settle(), 404)).rejects.toThrow(`expected error with status 404, got: ${got}`);
   });
 
   it("prints the value of a promise that resolves", async () => {
