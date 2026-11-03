@@ -87,6 +87,38 @@ users when to expect the service back. Call `isDowntimeStarted` instead of compa
 page reopens a feature early. In the browser, `isDowntimeError` from
 `@a-novel-kit/nodelib-browser/http` tells a refusal during a started downtime from an outage.
 
+## Token verification
+
+`createJwtVerifier` verifies a compact JWT against the issuer's public keys, locally, so a server
+checks a token without calling the issuer on each request. It accepts Ed25519 signatures (RFC 9864)
+whose claims match the options. Create one verifier per process.
+
+```ts
+import { createJwtVerifier } from "@a-novel-kit/nodelib-server";
+
+const verifyAccessToken = createJwtVerifier({
+  fetchKeys: async () => {
+    const response = await fetch(jwksUrl, { signal: AbortSignal.timeout(2_000) });
+    if (!response.ok) throw new Error(`key set unavailable: HTTP ${response.status}`);
+    return (await response.json()).keys;
+  },
+  issuer: "https://issuer.example",
+  audience: "my-platform",
+  subject: "user-access",
+  leewayMs: 300_000,
+  cacheMs: 1_800_000,
+  staleIfErrorMs: 86_400_000,
+});
+
+const claims = await verifyAccessToken(token);
+```
+
+The verifier fetches the key set once per `cacheMs`, and concurrent callers share the fetch. A token
+naming a key the set lacks fetches the set again, at most every 10 seconds, so a key the issuer has
+just rotated to verifies at once. A failed fetch is retried after 30 seconds, and the last set stays
+in use for `staleIfErrorMs` past its cache. Every rejection throws, so a caller with another way to
+check a token, such as asking its issuer, can fall back to it.
+
 ## Tracing
 
 `@a-novel-kit/nodelib-server/telemetry` traces a SvelteKit server and carries each trace into the
