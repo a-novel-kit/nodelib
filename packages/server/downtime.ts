@@ -77,13 +77,21 @@ export function createDowntimeReader({
       // Keep the last known value.
     } finally {
       expires = Date.now() + ttlMs;
-      pending = undefined;
     }
 
     return downtime;
   }
 
-  return () => (Date.now() < expires ? Promise.resolve(downtime) : (pending ??= refresh()));
+  return () => {
+    if (Date.now() < expires) return Promise.resolve(downtime);
+
+    // A refresh failing before its first await finishes before `pending` holds it, so clearing waits
+    // for the promise.
+    pending ??= refresh().finally(() => {
+      pending = undefined;
+    });
+    return pending;
+  };
 }
 
 /**
