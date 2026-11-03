@@ -29,7 +29,8 @@ const user = await fetch("/api/user").then(handleHttpResponse).then(decodeHttpRe
 ```
 
 `isHttpStatusError` and `isDowntimeError` sort a caught error by status, or by a refusal during a
-planned downtime. `@a-novel-kit/nodelib-browser/utils` holds the `Debounce` and `retry` helpers.
+planned downtime. `@a-novel-kit/nodelib-browser/utils` holds the `Debounce` helper and the deprecated
+`retry`.
 
 `@a-novel-kit/nodelib-browser/telemetry` reports a platform's browser errors, page loads, navigations
 and Web Vitals to Sentry once the visitor accepts. It needs the optional `@sentry/browser` peer:

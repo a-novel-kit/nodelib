@@ -1,6 +1,8 @@
 /**
  * A RetryFailureFn produces the final result once retrying gives up. It receives the last error
  * and the arguments the call was made with, and either returns a fallback value or throws.
+ *
+ * @deprecated Belongs to the deprecated {@link retry}.
  */
 export type RetryFailureFn<T, Params extends unknown[]> = (error: unknown, ...params: Params) => T;
 
@@ -8,7 +10,11 @@ function defaultRetryFailureFn<T, Params extends unknown[]>(err: unknown, ..._: 
   throw err;
 }
 
-/** RetryParams tunes how {@link retry} attempts a callback and settles its final failure. */
+/**
+ * RetryParams tunes how {@link retry} attempts a callback and settles its final failure.
+ *
+ * @deprecated Belongs to the deprecated {@link retry}.
+ */
 export interface RetryParams<T, Params extends unknown[]> {
   /**
    * Total number of attempts (including the initial attempt) before failing.
@@ -36,6 +42,9 @@ export interface RetryParams<T, Params extends unknown[]> {
  * Wraps a callback so a failed call runs again. The returned function retries after each thrown
  * error until the callback succeeds, the attempts run out, or `condition` rejects the error. It then
  * defers to `onFailure`.
+ *
+ * @deprecated By default it retries every error of any operation. Retry at the boundary that owns
+ * the request, only an idempotent one, and bound each attempt with `AbortSignal.timeout`.
  */
 export function retry<T, Params extends unknown[]>(
   callback: (...params: Params) => T | Promise<T>,
