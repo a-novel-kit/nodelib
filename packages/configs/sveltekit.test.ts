@@ -13,6 +13,13 @@ vi.mock("@sveltejs/kit/vite", () => ({
   sveltekit: mocks.sveltekit,
 }));
 
+const defaultDirectives = {
+  "script-src": ["self"],
+  "object-src": ["none"],
+  "base-uri": ["none"],
+  "frame-ancestors": ["none"],
+};
+
 describe("SvelteKitVite", () => {
   beforeEach(() => {
     mocks.sveltekit.mockClear();
@@ -38,6 +45,7 @@ describe("SvelteKitVite", () => {
 
     expect(mocks.sveltekit).toHaveBeenCalledWith({
       adapter: expect.objectContaining({ name: "@sveltejs/adapter-node" }),
+      csp: { mode: "auto", directives: defaultDirectives },
       paths: { base: "/studio" },
     });
   });
@@ -50,6 +58,29 @@ describe("SvelteKitVite", () => {
 
     SvelteKitVite({}, { adapter });
 
-    expect(mocks.sveltekit).toHaveBeenCalledWith({ adapter });
+    expect(mocks.sveltekit).toHaveBeenCalledWith({ adapter, csp: { mode: "auto", directives: defaultDirectives } });
+  });
+
+  it("lets an application add a directive, replace one, and choose the mode", () => {
+    SvelteKitVite(
+      {},
+      {
+        csp: {
+          mode: "nonce",
+          directives: { "connect-src": ["self"], "frame-ancestors": ["self"] },
+          reportOnly: { "default-src": ["self"] },
+        },
+      }
+    );
+
+    expect(mocks.sveltekit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        csp: {
+          mode: "nonce",
+          directives: { ...defaultDirectives, "connect-src": ["self"], "frame-ancestors": ["self"] },
+          reportOnly: { "default-src": ["self"] },
+        },
+      })
+    );
   });
 });
