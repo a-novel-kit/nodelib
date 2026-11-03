@@ -10,6 +10,12 @@ const problemCases = [
     expectTags: { invalidFields: { email: "email" }, accountExists: true },
   },
   {
+    name: "reads the problem details media type in any case, with parameters",
+    contentType: "Application/Problem+JSON; charset=utf-8",
+    body: { type: "about:blank", status: 422, tags: { accountExists: true } },
+    expectTags: { accountExists: true },
+  },
+  {
     name: "ignores a JSON body that is not problem details",
     contentType: "application/json",
     body: { tags: { accountExists: true } },
