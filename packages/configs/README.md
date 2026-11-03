@@ -29,6 +29,17 @@ which only a project importing them installs.
 
 Each framework entry point accepts product-specific paths or policy and keeps the shared defaults.
 
+`SvelteKitVite` gives every page a Content Security Policy: `script-src 'self'` with SvelteKit's
+nonce or hash for its own inline scripts, `object-src 'none'`, `base-uri 'none'` and
+`frame-ancestors 'none'`. Each directive in `kit.csp.directives` adds to that policy or replaces the
+default of the same name. `form-action` stays open, since a sign-in form redirects to an origin each
+deployment configures at runtime. The platform sends it from its server hook, where a second policy
+narrows the first:
+
+```ts
+response.headers.append("content-security-policy", `form-action 'self' ${accountOrigin}`);
+```
+
 The Vitest matrix runs unit tests offline through `vitest-offline`: the global `fetch` rejects every
 request a test does not stub. A test answers its requests with `vi.stubGlobal("fetch", …)`.
 
