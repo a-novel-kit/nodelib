@@ -16,7 +16,8 @@ export async function screenshot(page: Page, info: TestInfo, name: string, mask:
   const options = { fullPage: true, mask, animations: "disabled" as const };
   const root = process.env.PLAYWRIGHT_SNAPSHOT_DIR;
   if (!root) {
-    await info.attach(name, { body: await page.screenshot(options), contentType: "image/png" });
+    const body = await fitViewportToDocument(page, () => page.screenshot(options));
+    await info.attach(name, { body, contentType: "image/png" });
     return;
   }
 
@@ -25,5 +26,25 @@ export async function screenshot(page: Page, info: TestInfo, name: string, mask:
     type: "visual-snapshot",
     description: relative(resolve(root), info.snapshotPath(filename, { kind: "screenshot" })).replaceAll("\\", "/"),
   });
-  await expect.soft(page).toHaveScreenshot(filename, options);
+  await fitViewportToDocument(page, () => expect.soft(page).toHaveScreenshot(filename, options));
+}
+
+/**
+ * Runs a full-page capture of a coarse-pointer page at a viewport as tall as its document, where
+ * viewport units measure the whole document. Chromium paints a capture beyond the viewport without
+ * touch emulation, so the page would show its fine-pointer styles under masks placed from its coarse
+ * layout. Tracked in https://issues.chromium.org/issues/558509412
+ */
+async function fitViewportToDocument<T>(page: Page, capture: () => Promise<T>): Promise<T> {
+  const viewport = page.viewportSize();
+  const coarse = await page.evaluate(() => matchMedia("(pointer: coarse)").matches);
+  if (!viewport || !coarse) return capture();
+
+  const height = await page.evaluate(() => document.documentElement.scrollHeight);
+  await page.setViewportSize({ width: viewport.width, height });
+  try {
+    return await capture();
+  } finally {
+    await page.setViewportSize(viewport);
+  }
 }
