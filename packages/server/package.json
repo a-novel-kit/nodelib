@@ -1,6 +1,6 @@
 {
   "name": "@a-novel-kit/nodelib-server",
-  "version": "2.4.2",
+  "version": "2.4.3",
   "private": false,
   "description": "Framework-independent server runtime primitives for a-novel platform applications",
   "repository": {
