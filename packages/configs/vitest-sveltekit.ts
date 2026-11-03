@@ -44,8 +44,8 @@ function headlessChromium() {
  * Unit tests run offline: the global `fetch` rejects every request a test does not stub.
  */
 export function SvelteKitVitest(options: SvelteKitVitestOptions): ViteUserConfig {
-  const rootUrl = typeof options.rootUrl === "string" ? new URL(options.rootUrl) : options.rootUrl;
-  const storybookConfigDirectory = options.storybookConfigDirectory ?? fileURLToPath(new URL("./.storybook", rootUrl));
+  const storybookConfigDirectory =
+    options.storybookConfigDirectory ?? fileURLToPath(new URL("./.storybook", options.rootUrl));
   const plugins = (): PluginOption[] => [sveltekit(), ...(options.vitePlugins?.() ?? [])];
 
   return defineConfig({
