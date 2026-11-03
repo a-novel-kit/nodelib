@@ -15,6 +15,7 @@ const headerCases: [string | null, string][] = [
   ["fr;q=0, *;q=1", "en"],
   ["fr;q=invalid, en;q=0.5", "en"],
   ["-, fr;q=0.5", "fr"],
+  ["fr ;q=0.9, en;q=0.8", "fr"],
 ];
 
 describe("resolveAcceptLanguage", () => {
@@ -24,6 +25,10 @@ describe("resolveAcceptLanguage", () => {
 
   it("preserves the supported locale spelling", () => {
     expect(resolveAcceptLanguage("fr-fr", ["en", "fr-FR"] as const, "en")).toBe("fr-FR");
+  });
+
+  it("truncates a range one subtag at a time before falling back to its language", () => {
+    expect(resolveAcceptLanguage("zh-Hant-TW", ["en", "zh-Hans", "zh-Hant"] as const, "en")).toBe("zh-Hant");
   });
 
   it("matches a regional preference to the first supported variant", () => {
