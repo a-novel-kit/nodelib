@@ -20,6 +20,7 @@ which only a project importing them installs.
 | ---------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
 | `@a-novel-kit/nodelib-config`                  | ESLint and Prettier factories                           | `prettier-plugin-svelte` and `prettier-plugin-css-order` for Svelte, `prettier-plugin-sql` |
 | `@a-novel-kit/nodelib-config/eslint-svelte`    | ESLint config with the Svelte and Storybook rules       | `eslint-plugin-svelte`, `eslint-plugin-storybook`                                          |
+| `@a-novel-kit/nodelib-config/faro`             | Release-build source-map upload to Grafana Faro         | `vite`                                                                                     |
 | `@a-novel-kit/nodelib-config/i18next`          | Static JSON or YAML extraction, status, and type policy | `i18next-cli`, `i18next-cli-plugin-svelte`                                                 |
 | `@a-novel-kit/nodelib-config/playwright`       | End-to-end suite of a platform's production build       | `playwright`                                                                               |
 | `@a-novel-kit/nodelib-config/sveltekit`        | Vite config with SvelteKit and the Node adapter         | `vite`, `@sveltejs/kit`, `@sveltejs/adapter-node`                                          |
@@ -55,6 +56,22 @@ export default SvelteKitVitest({
   rootUrl: import.meta.url,
   vitePlugins: () => [Yaml()],
 });
+```
+
+A release build sends the browser's source maps to the platform's Grafana Faro app, then deletes them,
+so the image ships none. The plugin acts only when the build holds `FARO_SOURCEMAP_API_KEY` and
+`FARO_SOURCEMAP_APP_ID`, and a refused upload fails the build:
+
+```ts
+import { FaroSourceMaps } from "@a-novel-kit/nodelib-config/faro";
+
+const faro = {
+  appName: "platform-studio",
+  endpoint: "https://faro-api-prod-eu-west-2.grafana.net/faro",
+  stackId: 1896612,
+};
+
+export default SvelteKitVite({ plugins: [Yaml(), FaroSourceMaps(faro)] });
 ```
 
 ## Commands

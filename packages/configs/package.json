@@ -37,6 +37,10 @@
       "types": "./dist/vitest-sveltekit.d.ts",
       "import": "./dist/vitest-sveltekit/index.es.js"
     },
+    "./faro": {
+      "types": "./dist/faro.d.ts",
+      "import": "./dist/faro/index.es.js"
+    },
     "./yaml": {
       "types": "./dist/yaml.d.ts",
       "import": "./dist/yaml/index.es.js"
