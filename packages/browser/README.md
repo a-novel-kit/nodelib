@@ -32,21 +32,22 @@ const user = await fetch("/api/user").then(handleHttpResponse).then(decodeHttpRe
 planned downtime. `@a-novel-kit/nodelib-browser/utils` holds the `Debounce` helper and the deprecated
 `retry`.
 
-`@a-novel-kit/nodelib-browser/telemetry` reports a platform's browser errors, page loads, navigations
-and Web Vitals to Sentry once the visitor accepts. It needs the optional `@sentry/browser` peer:
+`@a-novel-kit/nodelib-browser/telemetry` reports a platform's browser errors, page views, Web Vitals
+and requests to Grafana Faro once the visitor accepts. It needs the optional Faro peers:
 
 ```bash
-pnpm add @sentry/browser
+pnpm add @grafana/faro-web-sdk @grafana/faro-web-tracing
 ```
 
 The SDK downloads only after the visitor accepts, and the choice stays on the device for six months.
-Same-origin requests carry a W3C `traceparent`, so each trace continues through the platform's
-server. Query values, cookies, headers, sessions and console messages never leave the browser.
+A Faro session lasts one visit and is never kept on the device. Same-origin requests carry a W3C
+`traceparent`, so each trace continues through the platform's server. Query values, fragments, user
+details and console messages never leave the browser.
 
 ```ts
 import { BrowserTelemetry } from "@a-novel-kit/nodelib-browser/telemetry";
 
-export const telemetry = new BrowserTelemetry({ dsn: env.PUBLIC_SENTRY_DSN, release: "platform-studio@1.2.3" });
+export const telemetry = new BrowserTelemetry({ url: env.PUBLIC_FARO_URL, name: "platform-studio", version });
 
 // hooks.client.ts
 export const init: ClientInit = () => void telemetry.start();
@@ -54,7 +55,6 @@ export const handleError: HandleClientError = ({ kind, error }) => {
   if (kind === "unknown") telemetry.captureError(error);
 };
 
-// The root layout names spans after routes, and shows the banner while `telemetry.choice` is undefined.
-beforeNavigate((navigation) => telemetry.navigate(navigation));
+// The root layout names views after routes, and shows the banner while `telemetry.choice` is undefined.
 afterNavigate(() => telemetry.arrive(page.route.id));
 ```
