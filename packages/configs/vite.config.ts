@@ -6,6 +6,7 @@ import { mergeConfig } from "vite";
 const entries = {
   index: "index.ts",
   "eslint-svelte": "eslint-svelte.ts",
+  faro: "faro.ts",
   i18next: "i18next.ts",
   "i18n-changes": "i18n-changes-cli.ts",
   playwright: "playwright.ts",
