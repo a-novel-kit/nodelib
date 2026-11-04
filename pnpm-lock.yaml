@@ -406,7 +406,7 @@ importers:
         specifier: ^3.23.1
         version: 3.23.1(eslint@10.14.0(jiti@2.7.0))(svelte@5.57.3(@typescript-eslint/types@8.72.1))
       globals:
-        specifier: ^17.13.0
+        specifier: ^17.14.0
         version: 17.14.0
       prettier:
         specifier: ^3.9.10
