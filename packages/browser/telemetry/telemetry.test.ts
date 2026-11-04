@@ -3,98 +3,101 @@ import { BrowserTelemetry } from "./telemetry";
 
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import * as Sentry from "@sentry/browser";
+import * as Faro from "@grafana/faro-web-sdk";
 
-const DSN = "https://key@o1.ingest.sentry.io/1";
+const COLLECTOR = "https://faro-collector-prod-eu-west-2.grafana.net/collect/key";
+const OPTIONS = { url: COLLECTOR, name: "platform-studio", version: "1.2.3" };
 
-const sent = vi.hoisted(() => [] as string[]);
-
-// The SDK wraps `fetch` once per page, at its first start, so the stub stays for the whole file.
+// Every request reaches this stub, the collector's included. Faro wraps `fetch` at its first start,
+// so the stub stays for the whole file.
 const fetch = vi.fn(async (_input: RequestInfo | URL, _init?: RequestInit) => new Response("{}"));
 vi.stubGlobal("fetch", fetch);
 
-// The real SDK runs, but its envelopes land in `sent` instead of reaching Sentry.
-vi.mock("@sentry/browser", async (importOriginal) => {
-  const sentry = await importOriginal<typeof Sentry>();
-  const transport: Sentry.BrowserOptions["transport"] = (options) =>
-    sentry.createTransport(options, async ({ body }) => {
-      sent.push(typeof body === "string" ? body : new TextDecoder().decode(body));
-      return { statusCode: 200 };
-    });
-
-  return { ...sentry, init: vi.fn((options: Sentry.BrowserOptions) => sentry.init({ ...options, transport })) };
+// The real SDK runs, one isolated instance per test, unbatched so each signal posts at once.
+vi.mock("@grafana/faro-web-sdk", async (importOriginal) => {
+  const faro = await importOriginal<typeof Faro>();
+  const initializeFaro = (config: Faro.BrowserConfig) =>
+    faro.initializeFaro({ ...config, isolate: true, batching: { enabled: false } });
+  return { ...faro, initializeFaro: vi.fn(initializeFaro) };
 });
 
-/** Returns the payloads of every envelope item of the given type sent so far. */
-function sentItems(type: string): Record<string, unknown>[] {
-  return sent.flatMap((envelope) => {
-    const lines = envelope.split("\n").filter(Boolean);
-    return lines.flatMap((line, index) =>
-      JSON.parse(lines[index - 1] ?? "{}").type === type ? [JSON.parse(line)] : []
-    );
-  });
+interface Payload {
+  meta?: { view?: { name?: string } };
+  exceptions?: { value?: string }[];
 }
 
-function activeRouteName(): string | undefined {
-  const span = Sentry.getActiveSpan();
-  return span && Sentry.spanToJSON(Sentry.getRootSpan(span)).name;
+/** Returns what Faro posted to its collector so far. */
+function collected(): Payload[] {
+  return fetch.mock.calls
+    .filter(([input]) => String(input) === COLLECTOR)
+    .map(([, init]) => JSON.parse(String(init?.body)) as Payload);
 }
 
-afterEach(async () => {
-  // A closed client leaves its last span active on the shared scope.
-  Sentry.getActiveSpan()?.end();
-  await Sentry.close();
+function exceptionValues(): (string | undefined)[] {
+  return collected().flatMap((payload) => payload.exceptions?.map((exception) => exception.value) ?? []);
+}
+
+afterEach(() => {
   localStorage.clear();
-  sent.length = 0;
-  vi.clearAllMocks();
+  fetch.mockClear();
+  vi.mocked(Faro.initializeFaro).mockClear();
 });
 
 describe("BrowserTelemetry", () => {
   it("loads nothing until the visitor accepts", async () => {
-    const telemetry = new BrowserTelemetry({ dsn: DSN });
+    const telemetry = new BrowserTelemetry(OPTIONS);
 
     await telemetry.start();
 
     expect(telemetry.choice).toBeUndefined();
-    expect(Sentry.init).not.toHaveBeenCalled();
+    expect(Faro.initializeFaro).not.toHaveBeenCalled();
   });
 
-  it("stays off without a DSN, whatever the visitor chose", async () => {
+  it("stays off without a collector, whatever the visitor chose", async () => {
     saveTelemetryChoice("accepted");
-    const telemetry = new BrowserTelemetry({});
+    const telemetry = new BrowserTelemetry({ name: "platform-studio", version: "1.2.3" });
 
     await telemetry.start();
+    await telemetry.choose("accepted");
 
     expect(telemetry.enabled).toBe(false);
-    expect(Sentry.init).not.toHaveBeenCalled();
+    expect(Faro.initializeFaro).not.toHaveBeenCalled();
   });
 
-  it("starts for a visitor who accepted on an earlier visit", async () => {
+  it("starts for a visitor who accepted on an earlier visit, keeping no session or console", async () => {
     saveTelemetryChoice("accepted");
 
-    await new BrowserTelemetry({ dsn: DSN, release: "platform-studio@1.2.3" }).start();
+    await new BrowserTelemetry(OPTIONS).start();
 
-    expect(Sentry.init).toHaveBeenCalledWith(expect.objectContaining({ dsn: DSN, release: "platform-studio@1.2.3" }));
-    expect(Sentry.getClient()?.getIntegrationByName("BrowserTracing")).toBeDefined();
-    expect(Sentry.getClient()?.getIntegrationByName("BrowserSession")).toBeUndefined();
-    expect(Sentry.getClient()?.getIntegrationByName("Console")).toBeUndefined();
+    const [config] = vi.mocked(Faro.initializeFaro).mock.lastCall ?? [];
+    expect(config).toMatchObject({
+      url: COLLECTOR,
+      app: { name: "platform-studio", version: "1.2.3" },
+      sessionTracking: { persistent: false },
+    });
+    const instrumentations = config?.instrumentations?.map(({ name }) => name) ?? [];
+    expect(instrumentations).toContain("@grafana/faro-web-tracing");
+    expect(instrumentations.filter((name) => name.includes("console"))).toEqual([]);
   });
 
   it("reports caught errors without query values", async () => {
-    window.history.replaceState(null, "", "/password/reset?shortCode=secret");
-    const telemetry = new BrowserTelemetry({ dsn: DSN });
+    window.history.replaceState(null, "", "/password/reset?shortCode=secret#target");
+    const telemetry = new BrowserTelemetry(OPTIONS);
     await telemetry.choose("accepted");
 
     telemetry.captureError(new Error("boom"));
-    await Sentry.flush();
 
-    const [event] = sentItems("event");
-    expect(event).toMatchObject({ exception: { values: [{ value: "boom" }] } });
-    expect(sent.join()).not.toContain("secret");
+    await vi.waitFor(() => expect(exceptionValues()).toContain("boom"));
+    const sent = JSON.stringify(collected());
+    expect(sent).toContain("/password/reset");
+    expect(sent).not.toContain("secret");
+    expect(sent).not.toContain("target");
+    window.history.replaceState(null, "", "/");
   });
 
   it("carries the trace to same-origin requests only", async () => {
-    await new BrowserTelemetry({ dsn: DSN }).choose("accepted");
+    await new BrowserTelemetry(OPTIONS).choose("accepted");
+    fetch.mockClear();
 
     await window.fetch("/api/stories");
     await window.fetch("https://example.com/feed");
@@ -104,45 +107,39 @@ describe("BrowserTelemetry", () => {
     expect(headers[1]?.get("traceparent")).toBeNull();
   });
 
-  it("stops reporting once the visitor declines", async () => {
-    const telemetry = new BrowserTelemetry({ dsn: DSN });
+  it("sends nothing while the visitor declines, and resumes once they accept again", async () => {
+    const telemetry = new BrowserTelemetry(OPTIONS);
     await telemetry.choose("accepted");
 
     await telemetry.choose("declined");
-    telemetry.captureError(new Error("boom"));
-    await Sentry.flush();
+    telemetry.captureError(new Error("while declined"));
+    await telemetry.choose("accepted");
+    telemetry.captureError(new Error("accepted again"));
 
-    expect(telemetry.choice).toBe("declined");
-    expect(sentItems("event")).toHaveLength(0);
+    await vi.waitFor(() => expect(exceptionValues()).toContain("accepted again"));
+    expect(telemetry.choice).toBe("accepted");
+    expect(exceptionValues()).not.toContain("while declined");
   });
 
-  it("names navigations and page loads after their route", async () => {
-    const telemetry = new BrowserTelemetry({ dsn: DSN });
+  it("names views after the route the visitor reached", async () => {
+    const telemetry = new BrowserTelemetry(OPTIONS);
     await telemetry.choose("accepted");
 
-    telemetry.arrive("/(app)");
-    expect(activeRouteName()).toBe("/(app)");
+    telemetry.arrive("/(app)/stories/[id]");
+    telemetry.captureError(new Error("boom"));
 
-    telemetry.navigate({ to: { route: { id: "/(app)/stories/[id]" } } });
-    expect(activeRouteName()).toBe("/(app)/stories/[id]");
+    await vi.waitFor(() => expect(exceptionValues()).toContain("boom"));
+    expect(collected().at(-1)?.meta?.view?.name).toBe("/(app)/stories/[id]");
   });
 
-  it("names the page load after the route the visitor reached before accepting", async () => {
-    const telemetry = new BrowserTelemetry({ dsn: DSN });
+  it("names the first view after the route reached before accepting", async () => {
+    const telemetry = new BrowserTelemetry(OPTIONS);
 
     telemetry.arrive("/(app)/account");
     await telemetry.choose("accepted");
+    telemetry.captureError(new Error("boom"));
 
-    expect(activeRouteName()).toBe("/(app)/account");
-  });
-
-  it("opens no span for a navigation that leaves the platform", async () => {
-    const telemetry = new BrowserTelemetry({ dsn: DSN });
-    await telemetry.choose("accepted");
-    telemetry.arrive("/(app)");
-
-    telemetry.navigate({ to: null, willUnload: true });
-
-    expect(activeRouteName()).toBe("/(app)");
+    await vi.waitFor(() => expect(exceptionValues()).toContain("boom"));
+    expect(collected().at(-1)?.meta?.view?.name).toBe("/(app)/account");
   });
 });

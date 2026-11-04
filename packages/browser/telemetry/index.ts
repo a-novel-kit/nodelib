@@ -1,5 +1,5 @@
 /**
- * Browser telemetry behind the visitor's consent: the consent store, and Sentry's browser SDK loaded
+ * Browser telemetry behind the visitor's consent: the consent store, and Grafana Faro's SDK loaded
  * only once the visitor accepts.
  */
 

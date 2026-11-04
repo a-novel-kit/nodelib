@@ -180,8 +180,8 @@ describe("startTelemetry", () => {
 
   it("exports over OTLP with the standard variables once an endpoint is set", async () => {
     const server = await recordingServer();
-    vi.stubEnv("OTEL_EXPORTER_OTLP_ENDPOINT", `${server.url}/api/1/integration/otlp`);
-    vi.stubEnv("OTEL_EXPORTER_OTLP_HEADERS", "x-sentry-auth=sentry sentry_key=public");
+    vi.stubEnv("OTEL_EXPORTER_OTLP_ENDPOINT", `${server.url}/otlp`);
+    vi.stubEnv("OTEL_EXPORTER_OTLP_HEADERS", "authorization=Basic dGVzdA==");
     vi.stubEnv("OTEL_EXPORTER_OTLP_COMPRESSION", "gzip");
 
     const telemetry = startTelemetry({ serviceName: "platform", enabled: true });
@@ -191,11 +191,11 @@ describe("startTelemetry", () => {
 
     expect(server.requests).toHaveLength(1);
     const [{ request, body }] = server.requests as [(typeof server.requests)[number]];
-    expect(request.url).toBe("/api/1/integration/otlp/v1/traces");
+    expect(request.url).toBe("/otlp/v1/traces");
     expect(request.headers).toMatchObject({
       "content-encoding": "gzip",
       "content-type": "application/x-protobuf",
-      "x-sentry-auth": "sentry sentry_key=public",
+      authorization: "Basic dGVzdA==",
     });
     // Protobuf keeps strings as raw UTF-8, so the decompressed export carries the names as is.
     const payload = gunzipSync(body).toString("utf8");
