@@ -1,4 +1,4 @@
-import { saveTelemetryChoice } from "./consent";
+import { TELEMETRY_CONSENT_COOKIE, saveTelemetryChoice } from "./consent";
 import { BrowserTelemetry } from "./telemetry";
 
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -38,7 +38,7 @@ function exceptionValues(): (string | undefined)[] {
 }
 
 afterEach(() => {
-  localStorage.clear();
+  document.cookie = `${TELEMETRY_CONSENT_COOKIE}=; Path=/; Max-Age=0`;
   fetch.mockClear();
   vi.mocked(Faro.initializeFaro).mockClear();
 });
@@ -105,6 +105,16 @@ describe("BrowserTelemetry", () => {
     const headers = fetch.mock.calls.map(([, init]) => new Headers(init?.headers));
     expect(headers[0]?.get("traceparent")).toMatch(/^00-[0-9a-f]{32}-[0-9a-f]{16}-01$/);
     expect(headers[1]?.get("traceparent")).toBeNull();
+  });
+
+  it("keeps the choice under the shared consent domain", async () => {
+    const write = vi.spyOn(document, "cookie", "set");
+    const telemetry = new BrowserTelemetry({ ...OPTIONS, url: undefined, consentDomain: "storyverse.fr" });
+
+    await telemetry.choose("declined");
+
+    expect(write).toHaveBeenCalledWith(expect.stringContaining("; Domain=storyverse.fr"));
+    write.mockRestore();
   });
 
   it("sends nothing while the visitor declines, and resumes once they accept again", async () => {

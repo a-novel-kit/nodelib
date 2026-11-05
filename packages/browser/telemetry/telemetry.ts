@@ -10,6 +10,11 @@ export interface BrowserTelemetryOptions {
   name: string;
   /** Names the release the browser runs. */
   version: string;
+  /**
+   * Names the domain every app that shares the visitor's choice runs under, as `storyverse.fr`, so
+   * one answer covers them all. Without it, the choice stays with the current host.
+   */
+  consentDomain?: string;
 }
 
 // An absolute URL's query and fragment. Short-code links carry credentials there.
@@ -56,7 +61,7 @@ export class BrowserTelemetry {
     return Boolean(this.#options.url);
   }
 
-  /** Returns the visitor's choice on this device, or undefined while they must choose. */
+  /** Returns the visitor's choice in this browser, or undefined while they must choose. */
   get choice(): TelemetryChoice | undefined {
     return readTelemetryChoice();
   }
@@ -68,7 +73,7 @@ export class BrowserTelemetry {
 
   /** Records the visitor's choice, then starts or stops reporting to match it. */
   async choose(choice: TelemetryChoice): Promise<void> {
-    saveTelemetryChoice(choice);
+    saveTelemetryChoice(choice, { domain: this.#options.consentDomain });
     if (choice === "accepted") {
       await this.#load();
       this.#faro?.unpause();

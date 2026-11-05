@@ -1,69 +1,53 @@
-import { readTelemetryChoice, saveTelemetryChoice } from "./consent";
+import { TELEMETRY_CONSENT_COOKIE, parseTelemetryChoice, readTelemetryChoice, saveTelemetryChoice } from "./consent";
 
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-const NOW = Date.UTC(2026, 9, 27);
-const DAY_MS = 24 * 60 * 60 * 1000;
-
 afterEach(() => {
   vi.restoreAllMocks();
-  localStorage.clear();
+  document.cookie = `${TELEMETRY_CONSENT_COOKIE}=; Path=/; Max-Age=0`;
+});
+
+describe("parseTelemetryChoice", () => {
+  it.each([
+    { name: "reads an acceptance", value: "accepted", want: "accepted" },
+    { name: "reads a refusal", value: "declined", want: "declined" },
+    { name: "ignores an unknown choice", value: "maybe", want: undefined },
+    { name: "asks a visitor who never answered", value: undefined, want: undefined },
+  ])("$name", ({ value, want }) => {
+    expect(parseTelemetryChoice(value)).toBe(want);
+  });
 });
 
 describe("readTelemetryChoice", () => {
-  it.each([
-    {
-      name: "returns a recent choice",
-      stored: { version: 1, choice: "declined", expires: NOW + DAY_MS },
-      want: "declined",
-    },
-    {
-      name: "asks again once the choice expires",
-      stored: { version: 1, choice: "accepted", expires: NOW },
-      want: undefined,
-    },
-    {
-      name: "asks again after a new banner version",
-      stored: { version: 0, choice: "accepted", expires: NOW + DAY_MS },
-      want: undefined,
-    },
-    {
-      name: "ignores an unknown choice",
-      stored: { version: 1, choice: "maybe", expires: NOW + DAY_MS },
-      want: undefined,
-    },
-    { name: "ignores an unreadable value", stored: "{", want: undefined },
-    { name: "asks a visitor who never answered", stored: undefined, want: undefined },
-  ])("$name", ({ stored, want }) => {
-    if (stored !== undefined) {
-      localStorage.setItem("telemetry-consent", typeof stored === "string" ? stored : JSON.stringify(stored));
-    }
+  it("reads the choice among other cookies", () => {
+    document.cookie = "theme=dark; Path=/";
+    document.cookie = `${TELEMETRY_CONSENT_COOKIE}=declined; Path=/`;
 
-    expect(readTelemetryChoice(NOW)).toBe(want);
+    expect(readTelemetryChoice()).toBe("declined");
   });
 
-  it("asks when the browser blocks storage", () => {
-    vi.spyOn(window, "localStorage", "get").mockImplementation(() => {
-      throw new DOMException("blocked", "SecurityError");
-    });
+  it("asks again after a new banner version", () => {
+    document.cookie = "telemetry-consent-v0=accepted; Path=/";
 
-    expect(readTelemetryChoice(NOW)).toBeUndefined();
+    expect(readTelemetryChoice()).toBeUndefined();
   });
 });
 
 describe("saveTelemetryChoice", () => {
   it("keeps the choice for six months", () => {
-    saveTelemetryChoice("accepted", NOW);
+    const write = vi.spyOn(document, "cookie", "set");
 
-    expect(readTelemetryChoice(NOW + 181 * DAY_MS)).toBe("accepted");
-    expect(readTelemetryChoice(NOW + 183 * DAY_MS)).toBeUndefined();
+    saveTelemetryChoice("accepted");
+
+    expect(readTelemetryChoice()).toBe("accepted");
+    expect(write).toHaveBeenCalledWith(`${TELEMETRY_CONSENT_COOKIE}=accepted; Path=/; Max-Age=15724800; SameSite=Lax`);
   });
 
-  it("survives a full storage", () => {
-    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
-      throw new DOMException("full", "QuotaExceededError");
-    });
+  it("shares the choice with every host of a domain", () => {
+    const write = vi.spyOn(document, "cookie", "set");
 
-    expect(() => saveTelemetryChoice("accepted", NOW)).not.toThrow();
+    saveTelemetryChoice("declined", { domain: "storyverse.fr" });
+
+    expect(write).toHaveBeenCalledWith(expect.stringContaining("; Domain=storyverse.fr"));
   });
 });
