@@ -3,6 +3,11 @@ import manifest from "./package.json" with { type: "json" };
 
 export default libraryConfig(
   import.meta.dirname,
-  { http: "http/index.ts", telemetry: "telemetry/index.ts", utils: "utils/index.ts" },
+  {
+    http: "http/index.ts",
+    preferences: "preferences/index.ts",
+    telemetry: "telemetry/index.ts",
+    utils: "utils/index.ts",
+  },
   manifest
 );
