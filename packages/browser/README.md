@@ -39,7 +39,10 @@ and requests to Grafana Faro once the visitor accepts. It needs the optional Far
 pnpm add @grafana/faro-web-sdk @grafana/faro-web-tracing
 ```
 
-The SDK downloads only after the visitor accepts, and the choice stays on the device for six months.
+The SDK downloads only after the visitor accepts, and the choice stays in a cookie for six months.
+With `consentDomain`, the cookie covers every host under that domain, so one answer serves every app
+there. A server reads the cookie named `TELEMETRY_CONSENT_COOKIE` with `parseTelemetryChoice`, so the
+page renders the answer before it runs in the browser.
 A Faro session lasts one visit and is never kept on the device. Same-origin requests carry a W3C
 `traceparent`, so each trace continues through the platform's server. Query values, fragments, user
 details and console messages never leave the browser.
@@ -47,7 +50,12 @@ details and console messages never leave the browser.
 ```ts
 import { BrowserTelemetry } from "@a-novel-kit/nodelib-browser/telemetry";
 
-export const telemetry = new BrowserTelemetry({ url: env.PUBLIC_FARO_URL, name: "platform-studio", version });
+export const telemetry = new BrowserTelemetry({
+  url: env.PUBLIC_FARO_URL,
+  name: "platform-studio",
+  version,
+  consentDomain: env.PUBLIC_CONSENT_DOMAIN,
+});
 
 // hooks.client.ts
 export const init: ClientInit = () => void telemetry.start();
