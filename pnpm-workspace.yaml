@@ -11,6 +11,8 @@ peerDependencyRules:
 overrides:
   "brace-expansion@>=2.0.0 <2.1.4": 2.1.7
   "esbuild@>=0.27.3 <0.28.1": 0.28.2
+  glob@>=9.0.0 <=14.0.1: ^14.0.2
+  minimatch@>=7.0.0 <11.0.1: ^11.0.1
 catalog:
   "@a-novel-kit/nodelib-config": "*"
   "@eslint/config-helpers": ^0.7.0
