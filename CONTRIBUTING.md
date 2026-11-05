@@ -28,7 +28,7 @@ pnpm build
 The workspace formats and lints itself with its own config package, read from `dist/`. Rebuild it with `pnpm build:config` after a change to `packages/configs`.
 
 ```bash
-pnpm format    # apply Prettier
+pnpm format    # rebuild the config package, then apply Prettier
 pnpm lint      # Prettier check, type check and ESLint
 pnpm test      # Vitest, with each *.test.ts beside its source
 ```

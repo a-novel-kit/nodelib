@@ -19,7 +19,7 @@
     "build:i18n": "vite build -c packages/i18n/vite.config.ts && tsc -p packages/i18n/tsconfig.build.json",
     "build:server": "vite build -c packages/server/vite.config.ts && tsc -p packages/server/tsconfig.build.json",
     "build:test": "vite build -c packages/test/vite.config.ts && tsc -p packages/test/tsconfig.build.json",
-    "format": "prettier --write . --config prettier.config.ts",
+    "format": "pnpm build:config && prettier --write . --config prettier.config.ts",
     "i18n:check": "pnpm i18n:extract:check && pnpm i18n:types:check && pnpm i18n:status && pnpm i18n:unused",
     "i18n:extract": "i18next-cli extract --with-types",
     "i18n:extract:check": "i18next-cli extract --ci --quiet",
