@@ -1,3 +1,5 @@
+import { type CookieOptions, writeCookie } from "../cookie.js";
+
 import { z } from "zod";
 
 /** TelemetryChoice is the visitor's answer to the telemetry consent banner. */
@@ -37,24 +39,12 @@ export function readTelemetryChoice(): TelemetryChoice | undefined {
 }
 
 /** Where the browser keeps a choice. */
-export interface SaveTelemetryChoiceOptions {
-  /**
-   * Names the domain every app that shares the choice runs under, as `storyverse.fr`. Without it,
-   * the choice stays with the current host.
-   */
-  domain?: string;
-}
+export type SaveTelemetryChoiceOptions = CookieOptions;
 
 /**
  * Keeps the visitor's choice in a cookie for six months. A browser that refuses cookies forgets it
  * with the page, and the banner asks again on the next visit.
  */
-export function saveTelemetryChoice(choice: TelemetryChoice, { domain }: SaveTelemetryChoiceOptions = {}): void {
-  if (typeof document === "undefined") return;
-
-  const attributes = [`Path=/`, `Max-Age=${CONSENT_LIFETIME_S}`, "SameSite=Lax"];
-  if (domain) attributes.push(`Domain=${domain}`);
-  if (location.protocol === "https:") attributes.push("Secure");
-
-  document.cookie = [`${TELEMETRY_CONSENT_COOKIE}=${choice}`, ...attributes].join("; ");
+export function saveTelemetryChoice(choice: TelemetryChoice, options?: SaveTelemetryChoiceOptions): void {
+  writeCookie(TELEMETRY_CONSENT_COOKIE, choice, CONSENT_LIFETIME_S, options);
 }

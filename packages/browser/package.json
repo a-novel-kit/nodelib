@@ -13,6 +13,10 @@
       "types": "./dist/http/index.d.ts",
       "import": "./dist/http/index.es.js"
     },
+    "./preferences": {
+      "types": "./dist/preferences/index.d.ts",
+      "import": "./dist/preferences/index.es.js"
+    },
     "./utils": {
       "types": "./dist/utils/index.d.ts",
       "import": "./dist/utils/index.es.js"

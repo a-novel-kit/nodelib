@@ -1,7 +1,7 @@
 # @a-novel-kit/nodelib-browser
 
-Browser helpers that handle `fetch` responses, shared async behavior and consented telemetry one way
-everywhere.
+Browser helpers that handle `fetch` responses, shared async behavior, device preferences and consented
+telemetry one way everywhere.
 
 ## Installation
 
@@ -54,7 +54,7 @@ export const telemetry = new BrowserTelemetry({
   url: env.PUBLIC_FARO_URL,
   name: "platform-studio",
   version,
-  consentDomain: env.PUBLIC_CONSENT_DOMAIN,
+  consentDomain: env.PUBLIC_PLATFORM_DOMAIN,
 });
 
 // hooks.client.ts
@@ -65,4 +65,15 @@ export const handleError: HandleClientError = ({ kind, error }) => {
 
 // The root layout names views after routes, and shows the banner while `telemetry.choice` is undefined.
 afterNavigate(() => telemetry.arrive(page.route.id));
+```
+
+`@a-novel-kit/nodelib-browser/preferences` keeps the settings a visitor leaves on a device, such as a
+collapsed navigation rail, in cookies. A server reads `NAVIGATION_RAIL_COOKIE` with
+`parseNavigationRail`, so the page renders the rail the visitor left. With `domain`, every app under
+that domain shares it:
+
+```ts
+import { saveNavigationRail } from "@a-novel-kit/nodelib-browser/preferences";
+
+saveNavigationRail("collapsed", { domain: env.PUBLIC_PLATFORM_DOMAIN });
 ```
