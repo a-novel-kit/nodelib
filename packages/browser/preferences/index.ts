@@ -4,4 +4,6 @@
  */
 
 export type { CookieOptions } from "../cookie.js";
+export * from "./language.js";
+export * from "./lifetime.js";
 export * from "./rail.js";
