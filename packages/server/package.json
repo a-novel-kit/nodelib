@@ -31,10 +31,10 @@
   },
   "peerDependencies": {
     "@opentelemetry/api": "^1.10.0",
-    "@opentelemetry/exporter-trace-otlp-proto": "^0.300.0",
-    "@opentelemetry/instrumentation": "^0.300.0",
-    "@opentelemetry/instrumentation-undici": "^0.34.0",
-    "@opentelemetry/resources": "^3.0.0",
+    "@opentelemetry/exporter-trace-otlp-proto": "^0.301.0",
+    "@opentelemetry/instrumentation": "^0.301.0",
+    "@opentelemetry/instrumentation-undici": "^0.35.0",
+    "@opentelemetry/resources": "^3.1.0",
     "@opentelemetry/sdk-trace-node": "^2.12.0"
   },
   "packageManager": "pnpm@12.18.0",
