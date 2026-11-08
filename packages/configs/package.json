@@ -87,7 +87,7 @@
     "eslint-plugin-svelte": "^3.24.0",
     "estree-walker": "^3.0.3",
     "globals": "^17.14.0",
-    "i18next-cli": "^1.82.5",
+    "i18next-cli": "^1.83.0",
     "i18next-cli-plugin-svelte": "^2.5.0",
     "playwright": "^1.64.1",
     "prettier": "^3.9.10",
@@ -99,7 +99,7 @@
     "svelte": "^5.57.3",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.72.1",
-    "vite": "^8.3.5",
+    "vite": "^8.3.6",
     "vitest": "^5.1.0"
   },
   "peerDependenciesMeta": {
