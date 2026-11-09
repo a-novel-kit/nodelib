@@ -35,7 +35,7 @@ catalog:
   jsdom: ^31.0.0
   playwright: 1.65.0
   i18next: 26.7.2
-  i18next-cli: 1.85.1
+  i18next-cli: 1.86.0
   i18next-cli-plugin-svelte: 2.5.0
   prettier: ^3.7.4
   prettier-plugin-css-order: ^2.2.0
