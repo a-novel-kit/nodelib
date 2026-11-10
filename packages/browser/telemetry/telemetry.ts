@@ -85,7 +85,7 @@ export class BrowserTelemetry {
     this.#faro?.pause();
   }
 
-  /** Reports an error SvelteKit caught. Call it from the client `handleError` hook. */
+  /** Reports an error no page handles, such as one the client `handleError` hook receives. */
   captureError(error: unknown): void {
     this.#faro?.api.pushError(error instanceof Error ? error : new Error(String(error)));
   }
