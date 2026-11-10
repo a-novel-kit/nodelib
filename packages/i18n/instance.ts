@@ -58,7 +58,6 @@ export function createStaticI18n<Locale extends string, Namespace extends string
 
   const instance = createInstance();
   void instance.init({
-    compatibilityJSON: "v4",
     defaultNS: options.defaultNamespace,
     fallbackLng: options.defaultLocale,
     initAsync: false,
