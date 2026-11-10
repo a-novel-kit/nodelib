@@ -29,8 +29,8 @@ const user = await fetch("/api/user").then(handleHttpResponse).then(decodeHttpRe
 ```
 
 `isHttpStatusError` and `isDowntimeError` sort a caught error by status, or by a refusal during a
-planned downtime. `@a-novel-kit/nodelib-browser/utils` holds the `Debounce` helper and the deprecated
-`retry`.
+planned downtime. `@a-novel-kit/nodelib-browser/utils` holds the `Debounce` helper, the deprecated
+`retry`, and `retryWithBackoff`, which repeats a failed read until its owner stops it.
 
 `@a-novel-kit/nodelib-browser/telemetry` reports a platform's browser errors, page views, Web Vitals
 and requests to Grafana Faro once the visitor accepts. It needs the optional Faro peers:
