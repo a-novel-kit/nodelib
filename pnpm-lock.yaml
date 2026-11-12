@@ -435,7 +435,7 @@ importers:
         specifier: ^6.0.3
         version: 6.0.3
       typescript-eslint:
-        specifier: ^8.72.1
+        specifier: ^8.72.2
         version: 8.72.2(eslint@10.14.0(jiti@2.7.0))(typescript@6.0.3)
       yaml:
         specifier: 'catalog:'
@@ -503,16 +503,16 @@ importers:
         specifier: ^1.10.0
         version: 1.10.0
       '@opentelemetry/exporter-trace-otlp-proto':
-        specifier: ^0.301.0
+        specifier: ^0.301.1
         version: 0.301.1(@opentelemetry/api@1.10.0)
       '@opentelemetry/instrumentation':
-        specifier: ^0.301.0
+        specifier: ^0.301.1
         version: 0.301.1(@opentelemetry/api@1.10.0)
       '@opentelemetry/instrumentation-undici':
         specifier: ^0.35.0
         version: 0.35.0(@opentelemetry/api@1.10.0)
       '@opentelemetry/resources':
-        specifier: ^3.1.0
+        specifier: ^3.1.1
         version: 3.1.1(@opentelemetry/api@1.10.0)
       '@opentelemetry/sdk-trace-node':
         specifier: ^2.12.0
@@ -2648,6 +2648,7 @@ packages:
   postcss-selector-parser@7.2.0:
     resolution: {integrity: sha512-Khh/tERVBn0I1499dvBSHY0pWJloMJWUxDsOBM0CCDPAcVZ10Jl2L1qy1f19uEX22spa8Mv7DCdEQJc0cGwBhQ==}
     engines: {node: '>=4'}
+    deprecated: Double-escapes CSS Modules class names (#362). Use 7.2.1.
 
   postcss@8.5.32:
     resolution: {integrity: sha512-LJlKCCAUFKOuZxipUdYw1NzIITEsPcgyOG9LkvRJvuKj/bRzbuRY0ARXvL0pWGpsZvn8jku+LMep2eU0seHp8g==}
