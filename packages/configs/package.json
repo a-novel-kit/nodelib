@@ -90,7 +90,7 @@
     "i18next-cli": "^1.87.0",
     "i18next-cli-plugin-svelte": "^2.5.0",
     "playwright": "^1.65.0",
-    "prettier": "^3.9.10",
+    "prettier": "^3.10.0",
     "prettier-plugin-css-order": "^2.2.0",
     "prettier-plugin-packagejson": "^2.5.20 || ^3.0.0",
     "prettier-plugin-sql": "^0.20.0",
