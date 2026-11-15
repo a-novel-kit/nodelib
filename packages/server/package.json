@@ -39,7 +39,7 @@
     "@opentelemetry/resources": "^3.1.1",
     "@opentelemetry/sdk-trace": "^3.1.1"
   },
-  "packageManager": "pnpm@12.18.0",
+  "packageManager": "pnpm@12.20.0",
   "engines": {
     "node": ">=24.0.0",
     "npm": ">=10.9.2"
