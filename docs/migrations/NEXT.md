@@ -1,0 +1,40 @@
+# Upgrading to NEXT
+
+`nodelib-server` traces with `@opentelemetry/sdk-trace`, which replaces the deprecated
+`@opentelemetry/sdk-trace-node`.
+
+## Do I need to act?
+
+**Required** for a project that installs `@a-novel-kit/nodelib-server`: swap its tracing peers with
+this release. `startTelemetry` behaves as before.
+
+## Swap the tracing peers
+
+`@opentelemetry/sdk-trace-node` is no longer a peer. `@opentelemetry/sdk-trace`,
+`@opentelemetry/core` and `@opentelemetry/context-async-hooks` take its place:
+
+```bash
+pnpm remove @opentelemetry/sdk-trace-node
+pnpm add @opentelemetry/sdk-trace@3 @opentelemetry/core@3 @opentelemetry/context-async-hooks@3
+```
+
+A project with `autoInstallPeers: false` installs without them, then fails to start, since the
+telemetry entry point imports all three. `pnpm why @opentelemetry/sdk-trace-node` prints nothing
+once the swap is complete.
+
+## Move direct SDK use to `TracerProvider`
+
+`@opentelemetry/sdk-trace` has one `TracerProvider` in place of `BasicTracerProvider` and
+`NodeTracerProvider`, and each span processor takes its exporter in an options object. A test that
+records spans changes like this:
+
+```diff
+-import { BasicTracerProvider, InMemorySpanExporter, SimpleSpanProcessor } from "@opentelemetry/sdk-trace-node";
++import { InMemorySpanExporter, SimpleSpanProcessor, TracerProvider } from "@opentelemetry/sdk-trace";
+
+-const provider = new BasicTracerProvider({ spanProcessors: [new SimpleSpanProcessor(exporter)] });
++const provider = new TracerProvider({ spanProcessors: [new SimpleSpanProcessor({ exporter })] });
+```
+
+`TracerProvider` has no `register()`. Code that called it sets the global tracer provider, context
+manager and propagator through `@opentelemetry/api`, as `startTelemetry` does.

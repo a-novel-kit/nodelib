@@ -1,4 +1,16 @@
-import { type Attributes, type Context, DiagConsoleLogger, DiagLogLevel, SpanKind, diag } from "@opentelemetry/api";
+import {
+  type Attributes,
+  type Context,
+  DiagConsoleLogger,
+  DiagLogLevel,
+  SpanKind,
+  context,
+  diag,
+  propagation,
+  trace,
+} from "@opentelemetry/api";
+import { AsyncLocalStorageContextManager } from "@opentelemetry/context-async-hooks";
+import { CompositePropagator, W3CBaggagePropagator, W3CTraceContextPropagator } from "@opentelemetry/core";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-proto";
 import { registerInstrumentations } from "@opentelemetry/instrumentation";
 import { UndiciInstrumentation } from "@opentelemetry/instrumentation-undici";
@@ -6,7 +18,6 @@ import { detectResources, envDetector, resourceFromAttributes } from "@opentelem
 import {
   BatchSpanProcessor,
   ConsoleSpanExporter,
-  NodeTracerProvider,
   NoopSpanProcessor,
   ParentBasedSampler,
   type Sampler,
@@ -14,7 +25,8 @@ import {
   type SamplingResult,
   type Span,
   type SpanExporter,
-} from "@opentelemetry/sdk-trace-node";
+  TracerProvider,
+} from "@opentelemetry/sdk-trace";
 
 /** Span attributes that hold a whole URL. */
 const urlAttributes = ["http.url", "url.full"];
@@ -62,16 +74,22 @@ export function startTelemetry(options: TelemetryOptions): Telemetry {
   // Without a logger, a failed export is silent.
   diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ERROR);
 
-  const provider = new NodeTracerProvider({
+  const provider = new TracerProvider({
     // The environment's attributes win, as they do in the Go SDK.
     resource: resourceFromAttributes({ "service.name": options.serviceName }).merge(
       detectResources({ detectors: [envDetector] })
     ),
     sampler: keepEveryTrace(options.untracedRoutes ?? []),
-    spanProcessors: [new UrlRedactor(), new RequestSpanKind(), new BatchSpanProcessor(spanExporter())],
+    spanProcessors: [new UrlRedactor(), new RequestSpanKind(), new BatchSpanProcessor({ exporter: spanExporter() })],
   });
 
-  provider.register();
+  // The provider installs nothing itself. The context manager keeps the active span across awaits,
+  // and the propagators send the trace context and baggage, as golib's OTLP preset does.
+  trace.setGlobalTracerProvider(provider);
+  context.setGlobalContextManager(new AsyncLocalStorageContextManager().enable());
+  propagation.setGlobalPropagator(
+    new CompositePropagator({ propagators: [new W3CTraceContextPropagator(), new W3CBaggagePropagator()] })
+  );
 
   const unregister = registerInstrumentations({
     tracerProvider: provider,
