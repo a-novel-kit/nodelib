@@ -9,7 +9,7 @@ const NODE_BUILT_IN_MODULES = builtinModules
   .flatMap((name) => [name, `node:${name}`]);
 
 export default defineConfig({
-  // Compiles the rune modules of nodelib-browser/svelte and their tests.
+  // Compiles the rune modules of nodelib-svelte and their tests.
   plugins: [svelte()],
   optimizeDeps: {
     exclude: NODE_BUILT_IN_MODULES,
@@ -34,8 +34,6 @@ export default defineConfig({
       {
         root: "packages/browser",
         extends: true,
-        // Svelte's default export condition is its server build, where effects never run.
-        resolve: { conditions: ["browser"] },
       },
       {
         root: "packages/configs",
@@ -48,6 +46,12 @@ export default defineConfig({
       {
         root: "packages/server",
         extends: true,
+      },
+      {
+        root: "packages/svelte",
+        extends: true,
+        // Svelte's default export condition is its server build, where effects never run.
+        resolve: { conditions: ["browser"] },
       },
       {
         root: "packages/test",

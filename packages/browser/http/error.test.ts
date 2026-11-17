@@ -84,19 +84,6 @@ describe("HttpError", () => {
     });
   });
 
-  it.each([
-    { name: "matches an HttpError from this copy", error: new HttpError(404, "missing"), expected: true },
-    {
-      name: "matches an HttpError from another copy of the package",
-      error: Object.assign(new Error("request failed with status 503"), { name: "HttpError", status: 503 }),
-      expected: true,
-    },
-    { name: "rejects another error", error: new TypeError("not an HttpError"), expected: false },
-    { name: "rejects a plain object named HttpError", error: { name: "HttpError" }, expected: false },
-  ])("instanceof $name", ({ error, expected }) => {
-    expect(error instanceof HttpError).toBe(expected);
-  });
-
   describe("isHttpError", () => {
     it("catches HttpError", async () => {
       const response = new Response("badaboom", { status: 404 });

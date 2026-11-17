@@ -70,16 +70,17 @@ own `HealthDependency` export can re-export the package's. The narrative engine'
 through `this.fetchResponse`, and imports `wait` from `@a-novel-kit/nodelib-browser/utils`, which
 leaves no abort listener behind.
 
-## Import the Svelte helpers from `nodelib-browser/svelte`
+## Import the Svelte helpers from `nodelib-svelte`
 
-A platform deletes `src/lib/client/retry.svelte.ts` and its test, `src/lib/ui/downtime.svelte.ts`,
-`src/lib/client/telemetry-preference.svelte.ts` and `src/lib/ui/telemetry-preference.ts`, and
-imports the same names from `@a-novel-kit/nodelib-browser/svelte`. `retryWhile` reports a bounded
-run's failure to `onError` instead of the platform's telemetry module:
+A platform adds `@a-novel-kit/nodelib-svelte`, deletes `src/lib/client/retry.svelte.ts` and its
+test, `src/lib/ui/downtime.svelte.ts`, `src/lib/client/telemetry-preference.svelte.ts` and
+`src/lib/ui/telemetry-preference.ts`, and imports the same names from the new package.
+`retryWhile` reports a bounded run's failure to `onError` instead of the platform's telemetry
+module:
 
 ```diff
 -import { retryWhile } from "#lib/client/retry.svelte.js";
-+import { retryWhile } from "@a-novel-kit/nodelib-browser/svelte";
++import { retryWhile } from "@a-novel-kit/nodelib-svelte";
 
  const listRetries = retryWhile(missing, attempt, {
    maxRetries: 3,
@@ -87,13 +88,12 @@ run's failure to `onError` instead of the platform's telemetry module:
  });
 ```
 
-The entry ships its modules with their runes for the application's Svelte compiler, so the
-project needs `svelte` 5.57.3 or later, which every platform has.
+The package ships its modules with their runes for the application's Svelte compiler, so the
+project needs `svelte` 5.57.3 or later, which every platform has. A SvelteKit server build inlines
+it, while nodelib-browser stays one external copy shared with the service clients.
 
-The entry also makes nodelib-browser a Svelte package, which a SvelteKit server build inlines, while
-each service client keeps loading its own copy from `node_modules`. An `HttpError` therefore matches
-by its name: `instanceof HttpError`, `isHttpError` and `isHttpStatusError` accept one from either
-copy, so no check changes.
+Prefer `isHttpError` and `isHttpStatusError` to `instanceof HttpError`: they match an error by its
+name, so they keep working should a bundler ever load two copies of nodelib-browser.
 
 ## Simplify the platform server
 

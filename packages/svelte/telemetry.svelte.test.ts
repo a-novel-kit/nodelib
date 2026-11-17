@@ -1,9 +1,10 @@
-import type { BrowserTelemetry } from "../telemetry/telemetry";
 import { createTelemetryPreference } from "./telemetry.svelte";
 
 import { flushSync } from "svelte";
 
 import { describe, expect, it, vi } from "vitest";
+
+import type { BrowserTelemetry } from "@a-novel-kit/nodelib-browser/telemetry";
 
 describe("createTelemetryPreference", () => {
   it("shows the server's answer until the visitor gives another, which telemetry follows", () => {

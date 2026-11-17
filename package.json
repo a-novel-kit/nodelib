@@ -13,11 +13,12 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "pnpm build:browser && pnpm build:config && pnpm build:i18n && pnpm build:server && pnpm build:test",
+    "build": "pnpm build:browser && pnpm build:config && pnpm build:i18n && pnpm build:server && pnpm build:svelte && pnpm build:test",
     "build:browser": "vite build -c packages/browser/vite.config.ts && tsc -p packages/browser/tsconfig.build.json",
     "build:config": "vite build -c packages/configs/vite.config.ts && tsc -p packages/configs/tsconfig.build.json",
     "build:i18n": "vite build -c packages/i18n/vite.config.ts && tsc -p packages/i18n/tsconfig.build.json",
     "build:server": "vite build -c packages/server/vite.config.ts && tsc -p packages/server/tsconfig.build.json",
+    "build:svelte": "vite build -c packages/svelte/vite.config.ts && tsc -p packages/svelte/tsconfig.build.json",
     "build:test": "vite build -c packages/test/vite.config.ts && tsc -p packages/test/tsconfig.build.json",
     "format": "pnpm build:config && prettier --write . --config prettier.config.ts",
     "i18n:check": "pnpm i18n:extract:check && pnpm i18n:types:check && pnpm i18n:status && pnpm i18n:unused",
@@ -32,11 +33,12 @@
     "lint:ci": "pnpm build:config && pnpm build:browser && pnpm i18n:check && pnpm lint",
     "lint:eslint": "eslint .",
     "lint:stylecheck": "prettier --check . --config prettier.config.ts",
-    "lint:typecheck": "pnpm lint:typecheck:browser && pnpm lint:typecheck:config && pnpm lint:typecheck:i18n && pnpm lint:typecheck:server && pnpm lint:typecheck:test",
+    "lint:typecheck": "pnpm lint:typecheck:browser && pnpm lint:typecheck:config && pnpm lint:typecheck:i18n && pnpm lint:typecheck:server && pnpm lint:typecheck:svelte && pnpm lint:typecheck:test",
     "lint:typecheck:browser": "tsc -p packages/browser/tsconfig.json --noEmit",
     "lint:typecheck:config": "tsc -p packages/configs/tsconfig.json --noEmit",
     "lint:typecheck:i18n": "tsc -p packages/i18n/tsconfig.json --noEmit",
     "lint:typecheck:server": "tsc -p packages/server/tsconfig.json --noEmit",
+    "lint:typecheck:svelte": "tsc -p packages/svelte/tsconfig.json --noEmit",
     "lint:typecheck:test": "tsc -p packages/test/tsconfig.json --noEmit",
     "test": "vitest run",
     "test:ci": "pnpm build:browser && pnpm test"

@@ -44,34 +44,11 @@ export async function profileUsernameUpdate(api: ProfileApi, accessToken: string
 A server-side caller passes a `fetcher` to the constructor, which wraps `fetch` with the headers its
 deployment needs, such as its service token: `new ProfileApi(url, serviceFetch(identity))`. Every
 method but `fetchResponse` throws an `HttpError` on a non-2xx status. `isHttpStatusError` and
-`isDowntimeError` sort a caught error by status, or by a refusal during a planned downtime. A
-SvelteKit server build inlines its own copy of this package, while each service client loads another,
-so an `HttpError` matches by its name: `instanceof HttpError` and `isHttpError` both accept one from
-either copy. SvelteKit
+`isDowntimeError` sort a caught error by status, or by a refusal during a planned downtime. They match
+an `HttpError` by its name, so prefer them to `instanceof HttpError`: they also accept an error from
+another copy of this package, should a bundler ever load two. SvelteKit
 exports an `HttpError` and an `isHttpError` of its own, for the errors a server sends; a file that
 imports both aliases this package's as `isServiceError`.
-
-`@a-novel-kit/nodelib-browser/svelte` holds the Svelte 5 helpers every platform shares. Its modules
-ship with their runes, which the application's Svelte compiler compiles, so it needs the optional
-`svelte` peer:
-
-| Export                                      | Role                                                                                           |
-| ------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `retryWhile`                                | Asks for missing data again on a backoff while a component lives; `onError` gets a failed run. |
-| `createPlatformDowntime` and its context    | The planned downtime a page shows, which flips to started when its start passes.               |
-| `createTelemetryPreference` and its context | The visitor's telemetry answer, which the Privacy page changes.                                |
-
-```svelte
-<script lang="ts">
-  import { invalidateAll } from "$app/navigation";
-
-  import { createPlatformDowntime, setPlatformDowntime } from "@a-novel-kit/nodelib-browser/svelte";
-
-  let { data, children } = $props();
-
-  setPlatformDowntime(createPlatformDowntime(() => data, invalidateAll));
-</script>
-```
 
 `@a-novel-kit/nodelib-browser/utils` holds `retryWithBackoff`, which repeats a failed read until its
 owner stops it, and `wait`, an abortable timer that leaves nothing behind.

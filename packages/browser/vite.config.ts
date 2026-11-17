@@ -6,7 +6,6 @@ export default libraryConfig(
   {
     http: "http/index.ts",
     preferences: "preferences/index.ts",
-    svelte: "svelte/index.svelte.ts",
     telemetry: "telemetry/index.ts",
     utils: "utils/index.ts",
   },

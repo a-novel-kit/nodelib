@@ -24,11 +24,6 @@
     "./telemetry": {
       "types": "./dist/telemetry/index.d.ts",
       "import": "./dist/telemetry/index.es.js"
-    },
-    "./svelte": {
-      "types": "./dist/svelte/index.svelte.d.ts",
-      "svelte": "./dist/svelte/index.svelte.js",
-      "import": "./dist/svelte/index.svelte.js"
     }
   },
   "files": [
@@ -46,7 +41,6 @@
   "peerDependencies": {
     "@grafana/faro-web-sdk": "^2.14.0",
     "@grafana/faro-web-tracing": "^2.14.0",
-    "svelte": "^5.57.3",
     "zod": "^4.6.7"
   },
   "peerDependenciesMeta": {
@@ -54,9 +48,6 @@
       "optional": true
     },
     "@grafana/faro-web-tracing": {
-      "optional": true
-    },
-    "svelte": {
       "optional": true
     }
   },

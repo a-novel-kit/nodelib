@@ -1,7 +1,6 @@
-import type { TelemetryChoice } from "../telemetry/consent.js";
-import type { BrowserTelemetry } from "../telemetry/telemetry.js";
-
 import { createContext } from "svelte";
+
+import type { BrowserTelemetry, TelemetryChoice } from "@a-novel-kit/nodelib-browser/telemetry";
 
 /** TelemetryPreference holds the visitor's answer about browser telemetry, which the Privacy page changes. */
 export interface TelemetryPreference {

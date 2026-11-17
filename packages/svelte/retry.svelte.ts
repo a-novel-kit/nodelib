@@ -1,4 +1,4 @@
-import { type RetryBackoffOptions, retryWithBackoff } from "../utils/backoff.js";
+import { type RetryBackoffOptions, retryWithBackoff } from "@a-novel-kit/nodelib-browser/utils";
 
 /** RetryWhileOptions spaces the attempts of {@link retryWhile}, and receives the failure that ends a bounded run. */
 export interface RetryWhileOptions extends Omit<RetryBackoffOptions, "signal"> {
