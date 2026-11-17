@@ -25,12 +25,18 @@ const directives = {
  * SvelteKit reads its options from the plugin, so `kit` carries them. The application deploys with
  * the Node adapter unless `kit` names another. Every page sends the default policy above; each
  * directive in `kit.csp.directives` adds to it or replaces the default one of that name.
+ *
+ * A deployment derives its origin from each request. A build for a known address, such as the
+ * Playwright server, trusts `ORIGIN` instead. The server traces each request, which
+ * `@a-novel-kit/nodelib-server/telemetry` exports. `kit.paths` and `kit.tracing` override both.
  */
 export function SvelteKitVite(config: UserConfig = {}, kit: Config = {}): UserConfig {
   const csp = { mode: "auto" as const, ...kit.csp, directives: { ...directives, ...kit.csp?.directives } };
+  const paths = { origin: process.env.ORIGIN, ...kit.paths };
+  const tracing = { server: true, ...kit.tracing };
 
   return defineConfig({
     ...config,
-    plugins: [sveltekit({ ...kit, adapter: kit.adapter ?? adapter(), csp }), ...(config.plugins ?? [])],
+    plugins: [sveltekit({ ...kit, adapter: kit.adapter ?? adapter(), csp, paths, tracing }), ...(config.plugins ?? [])],
   });
 }

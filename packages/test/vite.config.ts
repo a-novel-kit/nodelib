@@ -3,6 +3,6 @@ import manifest from "./package.json" with { type: "json" };
 
 export default libraryConfig(
   import.meta.dirname,
-  { http: "http/index.ts", playwright: "playwright/index.ts" },
+  { http: "http/index.ts", mailpit: "mailpit/index.ts", playwright: "playwright/index.ts" },
   manifest
 );

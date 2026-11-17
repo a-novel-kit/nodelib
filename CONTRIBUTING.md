@@ -4,17 +4,9 @@ This guide covers what is specific to `nodelib`. The [developer guide](https://a
 
 ## Repo layout
 
-`nodelib` is a [pnpm](https://pnpm.io) workspace. One repository hosts several packages that share tooling and a single version. Each package lives under `packages/*`, with its own `package.json` and build config:
+`nodelib` is a [pnpm](https://pnpm.io) workspace. One repository hosts several packages that share tooling and a single version. Each package lives under `packages/*`, with its own `package.json` and build config; the [README](./README.md#packages) lists them.
 
-| Directory          | Package                        |
-| ------------------ | ------------------------------ |
-| `packages/browser` | `@a-novel-kit/nodelib-browser` |
-| `packages/configs` | `@a-novel-kit/nodelib-config`  |
-| `packages/i18n`    | `@a-novel-kit/nodelib-i18n`    |
-| `packages/server`  | `@a-novel-kit/nodelib-server`  |
-| `packages/test`    | `@a-novel-kit/nodelib-test`    |
-
-The `pnpm-workspace.yaml` **catalog** pins each shared dependency once, so every package resolves the same version. `vite.library.ts` holds the build every package shares. A new package also needs its `build:<name>` and `lint:typecheck:<name>` scripts in the root `package.json`, and a project in `vitest.config.ts`.
+The `pnpm-workspace.yaml` **catalog** pins each shared dependency once, so every package resolves the same version. `vite.library.ts` holds the build every package shares, and `tsconfig.base.json` and `tsconfig.build.json` the TypeScript and declaration options every package extends. A new package also needs its `build:<name>` and `lint:typecheck:<name>` scripts in the root `package.json`, and a project in `vitest.config.ts`.
 
 ## Working in the repo
 
@@ -37,7 +29,7 @@ CI runs `pnpm lint:ci` and `pnpm test:ci`, which build the packages they read fi
 
 ## Publishing
 
-The packages share one version and release together to GitHub Packages. Cut a release from **Actions → release**, and pick the bump type. The workflow bumps the version and tags the commit, and the tag publishes the packages. The protected `release` environment decides who can cut a release.
+The packages share one version and release together to GitHub Packages. Cut a release from **Actions → release**; a `dry_run` shows the version it would cut. The workflow sizes the release from the commit history, bumps the version and tags the commit, and the tag publishes the packages. The protected `release` environment decides who can cut a release.
 
 ## The bar for additions
 

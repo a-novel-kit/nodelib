@@ -35,7 +35,10 @@ export interface I18nextOptions {
   secondaryLanguages?: readonly string[];
   /** Namespace used by translation calls without an explicit namespace. */
   defaultNamespace?: string;
-  /** Repository format for runtime source catalogs. */
+  /**
+   * Repository format for runtime source catalogs.
+   * @default "yaml"
+   */
   catalogFormat?: CatalogFormat;
   /** Directory containing product locales and generated declarations. */
   rootDirectory?: string;
@@ -55,7 +58,7 @@ export interface I18nextOptions {
 
 /** Builds the static i18next CLI configuration shared by Svelte applications. */
 export function I18next(options: I18nextOptions): I18nextToolkitConfig {
-  const catalogFormat = options.catalogFormat ?? "json";
+  const catalogFormat = options.catalogFormat ?? "yaml";
   const defaultNamespace = options.defaultNamespace ?? "common";
   const rootDirectory = options.rootDirectory ?? "src/lib/i18n";
   const localeDirectory = `${rootDirectory}/locales`;

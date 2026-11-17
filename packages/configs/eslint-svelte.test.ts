@@ -1,86 +1,74 @@
-import { Eslint } from "./eslint-base";
-import { EslintSvelte } from "./eslint-svelte";
-
-import path from "node:path";
+import { EslintSvelte, type EslintSvelteOptions } from "./eslint-svelte";
 
 import { describe, expect, it } from "vitest";
 
-import type { ConfigWithExtends } from "@eslint/config-helpers";
-import storybook from "eslint-plugin-storybook";
-import svelte from "eslint-plugin-svelte";
-import ts from "typescript-eslint";
+import { ESLint, type Linter } from "eslint";
 
-const gitIgnorePath = path.join(process.cwd(), ".gitignore");
-const svelteConfig = {};
-
-/** Reads a rule's setting from the last block declaring it, which wins for every file that block matches. */
-function effectiveRule(configs: ConfigWithExtends[], name: string): unknown {
-  return configs.findLast((config) => config.rules?.[name] !== undefined)?.rules?.[name];
+/** Returns the config ESLint applies to `file` under the preset. */
+async function effectiveConfig(options: Partial<EslintSvelteOptions>, file: string): Promise<Linter.Config> {
+  const overrideConfig = EslintSvelte({ svelte: {}, ...options });
+  const eslint = new ESLint({ cwd: process.cwd(), overrideConfigFile: true, overrideConfig });
+  return (await eslint.calculateConfigForFile(file)) as Linter.Config;
 }
 
-const layoutCases = [
-  {
-    name: "a Svelte library",
-    base: { gitIgnorePath },
-    framework: { svelte: svelteConfig, isLib: true },
-    storybookBlocks: [],
-    libraryRules: { "svelte/no-navigation-without-resolve": ["error", { ignoreLinks: true }] },
-  },
-  {
-    name: "a Svelte app with Storybook",
-    base: { gitIgnorePath, ignores: ["src/lib/i18n/generated/**"] },
-    framework: { svelte: svelteConfig, storybook: true },
-    storybookBlocks: storybook.configs["flat/recommended"],
-    libraryRules: {},
-  },
-];
+/** Reads a rule's severity, 0 when the config leaves it off, then its options. */
+function setting(config: Linter.Config, rule: string): unknown[] {
+  return (config.rules?.[rule] as unknown[] | undefined) ?? [0];
+}
+
+function severity(config: Linter.Config, rule: string): unknown {
+  return setting(config, rule)[0];
+}
 
 describe("EslintSvelte", () => {
-  it.each(layoutCases)(
-    "wraps the base config in the Svelte blocks for $name",
-    ({ base, framework, storybookBlocks, libraryRules }) => {
-      const [ignoresBlock, ...presets] = Eslint(base) as ConfigWithExtends[];
-      const [rulesBlock, prettier] = presets.splice(-2);
+  it.each([
+    { name: "a component", file: "src/Button.svelte", svelteParser: true },
+    { name: "a rune module", file: "src/state.svelte.ts", svelteParser: true },
+    { name: "a TypeScript module", file: "src/index.ts", svelteParser: false },
+  ])("parses $name with the Svelte config only where runes live", async ({ file, svelteParser }) => {
+    const config = await effectiveConfig({ svelte: { compilerOptions: {} } }, file);
+    const parserOptions = config.languageOptions?.parserOptions as Record<string, unknown> | undefined;
 
-      expect(EslintSvelte({ ...base, ...framework })).toEqual([
-        // globalIgnores names each block from a global counter, so two calls never share a name.
-        { ...ignoresBlock, name: expect.any(String) },
-        ...presets,
-        ...svelte.configs.recommended,
-        ...storybookBlocks,
-        {
-          ...rulesBlock,
-          rules: {
-            ...rulesBlock.rules,
-            ...libraryRules,
-            "@typescript-eslint/no-empty-object-type": "off",
-            "svelte/no-at-html-tags": "off",
-          },
-        },
-        {
-          files: ["**/*.svelte", "**/*.svelte.ts", "**/*.svelte.js"],
-          languageOptions: {
-            parserOptions: { projectService: true, extraFileExtensions: [".svelte"], parser: ts.parser, svelteConfig },
-          },
-        },
-        prettier,
-        ...svelte.configs.prettier,
-      ]);
-    }
-  );
+    expect(parserOptions?.svelteConfig).toEqual(svelteParser ? { compilerOptions: {} } : undefined);
+  });
 
-  it("lets consumer rules re-enable the Svelte exemptions", () => {
-    const configs = EslintSvelte({
-      svelte: svelteConfig,
-      customRules: {
-        rules: {
-          "@typescript-eslint/no-empty-object-type": "error",
-          "svelte/no-at-html-tags": "error",
-        },
+  it.each([
+    {
+      name: "keeps an app from rendering markup or reading import.meta.env",
+      isLib: false,
+      rules: { "svelte/no-at-html-tags": 2, "no-restricted-syntax": 2, "svelte/no-navigation-without-resolve": 2 },
+    },
+    {
+      name: "lets a library link without a route table",
+      isLib: true,
+      rules: { "svelte/no-at-html-tags": 2, "no-restricted-syntax": 0, "svelte/no-navigation-without-resolve": 2 },
+    },
+  ])("$name", async ({ isLib, rules }) => {
+    const config = await effectiveConfig({ isLib }, "src/Page.svelte");
+
+    for (const [rule, level] of Object.entries(rules)) expect(severity(config, rule), rule).toBe(level);
+    expect(setting(config, "svelte/no-navigation-without-resolve")[1]).toEqual(
+      isLib ? { ignoreLinks: true } : undefined
+    );
+  });
+
+  it.each([
+    { name: "checks stories when asked", storybook: true, level: 2 },
+    { name: "leaves stories to the base rules otherwise", storybook: false, level: 0 },
+  ])("$name", async ({ storybook, level }) => {
+    const config = await effectiveConfig({ storybook }, "src/Button.stories.ts");
+    expect(severity(config, "storybook/default-exports")).toBe(level);
+  });
+
+  it("lets consumer rules override the Svelte rules", async () => {
+    const config = await effectiveConfig(
+      {
+        customRules: { rules: { "@typescript-eslint/no-empty-object-type": "error", "svelte/no-at-html-tags": "off" } },
       },
-    }) as ConfigWithExtends[];
+      "src/Page.svelte"
+    );
 
-    expect(effectiveRule(configs, "@typescript-eslint/no-empty-object-type")).toBe("error");
-    expect(effectiveRule(configs, "svelte/no-at-html-tags")).toBe("error");
+    expect(severity(config, "@typescript-eslint/no-empty-object-type")).toBe(2);
+    expect(severity(config, "svelte/no-at-html-tags")).toBe(0);
   });
 });

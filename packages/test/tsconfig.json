@@ -1,21 +1,4 @@
 {
-  "include": ["**/*.ts"],
-  "compilerOptions": {
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "types": ["vite/client"],
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "resolveJsonModule": true,
-    "moduleDetection": "force",
-    "target": "ESNext",
-    "strict": true,
-    "allowJs": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "strictNullChecks": true,
-    "noEmit": true,
-    "allowImportingTsExtensions": true
-  }
+  "extends": "../../tsconfig.base.json",
+  "include": ["**/*.ts"]
 }

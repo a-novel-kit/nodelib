@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "${configDir}/dist",
+    "declarationMap": true,
+    "noEmit": false
+  },
+  "exclude": ["${configDir}/**/*.test.ts", "${configDir}/**/*.fixture.ts", "${configDir}/vite.config.ts"]
+}

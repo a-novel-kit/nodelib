@@ -13,6 +13,10 @@
       "types": "./dist/http/index.d.ts",
       "import": "./dist/http/index.es.js"
     },
+    "./mailpit": {
+      "types": "./dist/mailpit/index.d.ts",
+      "import": "./dist/mailpit/index.es.js"
+    },
     "./playwright": {
       "types": "./dist/playwright/index.d.ts",
       "import": "./dist/playwright/index.es.js"
@@ -34,7 +38,7 @@
   },
   "peerDependencies": {
     "@a-novel-kit/nodelib-browser": "*",
-    "jsdom": "^30.0.0",
+    "jsdom": "^30.0.0 || ^31.0.0",
     "playwright": "^1.63.0"
   },
   "peerDependenciesMeta": {
@@ -45,7 +49,6 @@
       "optional": true
     }
   },
-  "packageManager": "pnpm@12.14.0",
   "engines": {
     "node": ">=24.0.0",
     "npm": ">=10.9.2"

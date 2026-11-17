@@ -13,6 +13,8 @@ export interface SvelteKitVitestOptions {
   rootUrl: string | URL;
   /** Source globs included in unit-test coverage. */
   coverageInclude?: readonly string[];
+  /** Source globs left out of coverage: by default stories, story harnesses, fixtures and the Storybook i18n setup. */
+  coverageExclude?: readonly string[];
   /** Unit-test source globs. */
   unitInclude?: readonly string[];
   /** Unit-test exclusions, including files owned by the browser project. */
@@ -27,7 +29,20 @@ export interface SvelteKitVitestOptions {
   storybookUrl?: string;
   /** Additional Vite plugins constructed independently for each Vitest project. */
   vitePlugins?: () => readonly PluginOption[];
+  /**
+   * Dependencies every project optimizes before its first test, such as a service client and Zod. A
+   * dependency Vite discovers mid-run reloads the browser, which fails the tests in flight.
+   */
+  optimizeDepsInclude?: readonly string[];
 }
+
+/** The files only Storybook and tests run, which coverage leaves out by default. */
+const coverageExclude = [
+  "src/**/*.stories.{svelte,ts}",
+  "src/**/story.svelte",
+  "src/**/*.fixture.ts",
+  "src/lib/i18n/storybook.ts",
+];
 
 /** Builds the browser options that run one project's tests in headless Chromium, with a provider of its own. */
 function headlessChromium() {
@@ -47,6 +62,7 @@ export function SvelteKitVitest(options: SvelteKitVitestOptions): ViteUserConfig
   const storybookConfigDirectory =
     options.storybookConfigDirectory ?? fileURLToPath(new URL("./.storybook", options.rootUrl));
   const plugins = (): PluginOption[] => [sveltekit(), ...(options.vitePlugins?.() ?? [])];
+  const optimizeDeps = { include: [...(options.optimizeDepsInclude ?? [])] };
 
   return defineConfig({
     test: {
@@ -54,6 +70,7 @@ export function SvelteKitVitest(options: SvelteKitVitestOptions): ViteUserConfig
         clean: true,
         enabled: true,
         include: [...(options.coverageInclude ?? ["src/**/*.{svelte,ts}"])],
+        exclude: [...(options.coverageExclude ?? coverageExclude)],
         provider: "v8",
         reporter: ["text", "json", "lcov"],
         reportsDirectory: "coverage",
@@ -64,6 +81,7 @@ export function SvelteKitVitest(options: SvelteKitVitestOptions): ViteUserConfig
       projects: [
         defineProject({
           plugins: plugins(),
+          optimizeDeps,
           test: {
             name: "unit",
             environment: "node",
@@ -74,6 +92,7 @@ export function SvelteKitVitest(options: SvelteKitVitestOptions): ViteUserConfig
         }),
         defineProject({
           plugins: plugins(),
+          optimizeDeps,
           test: {
             name: "browser",
             include: [...(options.browserInclude ?? ["src/**/*.svelte.test.ts"])],
@@ -89,6 +108,7 @@ export function SvelteKitVitest(options: SvelteKitVitestOptions): ViteUserConfig
               storybookUrl: options.storybookUrl ?? process.env.SB_URL,
             }),
           ],
+          optimizeDeps,
           test: {
             name: "storybook",
             browser: headlessChromium(),

@@ -1,7 +1,7 @@
 import { SvelteKitVite } from "./sveltekit";
 
 import type { Plugin } from "vite";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Adapter } from "@sveltejs/kit";
 
@@ -23,6 +23,11 @@ const defaultDirectives = {
 describe("SvelteKitVite", () => {
   beforeEach(() => {
     mocks.sveltekit.mockClear();
+    vi.stubEnv("ORIGIN", undefined);
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it("preserves application configuration", () => {
@@ -46,7 +51,8 @@ describe("SvelteKitVite", () => {
     expect(mocks.sveltekit).toHaveBeenCalledWith({
       adapter: expect.objectContaining({ name: "@sveltejs/adapter-node" }),
       csp: { mode: "auto", directives: defaultDirectives },
-      paths: { base: "/studio" },
+      paths: { base: "/studio", origin: undefined },
+      tracing: { server: true },
     });
   });
 
@@ -58,7 +64,7 @@ describe("SvelteKitVite", () => {
 
     SvelteKitVite({}, { adapter });
 
-    expect(mocks.sveltekit).toHaveBeenCalledWith({ adapter, csp: { mode: "auto", directives: defaultDirectives } });
+    expect(mocks.sveltekit).toHaveBeenCalledWith(expect.objectContaining({ adapter }));
   });
 
   it("lets an application add a directive, replace one, and choose the mode", () => {
@@ -81,6 +87,24 @@ describe("SvelteKitVite", () => {
           reportOnly: { "default-src": ["self"] },
         },
       })
+    );
+  });
+
+  it.each([
+    { name: "trusts ORIGIN for a build at a known address", origin: "http://127.0.0.1:4173", kit: {}, paths: {} },
+    {
+      name: "lets an application choose its origin and tracing",
+      origin: "http://127.0.0.1:4173",
+      kit: { paths: { origin: "https://studio.test" }, tracing: { server: false } },
+      paths: { origin: "https://studio.test" },
+    },
+  ])("$name", ({ origin, kit, paths }) => {
+    vi.stubEnv("ORIGIN", origin);
+
+    SvelteKitVite({}, kit);
+
+    expect(mocks.sveltekit).toHaveBeenCalledWith(
+      expect.objectContaining({ paths: { origin, ...paths }, tracing: { server: true, ...kit.tracing } })
     );
   });
 });
