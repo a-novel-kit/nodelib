@@ -150,7 +150,8 @@ compresses each export. `serviceName` names the platform on every span, and the 
 A platform sets up tracing in three steps:
 
 1. Install the OpenTelemetry peers.
-2. Turn on SvelteKit's server spans with `sveltekit({ tracing: { server: true } })`.
+2. Turn on SvelteKit's server spans, which `SvelteKitVite` from `@a-novel-kit/nodelib-config/sveltekit`
+   does by default.
 3. Start tracing from `src/instrumentation.server.ts`. SvelteKit loads that file before the
    application:
 

@@ -21,14 +21,28 @@ export interface EslintOptions {
 }
 
 /**
- * Builds the shared flat ESLint config for A-Novel TypeScript packages. The returned array is ready
- * to spread into a package's eslint.config. A Svelte package uses `EslintSvelte` from
+ * Builds the shared flat ESLint config for A-Novel TypeScript packages, ready for a package's
+ * eslint.config to export as is. A package that adds rules passes `customRules`, or exports
+ * `defineConfig(Eslint(opts), block)`. A Svelte package uses `EslintSvelte` from
  * `@a-novel-kit/nodelib-config/eslint-svelte` instead.
- *
- * The array ends with the default rules block, then Prettier's block. A later block overrides an
- * earlier one, so Prettier switches off the formatting rules the others enable.
  */
-export function Eslint(opts: EslintOptions = {}): Parameters<typeof defineConfig> {
+export function Eslint(opts: EslintOptions = {}): ReturnType<typeof defineConfig> {
+  const { presets, rules, prettier } = eslintParts(opts);
+  return defineConfig([...presets, rules, prettier]);
+}
+
+/** EslintParts names the blocks of {@link Eslint}, for a preset that slots its own between them. */
+export interface EslintParts {
+  /** The ignores and the language presets. */
+  presets: ConfigWithExtends[];
+  /** The default rules block, which overrides the presets. */
+  rules: ConfigWithExtends;
+  /** Prettier's block, last, which switches off the formatting rules the others enable. */
+  prettier: ConfigWithExtends;
+}
+
+/** Builds the blocks of {@link Eslint}. */
+export function eslintParts(opts: EslintOptions): EslintParts {
   const rulesBlock: ConfigWithExtends = {
     ...opts.customRules,
     languageOptions: {
@@ -36,8 +50,6 @@ export function Eslint(opts: EslintOptions = {}): Parameters<typeof defineConfig
       ...opts.customRules?.languageOptions,
     },
     rules: {
-      "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/ban-ts-comment": "off",
       "no-unused-vars": "off",
       "@typescript-eslint/no-unused-vars": [
         "error",
@@ -52,12 +64,14 @@ export function Eslint(opts: EslintOptions = {}): Parameters<typeof defineConfig
     },
   };
 
-  return [
-    globalIgnores(["**/dist/**", "**/.*/**", ...(opts.ignores ?? [])]),
-    ...(opts.gitIgnorePath ? [includeIgnoreFile(opts.gitIgnorePath)] : []),
-    js.configs.recommended,
-    ...ts.configs.recommended,
-    rulesBlock,
+  return {
+    presets: [
+      globalIgnores(["**/dist/**", "**/.*/**", ...(opts.ignores ?? [])]),
+      ...(opts.gitIgnorePath ? [includeIgnoreFile(opts.gitIgnorePath)] : []),
+      js.configs.recommended,
+      ...ts.configs.recommended,
+    ],
+    rules: rulesBlock,
     prettier,
-  ];
+  };
 }

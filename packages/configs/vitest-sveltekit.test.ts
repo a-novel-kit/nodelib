@@ -24,6 +24,7 @@ describe("SvelteKitVitest", () => {
     const config = SvelteKitVitest({
       rootUrl: new URL(import.meta.url),
       coverageInclude: ["app/**/*.ts"],
+      coverageExclude: ["app/**/*.fixture.ts"],
       unitInclude: ["app/**/*.test.ts"],
       unitExclude: ["app/**/*.svelte.test.ts"],
       browserInclude: ["app/**/*.svelte.test.ts"],
@@ -31,9 +32,11 @@ describe("SvelteKitVitest", () => {
       storybookScript: "pnpm storybook:test",
       storybookUrl: "http://127.0.0.1:6006",
       vitePlugins,
+      optimizeDepsInclude: ["zod"],
     });
 
     expect(config.test?.coverage?.include).toEqual(["app/**/*.ts"]);
+    expect(config.test?.coverage?.exclude).toEqual(["app/**/*.fixture.ts"]);
     expect(config.test?.projects).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -53,6 +56,7 @@ describe("SvelteKitVitest", () => {
       expect(project).toEqual(
         expect.objectContaining({
           plugins: expect.arrayContaining([expect.objectContaining({ name: "consumer-yaml" })]),
+          optimizeDeps: { include: ["zod"] },
         })
       );
     }
@@ -70,6 +74,12 @@ describe("SvelteKitVitest", () => {
     const config = SvelteKitVitest({ rootUrl: import.meta.url });
 
     expect(config.test?.coverage?.include).toEqual(["src/**/*.{svelte,ts}"]);
+    expect(config.test?.coverage?.exclude).toEqual([
+      "src/**/*.stories.{svelte,ts}",
+      "src/**/story.svelte",
+      "src/**/*.fixture.ts",
+      "src/lib/i18n/storybook.ts",
+    ]);
     expect(config.test?.projects).toEqual(
       expect.arrayContaining([
         expect.objectContaining({

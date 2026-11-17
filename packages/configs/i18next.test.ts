@@ -12,11 +12,11 @@ describe("I18next", () => {
     expect(config.extract).toMatchObject({
       defaultNS: "common",
       input: ["src/**/*.{svelte,ts}"],
-      output: "src/lib/i18n/locales/{{language}}/{{namespace}}.json",
+      output: "src/lib/i18n/locales/{{language}}/{{namespace}}.yaml",
       primaryLanguage: "en",
       secondaryLanguages: ["fr"],
       removeUnusedKeys: true,
-      outputFormat: "json",
+      outputFormat: "yaml",
       warnOnConflicts: "error",
     });
     expect(config.types).toMatchObject({
@@ -40,26 +40,26 @@ describe("I18next", () => {
 
     expect(config.extract).toMatchObject({
       input: ["fixtures/**/*.svelte"],
-      output: "fixtures/i18n/locales/{{language}}/{{namespace}}.json",
+      output: "fixtures/i18n/locales/{{language}}/{{namespace}}.yaml",
       preservePatterns: ["runtime.allowed.*"],
       removeUnusedKeys: true,
     });
   });
 
-  it("derives YAML extraction and type paths when the product selects YAML", () => {
+  it("derives JSON extraction and type paths when the product selects JSON", () => {
     const config = I18next({
-      catalogFormat: "yaml",
+      catalogFormat: "json",
       locales: ["en", "fr"],
       primaryLanguage: "en",
     });
 
     expect(config.extract).toMatchObject({
-      output: "src/lib/i18n/locales/{{language}}/{{namespace}}.yaml",
-      outputFormat: "yaml",
+      output: "src/lib/i18n/locales/{{language}}/{{namespace}}.json",
+      outputFormat: "json",
     });
     expect(config.types).toMatchObject({
       basePath: "src/lib/i18n/locales/en",
-      input: ["src/lib/i18n/locales/en/**/*.yaml"],
+      input: ["src/lib/i18n/locales/en/**/*.json"],
     });
   });
 
@@ -98,8 +98,8 @@ describe("I18next", () => {
       indentation: 2,
       input: ["src/**/*.{svelte,ts}"],
       mergeNamespaces: false,
-      output: "src/lib/i18n/locales/{{language}}/{{namespace}}.json",
-      outputFormat: "json",
+      output: "src/lib/i18n/locales/{{language}}/{{namespace}}.yaml",
+      outputFormat: "yaml",
       preservePatterns: ["runtime.allowed.*"],
       primaryLanguage: "en",
       removeUnusedKeys: true,

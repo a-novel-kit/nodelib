@@ -1,4 +1,4 @@
-import { expectStatus } from "./err";
+import { expectStatus } from "./status";
 
 import { describe, expect, it } from "vitest";
 

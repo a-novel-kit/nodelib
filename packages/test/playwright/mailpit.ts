@@ -1,4 +1,5 @@
-import { JSDOM } from "jsdom";
+import { mailLinks, searchMail } from "../mailpit/reader.js";
+
 import { expect } from "playwright/test";
 
 /** Where to read emails, and the only origin an accepted link may point to. */
@@ -39,46 +40,6 @@ export async function emailLink(
 
 /** Finds a link to `pathname` in the latest emails Mailpit holds for `email`. */
 async function deliveredLink(mailpit: string, email: string, pathname: string): Promise<string | undefined> {
-  const query = new URLSearchParams({ query: `to:"${email}"`, limit: "10" });
-  for (const id of messageIds(await read(`${mailpit}/api/v1/search?${query}`))) {
-    const html = messageHtml(await read(`${mailpit}/api/v1/message/${id}`));
-    const href = links(html).find((candidate) => new URL(candidate).pathname === pathname);
-    if (href) return href;
-  }
-  return undefined;
-}
-
-async function read(url: string): Promise<unknown> {
-  const response = await fetch(url);
-  if (!response.ok) {
-    // An unread body holds its connection until the server closes it.
-    await response.body?.cancel();
-    throw new Error(`Mailpit answered ${response.status} for ${url}`);
-  }
-
-  return response.json();
-}
-
-function messageIds(search: unknown): string[] {
-  const messages = (search as { messages?: unknown }).messages;
-  if (!Array.isArray(messages)) throw new TypeError("Mailpit search has no messages list");
-  return messages.map(messageId);
-}
-
-function messageId(message: { ID?: unknown }): string {
-  if (typeof message.ID !== "string") throw new TypeError("Mailpit message has no ID");
-  return message.ID;
-}
-
-function messageHtml(message: unknown): string {
-  const html = (message as { HTML?: unknown }).HTML;
-  if (typeof html !== "string") throw new TypeError("Mailpit message has no HTML body");
-  return html;
-}
-
-function links(html: string): string[] {
-  const dom = new JSDOM(html);
-  const hrefs = Array.from(dom.window.document.querySelectorAll<HTMLAnchorElement>("a[href]"), (anchor) => anchor.href);
-  dom.window.close();
-  return hrefs;
+  const links = (await searchMail(mailpit, `to:"${email}"`)).flatMap(({ HTML }) => mailLinks(HTML));
+  return links.find((candidate) => new URL(candidate).pathname === pathname);
 }

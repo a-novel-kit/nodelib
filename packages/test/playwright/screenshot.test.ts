@@ -105,7 +105,7 @@ describe("screenshot in Chromium", () => {
 
     await screenshot(page, info as unknown as TestInfo, "touch", [page.locator("#value")]);
 
-    const [[, { body }]] = info.attach.mock.calls;
+    const [, { body }] = info.attach.mock.calls[0] ?? [];
     // The control is lime through row 140, the masked value magenta through row 180, the last row yellow.
     expect(await colorsAt(page, body, [50, 120, 160, 2200])).toEqual(["0,255,0", "0,255,0", "255,0,255", "255,255,0"]);
     expect(page.viewportSize()).toEqual(devices["Pixel 7"].viewport);

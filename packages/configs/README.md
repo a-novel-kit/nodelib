@@ -29,6 +29,23 @@ which only a project importing them installs.
 | `@a-novel-kit/nodelib-config/yaml`             | Build-time JSON-compatible YAML modules for Vite        | `vite`                                                                                     |
 
 Each framework entry point accepts product-specific paths or policy and keeps the shared defaults.
+The factories carry PascalCase names, as `Eslint` and `SvelteKitVite`, against the camelCase rule for
+functions: each one stands for a whole tool's configuration, named after the tool.
+
+An `eslint.config.ts` exports the factory's result as is. `EslintSvelte` keeps `{@html}` an error and
+forbids `import.meta.env`, since a SvelteKit app reads its configuration from `$app/env/private` and
+`$app/env/public`; `isLib: true` lifts the second rule and lets a library link without a route table:
+
+```ts
+import { EslintSvelte } from "@a-novel-kit/nodelib-config/eslint-svelte";
+
+export default EslintSvelte({
+  gitIgnorePath: path.join(import.meta.dirname, ".gitignore"),
+  ignores: ["src/lib/i18n/generated/**"],
+  storybook: true,
+  svelte: {},
+});
+```
 
 `SvelteKitVite` gives every page a Content Security Policy: `script-src 'self'` with SvelteKit's
 nonce or hash for its own inline scripts, `object-src 'none'`, `base-uri 'none'` and
@@ -40,6 +57,10 @@ narrows the first:
 ```ts
 response.headers.append("content-security-policy", `form-action 'self' ${accountOrigin}`);
 ```
+
+`SvelteKitVite` also turns on SvelteKit's server spans, which `@a-novel-kit/nodelib-server/telemetry`
+exports, and trusts `ORIGIN` when it is set, as on the Playwright server; a deployment derives its
+origin from each request.
 
 The Vitest matrix runs unit tests offline through `vitest-offline`: the global `fetch` rejects every
 request a test does not stub. A test answers its requests with `vi.stubGlobal("fetch", …)`.
@@ -55,8 +76,18 @@ import { Yaml } from "@a-novel-kit/nodelib-config/yaml";
 export default SvelteKitVitest({
   rootUrl: import.meta.url,
   vitePlugins: () => [Yaml()],
+  // Optimized before the first test, so the browser never reloads under a test in flight.
+  optimizeDepsInclude: ["@a-novel/service-authentication-rest", "zod"],
 });
 ```
+
+Coverage leaves out what only Storybook and tests run: stories, story harnesses, fixtures and
+`src/lib/i18n/storybook.ts`. `coverageExclude` replaces that list.
+
+`SvelteKitPlaywright` runs the suite against the production build. Its `servers` start one server of
+that build per entry, each with its own environment over the shared `serverEnvironment`, such as one
+per planned downtime state (`downtimeServers` from `@a-novel-kit/nodelib-test/playwright`). The first
+builds the application and serves the suite's base URL.
 
 A release build sends the browser's source maps to the platform's Grafana Faro app, then deletes them,
 so the image ships none. The plugin acts only when the build holds `FARO_SOURCEMAP_API_KEY` and

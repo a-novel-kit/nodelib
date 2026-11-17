@@ -1,14 +1,16 @@
 # Upgrading to NEXT
 
 nodelib takes in the code every service client and every platform copies: a `RestClient` base, the
-Svelte helpers, and the platform server's workarounds. It also drops the exports no repository uses.
+Svelte helpers, the end-to-end harness and the preset overrides. It also drops the exports no
+repository uses.
 
 ## Do I need to act?
 
 **Required** only for a project that imports a removed export, which no repository of either
-organization does, and for a service client built on `RestClient`, which raises its peer on
-nodelib-browser to this release. **Recommended** for every
-service JS client and every platform: each section names the local copies the release replaces.
+organization does, for a service client built on `RestClient`, which raises its peer on
+nodelib-browser to this release, and for a project that relies on a changed default listed below.
+**Recommended** for every service JS client and every platform: each section names the local copies
+the release replaces.
 
 ## Replace the removed exports
 
@@ -97,6 +99,65 @@ it, while nodelib-browser stays one external copy shared with the service client
 
 Prefer `isHttpError` and `isHttpStatusError` to `instanceof HttpError`: they match an error by its
 name, so they keep working should a bundler ever load two copies of nodelib-browser.
+
+## Drop the preset overrides
+
+The presets now hold what every platform overrode the same way:
+
+- **ESLint.** `EslintSvelte` keeps `svelte/no-at-html-tags` an error and forbids `import.meta.env`
+  outside a library (`isLib: true`). Delete the override block, and export the factory's result as
+  is: `export default EslintSvelte({ … })`. `Eslint` and `EslintSvelte` return `defineConfig`'s
+  result, which a spread still accepts. The base preset no longer turns off
+  `@typescript-eslint/no-explicit-any` and `@typescript-eslint/ban-ts-comment`: replace an `any` with
+  `unknown` or a real type.
+- **Vite.** `SvelteKitVite` sets `paths.origin` from `ORIGIN` and `tracing.server`. Delete both from
+  `vite.config.ts`, and account's `frame-ancestors`, which was already the default.
+- **Vitest.** `SvelteKitVitest` leaves stories, story harnesses, fixtures and
+  `src/lib/i18n/storybook.ts` out of coverage, and takes `optimizeDepsInclude`. Replace the
+  `mergeConfig` wrapper and the `validation-dependencies` plugin:
+
+  ```ts
+  export default SvelteKitVitest({
+    rootUrl: import.meta.url,
+    vitePlugins: () => [Yaml()],
+    optimizeDepsInclude: ["@a-novel/service-authentication-rest", "zod"],
+  });
+  ```
+
+- **i18next.** `I18next` reads YAML catalogs by default. Delete `catalogFormat: "yaml"`; a JSON
+  project now passes `catalogFormat: "json"`.
+
+## Run the downtime servers from the shared harness
+
+`SvelteKitPlaywright` takes `servers`, one server of the build each, and `port` is deprecated.
+nodelib-test lists the downtime servers and serves their documents, and draws the service tokens, so
+a platform deletes the body of `tests/e2e/downtime.ts` and most of `tests/e2e/service-token.ts`:
+
+```ts
+// playwright.config.ts
+export default defineConfig({
+  ...SvelteKitPlaywright({ servers: downtimeServers(), serverEnvironment: { … }, use: { … } }),
+  globalSetup: ["./tests/e2e/setup.ts", "./tests/e2e/service-token.ts", "./tests/e2e/downtime.ts"],
+  workers: 1,
+});
+
+// tests/e2e/downtime.ts
+export default downtimeSetup();
+
+// tests/e2e/service-token.ts
+export default serviceTokenSetup([
+  { path: serviceTokenPath, subject: platformCaller },
+  { path: profileServiceTokenPath, subject: platformCaller, audience: "profile" },
+]);
+```
+
+A journey imports `downtimeOrigin("started")` and `callerFetch(subject)` from
+`@a-novel-kit/nodelib-test/playwright`. `webServer` is now a list, even for one server.
+
+## Read Mailpit through `nodelib-test/mailpit`
+
+`searchMail` and `mailLinks` read the emails a test sends, without a test runner of their own. A
+service's integration suite replaces its Mailpit loop with them and polls through `vi.waitFor`.
 
 ## Simplify the platform server
 

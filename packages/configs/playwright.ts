@@ -2,11 +2,25 @@ import { resolve } from "node:path";
 
 import { type PlaywrightTestConfig, devices } from "playwright/test";
 
+/** One server of the application's production build. */
+export interface SvelteKitPlaywrightServer {
+  /** Port the server listens on. */
+  port: number;
+  /** Environment of this server alone, over the shared `serverEnvironment`. */
+  serverEnvironment?: Record<string, string>;
+}
+
 /** Product details for a SvelteKit platform's end-to-end suite. */
 export interface SvelteKitPlaywrightOptions {
-  /** Port the built application listens on. */
-  port: number;
-  /** Server environment beyond HOST, PORT and ORIGIN, such as backend service URLs. */
+  /**
+   * Servers of one build, each on its own port, such as one per planned downtime state. The first
+   * builds the application and serves `baseURL`; a test reaches another through its origin.
+   * @default [{ port: 4173 }]
+   */
+  servers?: SvelteKitPlaywrightServer[];
+  /** @deprecated Pass `servers: [{ port }]`. */
+  port?: number;
+  /** Environment of every server beyond HOST, PORT and ORIGIN, such as backend service URLs. */
   serverEnvironment?: Record<string, string>;
   /** Module that starts the disposable services and returns their teardown. */
   globalSetup?: string;
@@ -24,8 +38,10 @@ export interface SvelteKitPlaywrightOptions {
  * resolve under `PLAYWRIGHT_SNAPSHOT_DIR` as `{projectName}/{testFilePath}/{arg}{ext}`, and the HTML
  * report lands in `playwright-report/`.
  */
-export function SvelteKitPlaywright(options: SvelteKitPlaywrightOptions): PlaywrightTestConfig {
-  const baseURL = `http://127.0.0.1:${options.port}`;
+export function SvelteKitPlaywright(options: SvelteKitPlaywrightOptions = {}): PlaywrightTestConfig {
+  const servers = options.servers ?? [{ port: options.port ?? 4173 }];
+  // The first server builds the application and serves the suite's base URL.
+  const baseURL = origin(servers[0]?.port ?? 4173);
   const snapshots = process.env.PLAYWRIGHT_SNAPSHOT_DIR;
 
   return {
@@ -55,12 +71,23 @@ export function SvelteKitPlaywright(options: SvelteKitPlaywrightOptions): Playwr
       { name: "desktop", use: { ...devices["Desktop Chrome"] } },
       { name: "mobile", use: { ...devices["Pixel 7"] } },
     ],
-    webServer: {
-      command: "pnpm build && node build",
-      url: `${baseURL}/ping`,
+    // Playwright starts the servers in order, so the later ones serve the build the first one made.
+    webServer: servers.map(({ port, serverEnvironment }, index) => ({
+      command: index === 0 ? "pnpm build && node build" : "node build",
+      url: `${origin(port)}/ping`,
       timeout: 120_000,
       reuseExistingServer: false,
-      env: { ...options.serverEnvironment, HOST: "127.0.0.1", PORT: String(options.port), ORIGIN: baseURL },
-    },
+      env: {
+        ...options.serverEnvironment,
+        ...serverEnvironment,
+        HOST: "127.0.0.1",
+        PORT: String(port),
+        ORIGIN: origin(port),
+      },
+    })),
   };
+}
+
+function origin(port: number): string {
+  return `http://127.0.0.1:${port}`;
 }
