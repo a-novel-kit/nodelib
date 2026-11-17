@@ -6,7 +6,8 @@ Svelte helpers, and the platform server's workarounds. It also drops the exports
 ## Do I need to act?
 
 **Required** only for a project that imports a removed export, which no repository of either
-organization does. **Recommended** for every
+organization does, and for a service client built on `RestClient`, which raises its peer on
+nodelib-browser to this release. **Recommended** for every
 service JS client and every platform: each section names the local copies the release replaces.
 
 ## Replace the removed exports
@@ -58,7 +59,13 @@ without a body sends no `Content-Type`:
  });
 ```
 
-`HTTP_HEADERS` is deprecated, and leaves in a later release once no client uses it. The service's
+The client's `pkg/js/rest/package.json` raises its `@a-novel-kit/nodelib-browser` peer from
+`^1.3.18 || ^2.0.0` to this release: an older nodelib-browser has no `RestClient`, and the client
+would fail at import.
+
+`HTTP_HEADERS` is deprecated, and leaves in a later release once no client uses it. A plain `fetch`,
+such as platform-studio's `src/lib/client/projects/api.ts` calling Studio's own routes, sets
+`{ "Content-Type": "application/json" }` beside its body instead. The service's
 own `HealthDependency` export can re-export the package's. The narrative engine's `stream` sends
 through `this.fetchResponse`, and imports `wait` from `@a-novel-kit/nodelib-browser/utils`, which
 leaves no abort listener behind.
@@ -83,11 +90,17 @@ run's failure to `onError` instead of the platform's telemetry module:
 The entry ships its modules with their runes for the application's Svelte compiler, so the
 project needs `svelte` 5.57.3 or later, which every platform has.
 
+The entry also makes nodelib-browser a Svelte package, which a SvelteKit server build inlines, while
+each service client keeps loading its own copy from `node_modules`. An `HttpError` therefore matches
+by its name: `instanceof HttpError`, `isHttpError` and `isHttpStatusError` accept one from either
+copy, so no check changes.
+
 ## Simplify the platform server
 
 - **Runtime config.** `environmentHttpUrl(name, { defaultValue })` and `environmentOptional(name)`
   replace the `DOWNTIME_URL ?? default` and `*_TOKEN_PATH || undefined` workarounds, so `RuntimeConfig`
-  becomes `EnvironmentOutput<typeof schema>`.
+  becomes `EnvironmentOutput<typeof schema>`. An optional field is a required key typed
+  `string | undefined`, so a test fixture of the config sets `serviceTokenPath: undefined`.
 - **Health.** Each service's entry in `aggregateHealth`'s `config` takes its own `fetch`. Pass
   `serviceFetch({ serviceTokenPath })` there, and drop the code that maps a probe URL back to a token.
 - **Tracing.** `traceResponse` from `@a-novel-kit/nodelib-server/telemetry` replaces the hook's local

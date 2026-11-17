@@ -36,6 +36,15 @@ export class HttpError extends Error {
     this.status = status;
     this.tags = tags;
   }
+
+  /**
+   * Matches an HttpError from any copy of this package by its name, as {@link isHttpError} does. A
+   * SvelteKit server build inlines the app's own copy, since the `./svelte` entry makes this a Svelte
+   * package, while each service client loads another one from `node_modules`.
+   */
+  static [Symbol.hasInstance](value: unknown): boolean {
+    return isHttpError(value);
+  }
 }
 
 /**

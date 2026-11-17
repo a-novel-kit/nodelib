@@ -44,7 +44,10 @@ export async function profileUsernameUpdate(api: ProfileApi, accessToken: string
 A server-side caller passes a `fetcher` to the constructor, which wraps `fetch` with the headers its
 deployment needs, such as its service token: `new ProfileApi(url, serviceFetch(identity))`. Every
 method but `fetchResponse` throws an `HttpError` on a non-2xx status. `isHttpStatusError` and
-`isDowntimeError` sort a caught error by status, or by a refusal during a planned downtime. SvelteKit
+`isDowntimeError` sort a caught error by status, or by a refusal during a planned downtime. A
+SvelteKit server build inlines its own copy of this package, while each service client loads another,
+so an `HttpError` matches by its name: `instanceof HttpError` and `isHttpError` both accept one from
+either copy. SvelteKit
 exports an `HttpError` and an `isHttpError` of its own, for the errors a server sends; a file that
 imports both aliases this package's as `isServiceError`.
 
