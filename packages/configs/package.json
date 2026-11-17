@@ -29,6 +29,10 @@
       "types": "./dist/sveltekit.d.ts",
       "import": "./dist/sveltekit/index.es.js"
     },
+    "./vite-library": {
+      "types": "./dist/vite-library.d.ts",
+      "import": "./dist/vite-library/index.es.js"
+    },
     "./vitest-offline": {
       "types": "./dist/vitest-offline.d.ts",
       "import": "./dist/vitest-offline/index.es.js"

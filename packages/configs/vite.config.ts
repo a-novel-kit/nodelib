@@ -1,5 +1,5 @@
-import { libraryConfig } from "../../vite.library.ts";
 import manifest from "./package.json" with { type: "json" };
+import { ViteLibrary } from "./vite-library.ts";
 
 import { mergeConfig } from "vite";
 
@@ -12,11 +12,12 @@ const entries = {
   playwright: "playwright.ts",
   sveltekit: "sveltekit.ts",
   "vitest-offline": "vitest-offline.ts",
+  "vite-library": "vite-library.ts",
   "vitest-sveltekit": "vitest-sveltekit.ts",
   yaml: "yaml.ts",
 };
 
-export default mergeConfig(libraryConfig(import.meta.dirname, entries, manifest), {
+export default mergeConfig(ViteLibrary(import.meta.dirname, entries, manifest), {
   build: {
     rollupOptions: {
       output: {

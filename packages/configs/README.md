@@ -16,17 +16,18 @@ which only a project importing them installs.
 
 ## Entry points
 
-| Import                                         | Role                                                    | Optional peers                                                                             |
-| ---------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `@a-novel-kit/nodelib-config`                  | ESLint and Prettier factories                           | `prettier-plugin-svelte` and `prettier-plugin-css-order` for Svelte, `prettier-plugin-sql` |
-| `@a-novel-kit/nodelib-config/eslint-svelte`    | ESLint config with the Svelte and Storybook rules       | `eslint-plugin-svelte`, `eslint-plugin-storybook`                                          |
-| `@a-novel-kit/nodelib-config/faro`             | Release-build source-map upload to Grafana Faro         | `vite`                                                                                     |
-| `@a-novel-kit/nodelib-config/i18next`          | Static JSON or YAML extraction, status, and type policy | `i18next-cli`, `i18next-cli-plugin-svelte`                                                 |
-| `@a-novel-kit/nodelib-config/playwright`       | End-to-end suite of a platform's production build       | `playwright`                                                                               |
-| `@a-novel-kit/nodelib-config/sveltekit`        | Vite config with SvelteKit and the Node adapter         | `vite`, `@sveltejs/kit`, `@sveltejs/adapter-node`, `@opentelemetry/api`                    |
-| `@a-novel-kit/nodelib-config/vitest-offline`   | Vitest setup file that rejects every unstubbed `fetch`  | None                                                                                       |
-| `@a-novel-kit/nodelib-config/vitest-sveltekit` | Unit, browser-component, and Storybook test projects    | `vitest`, `@vitest/browser-playwright`, `@storybook/addon-vitest`, `@sveltejs/kit`         |
-| `@a-novel-kit/nodelib-config/yaml`             | Build-time JSON-compatible YAML modules for Vite        | `vite`                                                                                     |
+| Import                                         | Role                                                        | Optional peers                                                                             |
+| ---------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `@a-novel-kit/nodelib-config`                  | ESLint and Prettier factories                               | `prettier-plugin-svelte` and `prettier-plugin-css-order` for Svelte, `prettier-plugin-sql` |
+| `@a-novel-kit/nodelib-config/eslint-svelte`    | ESLint config with the Svelte and Storybook rules           | `eslint-plugin-svelte`, `eslint-plugin-storybook`                                          |
+| `@a-novel-kit/nodelib-config/faro`             | Release-build source-map upload to Grafana Faro             | `vite`                                                                                     |
+| `@a-novel-kit/nodelib-config/i18next`          | Static JSON or YAML extraction, status, and type policy     | `i18next-cli`, `i18next-cli-plugin-svelte`                                                 |
+| `@a-novel-kit/nodelib-config/playwright`       | End-to-end suite of a platform's production build           | `playwright`                                                                               |
+| `@a-novel-kit/nodelib-config/sveltekit`        | Vite config with SvelteKit and the Node adapter             | `vite`, `@sveltejs/kit`, `@sveltejs/adapter-node`, `@opentelemetry/api`                    |
+| `@a-novel-kit/nodelib-config/vite-library`     | Library build of nodelib's packages and the service clients | `vite`                                                                                     |
+| `@a-novel-kit/nodelib-config/vitest-offline`   | Vitest setup file that rejects every unstubbed `fetch`      | None                                                                                       |
+| `@a-novel-kit/nodelib-config/vitest-sveltekit` | Unit, browser-component, and Storybook test projects        | `vitest`, `@vitest/browser-playwright`, `@storybook/addon-vitest`, `@sveltejs/kit`         |
+| `@a-novel-kit/nodelib-config/yaml`             | Build-time JSON-compatible YAML modules for Vite            | `vite`                                                                                     |
 
 Each framework entry point accepts product-specific paths or policy and keeps the shared defaults.
 The factories carry PascalCase names, as `Eslint` and `SvelteKitVite`, against the camelCase rule for
@@ -125,3 +126,16 @@ nodelib-i18n-changes drift --source en --base origin/master
 ```
 
 The base branch must be fetched, as in a CI checkout with `fetch-depth: 0`.
+
+`ViteLibrary` builds a published library: ES modules with source maps, every dependency and peer
+left to the consumer, subpath imports included, so the consumer keeps one copy of each. A service's
+REST client builds with it:
+
+```ts
+// pkg/js/rest/vite.config.ts
+import manifest from "./package.json" with { type: "json" };
+
+import { ViteLibrary } from "@a-novel-kit/nodelib-config/vite-library";
+
+export default ViteLibrary(import.meta.dirname, { src: "src/index.ts" }, manifest);
+```
