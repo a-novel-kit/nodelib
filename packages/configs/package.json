@@ -81,7 +81,7 @@
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@types/node": "^26.6.6",
     "@vitest/browser-playwright": "^5.1.0",
-    "eslint": "^10.14.0",
+    "eslint": "^10.15.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-storybook": "^10.6.7",
     "eslint-plugin-svelte": "^3.24.1",
@@ -155,7 +155,7 @@
       "optional": true
     }
   },
-  "packageManager": "pnpm@12.20.0",
+  "packageManager": "pnpm@12.21.0",
   "engines": {
     "node": ">=24.0.0",
     "npm": ">=10.9.2"
