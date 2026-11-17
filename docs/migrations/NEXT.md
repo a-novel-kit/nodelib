@@ -72,6 +72,24 @@ own `HealthDependency` export can re-export the package's. The narrative engine'
 through `this.fetchResponse`, and imports `wait` from `@a-novel-kit/nodelib-browser/utils`, which
 leaves no abort listener behind.
 
+## Build a service client with `ViteLibrary`
+
+`@a-novel-kit/nodelib-config/vite-library` publishes the library build nodelib's packages use. A
+service's `pkg/js/rest/vite.config.ts`, and service-authentication's `pkg/js/rest-test/vite.config.ts`,
+shrink to one call, which keeps `dist/src/index.es.js` and every peer subpath external:
+
+```ts
+import manifest from "./package.json" with { type: "json" };
+
+import { ViteLibrary } from "@a-novel-kit/nodelib-config/vite-library";
+
+export default ViteLibrary(import.meta.dirname, { src: "src/index.ts" }, manifest);
+```
+
+The output is no longer minified, which the consumer's bundler does anyway, and Node's built-in
+modules stay external without a hand-written list. The `--outDir` of service-json-keys' `build`
+script goes, since the build writes beside its config.
+
 ## Import the Svelte helpers from `nodelib-svelte`
 
 An a-novel-kit owner first makes the newly published package public, as nodelib-browser is: GitHub
