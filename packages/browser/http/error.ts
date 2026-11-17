@@ -53,7 +53,7 @@ export async function newHttpError(response: Response): Promise<HttpError> {
  * parameters and ignoring case (RFC 9110 §8.3.1).
  */
 function problemTags(headers: Headers, text: string): ProblemTags {
-  const mediaType = headers.get("Content-Type")?.split(";", 1)[0].trim().toLowerCase();
+  const mediaType = headers.get("Content-Type")?.split(";", 1)[0]?.trim().toLowerCase();
   if (mediaType !== "application/problem+json") {
     return {};
   }

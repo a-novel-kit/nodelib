@@ -1,5 +1,5 @@
-import { type CookieOptions, writeCookie } from "../cookie.js";
-import { PREFERENCE_LIFETIME_S } from "./lifetime.js";
+import type { CookieOptions } from "../cookie.js";
+import { savePreference } from "./preference.js";
 
 /** How the visitor left the navigation rail: with its labels, or narrowed to its icons. */
 export type NavigationRail = "expanded" | "collapsed";
@@ -17,5 +17,5 @@ export function parseNavigationRail(value: string | undefined): NavigationRail {
 
 /** Keeps the rail in a cookie for a year. */
 export function saveNavigationRail(rail: NavigationRail, options?: CookieOptions): void {
-  writeCookie(NAVIGATION_RAIL_COOKIE, rail, PREFERENCE_LIFETIME_S, options);
+  savePreference(NAVIGATION_RAIL_COOKIE, rail, options);
 }

@@ -1,12 +1,8 @@
-import { aggregateHealth } from "./health";
+import { type HealthServiceConfig, aggregateHealth } from "./health";
 
 import { describe, expect, it, vi } from "vitest";
 
-const services = {
-  authentication: {
-    url: "http://authentication:8080/healthcheck",
-  },
-};
+const authentication: HealthServiceConfig = { timeoutMs: 500, url: "http://authentication:8080/healthcheck" };
 
 describe("aggregateHealth", () => {
   it("resolves private service configuration inside the health boundary", async () => {
@@ -18,12 +14,7 @@ describe("aggregateHealth", () => {
     const fetchImplementation = vi.fn<typeof globalThis.fetch>(async () => Response.json(dependencies));
 
     const health = await aggregateHealth({
-      config: {
-        authentication: () => ({
-          timeoutMs: 500,
-          url: services.authentication.url,
-        }),
-      },
+      config: { authentication: () => authentication },
       fetch: fetchImplementation,
     });
 
@@ -36,24 +27,43 @@ describe("aggregateHealth", () => {
       },
       status: "up",
     });
-    expect(fetchImplementation).toHaveBeenCalledWith(new URL(services.authentication.url), {
+    expect(fetchImplementation).toHaveBeenCalledWith(new URL(authentication.url), {
       headers: { accept: "application/json" },
       signal: expect.any(AbortSignal),
     });
   });
 
-  it("derives a stable down response from config keys when private configuration fails", async () => {
+  it("sends a probe through its service's own fetch", async () => {
+    const shared = vi.fn<typeof globalThis.fetch>(async () => Response.json({}));
+    const own = vi.fn<typeof globalThis.fetch>(async () => Response.json({}));
+
+    await aggregateHealth({
+      config: {
+        authentication: () => ({ ...authentication, fetch: own }),
+        jsonKeys: () => ({ timeoutMs: 500, url: "http://json-keys:8080/healthcheck" }),
+      },
+      fetch: shared,
+    });
+
+    expect(own).toHaveBeenCalledExactlyOnceWith(new URL(authentication.url), expect.anything());
+    expect(shared).toHaveBeenCalledExactlyOnceWith(new URL("http://json-keys:8080/healthcheck"), expect.anything());
+  });
+
+  it.each([
+    {
+      name: "a configuration that throws",
+      authentication: () => {
+        throw new Error("private configuration detail");
+      },
+    },
+    { name: "an invalid deadline", authentication: () => ({ ...authentication, timeoutMs: 0 }) },
+  ])("reports every service down, and sends nothing, on $name", async ({ authentication }) => {
     const fetchImplementation = vi.fn<typeof globalThis.fetch>();
 
     const health = await aggregateHealth({
       config: {
-        authentication: () => {
-          throw new Error("private configuration detail");
-        },
-        jsonKeys: () => ({
-          timeoutMs: 500,
-          url: "http://json-keys:8080/healthcheck",
-        }),
+        authentication,
+        jsonKeys: () => ({ timeoutMs: 500, url: "http://json-keys:8080/healthcheck" }),
       },
       fetch: fetchImplementation,
     });
@@ -65,7 +75,6 @@ describe("aggregateHealth", () => {
       },
       status: "down",
     });
-    expect(health.services.jsonKeys.status).toBe("down");
     expect(fetchImplementation).not.toHaveBeenCalled();
   });
 
@@ -76,7 +85,10 @@ describe("aggregateHealth", () => {
     };
     const fetchImplementation = vi.fn<typeof globalThis.fetch>(async () => Response.json(dependencies));
 
-    const health = await aggregateHealth({ fetch: fetchImplementation, services, timeoutMs: 500 });
+    const health = await aggregateHealth({
+      config: { authentication: () => authentication },
+      fetch: fetchImplementation,
+    });
 
     expect(health).toEqual({
       services: {
@@ -87,7 +99,6 @@ describe("aggregateHealth", () => {
       },
       status: "down",
     });
-    expect(health.services.authentication.status).toBe("up");
   });
 
   it.each([
@@ -97,7 +108,9 @@ describe("aggregateHealth", () => {
   ])("reports an unavailable service without fabricated dependencies for %s", async (_name, request) => {
     const fetchImplementation = vi.fn<typeof globalThis.fetch>(request);
 
-    await expect(aggregateHealth({ fetch: fetchImplementation, services, timeoutMs: 500 })).resolves.toEqual({
+    await expect(
+      aggregateHealth({ config: { authentication: () => authentication }, fetch: fetchImplementation })
+    ).resolves.toEqual({
       services: {
         authentication: { status: "down" },
       },
@@ -108,14 +121,7 @@ describe("aggregateHealth", () => {
   it("releases the body of a non-success response", async () => {
     const failure = Response.json({ "client:postgres": { status: "up" } }, { status: 503 });
 
-    await aggregateHealth({ fetch: async () => failure, services, timeoutMs: 500 });
+    await aggregateHealth({ config: { authentication: () => authentication }, fetch: async () => failure });
     expect(failure.bodyUsed).toBe(true);
-  });
-
-  it("rejects an invalid deadline before sending requests for an eager registry", async () => {
-    const fetchImplementation = vi.fn<typeof globalThis.fetch>();
-
-    await expect(aggregateHealth({ fetch: fetchImplementation, services, timeoutMs: 0 })).rejects.toThrow(RangeError);
-    expect(fetchImplementation).not.toHaveBeenCalled();
   });
 });

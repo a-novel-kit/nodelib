@@ -1,9 +1,17 @@
-import { EnvironmentValidationError, environmentHttpUrl, environmentInteger, parseEnvironment } from "./environment";
+import {
+  EnvironmentValidationError,
+  environmentHttpUrl,
+  environmentInteger,
+  environmentOptional,
+  parseEnvironment,
+} from "./environment";
 
 import { describe, expect, it } from "vitest";
 
 const schema = {
+  downtimeUrl: environmentHttpUrl("DOWNTIME_URL", { defaultValue: "https://example.test/downtime.json" }),
   serviceUrl: environmentHttpUrl("SERVICE_URL"),
+  tokenPath: environmentOptional("TOKEN_PATH"),
   timeoutMs: environmentInteger("TIMEOUT_MS", {
     defaultValue: 2_000,
     minimum: 100,
@@ -16,21 +24,30 @@ describe("parseEnvironment", () => {
     expect(
       parseEnvironment(
         {
+          DOWNTIME_URL: "http://127.0.0.1:4180/none.json",
           SERVICE_URL: "https://service.example.test/api/",
           TIMEOUT_MS: "750",
+          TOKEN_PATH: "/var/run/token",
         },
         schema
       )
     ).toEqual({
+      downtimeUrl: "http://127.0.0.1:4180/none.json",
       serviceUrl: "https://service.example.test/api",
       timeoutMs: 750,
+      tokenPath: "/var/run/token",
     });
   });
 
-  it("uses defaults for absent optional variables", () => {
-    expect(parseEnvironment({ SERVICE_URL: "http://service:8080" }, schema)).toEqual({
+  it.each([
+    { name: "uses defaults for absent optional variables", tokenPath: undefined },
+    { name: "reads an empty optional variable as absent", tokenPath: "" },
+  ])("$name", ({ tokenPath }) => {
+    expect(parseEnvironment({ SERVICE_URL: "http://service:8080", TOKEN_PATH: tokenPath }, schema)).toEqual({
+      downtimeUrl: "https://example.test/downtime.json",
       serviceUrl: "http://service:8080",
       timeoutMs: 2_000,
+      tokenPath: undefined,
     });
   });
 
@@ -61,6 +78,12 @@ describe("environment fields", () => {
     "https://service.example.test#private",
   ])("rejects an unsafe service URL: %s", (serviceUrl) => {
     expect(() => parseEnvironment({ SERVICE_URL: serviceUrl }, schema)).toThrow(EnvironmentValidationError);
+  });
+
+  it("rejects an invalid URL default before reading an environment", () => {
+    expect(() => environmentHttpUrl("DOWNTIME_URL", { defaultValue: "https://example.test?token=private" })).toThrow(
+      RangeError
+    );
   });
 
   it("rejects an invalid integer definition before reading an environment", () => {

@@ -1,4 +1,4 @@
-import { retryWithBackoff } from "./backoff";
+import { retryWithBackoff, wait } from "./backoff";
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -193,5 +193,25 @@ describe("retryWithBackoff", () => {
 
     expect(attempt).not.toHaveBeenCalled();
     expect(vi.getTimerCount()).toBe(0);
+  });
+});
+
+describe("wait", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("resolves after the delay, with or without a signal", async () => {
+    const settled = vi.fn();
+    void Promise.all([wait(1000), wait(1000, new AbortController().signal)]).then(settled);
+
+    await vi.advanceTimersByTimeAsync(999);
+    expect(settled).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(1);
+    expect(settled).toHaveBeenCalledOnce();
   });
 });

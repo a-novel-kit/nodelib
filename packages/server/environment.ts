@@ -51,15 +51,30 @@ function field<Value>(name: string, parse: (value: string | undefined) => Value)
   return { name, parse } as EnvironmentFieldDefinition<Value>;
 }
 
-/**
- * Defines a required HTTP or HTTPS base URL that excludes credentials, query parameters, and
- * fragments. The value drops its trailing slashes, so a path appends to it after a `/`.
- */
-export function environmentHttpUrl(name: string): EnvironmentField<string> {
-  return field(name, parseHttpUrl);
+/** HttpUrlEnvironmentOptions supplies the optional default of a URL variable. */
+export interface HttpUrlEnvironmentOptions {
+  /** The value used when the variable is absent. */
+  defaultValue?: string;
 }
 
-function parseHttpUrl(value: string | undefined): string {
+/**
+ * Defines an HTTP or HTTPS base URL that excludes credentials, query parameters, and fragments. The
+ * value drops its trailing slashes, so a path appends to it after a `/`. The variable is required
+ * unless the field has a default.
+ */
+export function environmentHttpUrl(
+  name: string,
+  { defaultValue }: HttpUrlEnvironmentOptions = {}
+): EnvironmentField<string> {
+  if (defaultValue !== undefined && httpUrl(defaultValue) === null) {
+    throw new RangeError("defaultValue must be an HTTP or HTTPS base URL");
+  }
+
+  return field(name, (value) => httpUrl(value ?? defaultValue) ?? invalidValue());
+}
+
+/** Normalizes a base URL, or returns null for a value that is not one. */
+function httpUrl(value: string | undefined): string | null {
   const url = value ? URL.parse(value) : null;
   if (
     !url ||
@@ -69,10 +84,15 @@ function parseHttpUrl(value: string | undefined): string {
     url.search.length > 0 ||
     url.hash.length > 0
   ) {
-    return invalidValue();
+    return null;
   }
 
   return url.toString().replace(/\/+$/, "");
+}
+
+/** Defines an optional text variable, such as a file path. An empty value counts as absent. */
+export function environmentOptional(name: string): EnvironmentField<string | undefined> {
+  return field(name, (value) => value || undefined);
 }
 
 /** IntegerEnvironmentOptions bounds an integer variable and supplies its optional default. */

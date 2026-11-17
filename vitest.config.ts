@@ -2,11 +2,15 @@ import { builtinModules } from "node:module";
 
 import { defineConfig } from "vitest/config";
 
+import { svelte } from "@sveltejs/vite-plugin-svelte";
+
 const NODE_BUILT_IN_MODULES = builtinModules
   .filter((name) => !name.startsWith("_"))
   .flatMap((name) => [name, `node:${name}`]);
 
 export default defineConfig({
+  // Compiles the rune modules of nodelib-browser/svelte and their tests.
+  plugins: [svelte()],
   optimizeDeps: {
     exclude: NODE_BUILT_IN_MODULES,
   },
@@ -30,6 +34,8 @@ export default defineConfig({
       {
         root: "packages/browser",
         extends: true,
+        // Svelte's default export condition is its server build, where effects never run.
+        resolve: { conditions: ["browser"] },
       },
       {
         root: "packages/configs",

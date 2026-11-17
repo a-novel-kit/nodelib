@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { type TelemetryOptions, startTelemetry } from "./telemetry";
+import { type TelemetryOptions, type TracedRequest, startTelemetry, traceResponse } from "./telemetry";
 
 import { type IncomingMessage, createServer } from "node:http";
 import type { AddressInfo } from "node:net";
@@ -7,7 +7,7 @@ import { gunzipSync } from "node:zlib";
 
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { ROOT_CONTEXT, SpanKind, TraceFlags, context, propagation, trace } from "@opentelemetry/api";
+import { ROOT_CONTEXT, SpanKind, SpanStatusCode, TraceFlags, context, propagation, trace } from "@opentelemetry/api";
 
 afterEach(() => {
   trace.disable();
@@ -201,5 +201,27 @@ describe("startTelemetry", () => {
     const payload = gunzipSync(body).toString("utf8");
     expect(payload).toContain("platform");
     expect(payload).toContain("operation");
+  });
+});
+
+describe("traceResponse", () => {
+  it.each([
+    {
+      name: "names the span after the matched route",
+      route: "/(app)/account",
+      status: 200,
+      span: "GET /(app)/account",
+    },
+    { name: "keeps the method alone without a route", route: null, status: 404, span: "GET" },
+    { name: "marks a server fault as an error", route: "/(app)/account", status: 503, span: "GET /(app)/account" },
+  ])("$name", ({ route, status, span }) => {
+    const root = { setAttribute: vi.fn(), setStatus: vi.fn(), updateName: vi.fn() };
+    const event: TracedRequest = { request: { method: "GET" }, route: { id: route }, tracing: { root } };
+
+    traceResponse(event, { status });
+
+    expect(root.updateName).toHaveBeenCalledExactlyOnceWith(span);
+    expect(root.setAttribute).toHaveBeenCalledExactlyOnceWith("http.response.status_code", status);
+    expect(root.setStatus.mock.calls).toEqual(status >= 500 ? [[{ code: SpanStatusCode.ERROR }]] : []);
   });
 });
