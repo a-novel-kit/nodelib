@@ -20,19 +20,22 @@ export interface RetryBackoffOptions {
   maxRetries?: number;
 }
 
-/** Waits for a delay, and rejects with the signal's reason once the signal aborts. */
-function wait(delay: number, signal: AbortSignal): Promise<void> {
+/**
+ * Waits for a delay, and rejects with the signal's reason once the signal aborts. Either way it
+ * leaves no timer and no listener behind, so a loop may wait on one signal as often as it likes.
+ */
+export function wait(delay: number, signal?: AbortSignal | null): Promise<void> {
   return new Promise((resolve, reject) => {
-    signal.throwIfAborted();
+    signal?.throwIfAborted();
 
     function abort() {
       clearTimeout(timer);
-      reject(signal.reason);
+      reject(signal?.reason);
     }
 
-    signal.addEventListener("abort", abort, { once: true });
+    signal?.addEventListener("abort", abort, { once: true });
     const timer = setTimeout(() => {
-      signal.removeEventListener("abort", abort);
+      signal?.removeEventListener("abort", abort);
       resolve();
     }, delay);
   });

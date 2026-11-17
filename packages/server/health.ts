@@ -12,19 +12,14 @@ export interface HealthDependency {
 /** HealthDependencies is the unmodified dependency map returned by one service. */
 export type HealthDependencies = Record<string, HealthDependency>;
 
-/** HealthService selects one configured endpoint from the platform service registry. */
-export interface HealthService {
+/** HealthServiceConfig resolves one service endpoint and its request deadline inside the health boundary. */
+export interface HealthServiceConfig {
   /** The absolute URL of the service health endpoint. */
   url: string | URL;
-}
-
-/** HealthServiceRegistry names every downstream whose readiness the platform reports. */
-export type HealthServiceRegistry = Readonly<Record<string, HealthService>>;
-
-/** HealthServiceConfig resolves one service endpoint and its request deadline inside the health boundary. */
-export interface HealthServiceConfig extends HealthService {
   /** The deadline applied to this service request. */
   timeoutMs: number;
+  /** Sends this probe in place of the shared `fetch`, as a service that requires the platform's token does. */
+  fetch?: typeof globalThis.fetch;
 }
 
 /** HealthConfig names every downstream before resolving private runtime configuration. */
@@ -46,21 +41,11 @@ export interface AggregatedHealth<Registry extends Readonly<Record<string, unkno
   services: { [Name in keyof Registry]: ServiceHealth };
 }
 
-/** AggregateHealthOptions supplies an already-resolved registry and request boundary. */
-export interface AggregateHealthOptions<Registry extends HealthServiceRegistry> {
-  /** The fetch implementation used by the host framework. */
-  fetch: typeof globalThis.fetch;
-  /** The configured endpoints to probe in parallel. */
-  services: Registry;
-  /** The deadline applied independently to each request. */
-  timeoutMs: number;
-}
-
 /** AggregateHealthConfigOptions keeps private configuration resolution inside the health boundary. */
 export interface AggregateHealthConfigOptions<Config extends HealthConfig> {
   /** Stable service names with lazy endpoint configuration. */
   config: Config;
-  /** The fetch implementation used by the host framework. */
+  /** The fetch implementation used by the host framework, for every probe without its own. */
   fetch: typeof globalThis.fetch;
 }
 
@@ -86,15 +71,14 @@ function assertTimeout(timeoutMs: number): void {
 
 async function probeService(
   fetchImplementation: typeof globalThis.fetch,
-  service: HealthService,
-  timeoutMs: number
+  service: HealthServiceConfig
 ): Promise<ServiceHealth> {
   try {
     const response = await fetchImplementation(new URL(service.url), {
       headers: {
         accept: "application/json",
       },
-      signal: AbortSignal.timeout(timeoutMs),
+      signal: AbortSignal.timeout(service.timeoutMs),
     });
     if (!response.ok) {
       // An unread body holds its connection until the deadline aborts it.
@@ -113,56 +97,39 @@ function isReady(service: ServiceHealth): boolean {
   return service.status === "up" && Object.values(service.dependencies).every(({ status }) => status === "up");
 }
 
-function result<Registry extends Readonly<Record<string, unknown>>>(
-  services: AggregatedHealth<Registry>["services"]
-): AggregatedHealth<Registry> {
+function result<Config extends HealthConfig>(services: Record<string, ServiceHealth>): AggregatedHealth<Config> {
   return {
-    services,
-    status: Object.values<ServiceHealth>(services).every(isReady) ? "up" : "down",
+    services: services as AggregatedHealth<Config>["services"],
+    status: Object.values(services).every(isReady) ? "up" : "down",
   };
 }
 
-/** Probes every service in parallel, each with the deadline `timeoutMs` gives it. */
-async function probeAll<Service extends HealthService>(
-  fetchImplementation: typeof globalThis.fetch,
-  services: Readonly<Record<string, Service>>,
-  timeoutMs: (service: Service) => number
-): Promise<AggregatedHealth<Readonly<Record<string, unknown>>>> {
-  const entries = await Promise.all(
-    Object.entries(services).map(
-      async ([name, service]) => [name, await probeService(fetchImplementation, service, timeoutMs(service))] as const
-    )
-  );
-
-  return result(Object.fromEntries(entries));
+/** Resolves each service's configuration, or returns null when any of them fails. */
+function resolveConfig(config: HealthConfig): [string, HealthServiceConfig][] | null {
+  try {
+    const services = Object.entries(config).map(
+      ([name, resolve]) => [name, resolve()] as [string, HealthServiceConfig]
+    );
+    for (const [, service] of services) assertTimeout(service.timeoutMs);
+    return services;
+  } catch {
+    return null;
+  }
 }
 
-/** Probes configured services and converts private configuration failures into stable down results. */
-export function aggregateHealth<const Config extends HealthConfig>(
-  options: AggregateHealthConfigOptions<Config>
-): Promise<AggregatedHealth<Config>>;
-/** Probes an already-resolved service registry in parallel. */
-export function aggregateHealth<const Registry extends HealthServiceRegistry>(
-  options: AggregateHealthOptions<Registry>
-): Promise<AggregatedHealth<Registry>>;
-export async function aggregateHealth(
-  options: AggregateHealthConfigOptions<HealthConfig> | AggregateHealthOptions<HealthServiceRegistry>
-): Promise<AggregatedHealth<Readonly<Record<string, unknown>>>> {
-  if ("config" in options) {
-    const names = Object.keys(options.config);
-
-    try {
-      const configured = Object.fromEntries(
-        Object.entries(options.config).map(([name, configure]) => [name, configure()] as const)
-      );
-      for (const service of Object.values(configured)) assertTimeout(service.timeoutMs);
-
-      return await probeAll(options.fetch, configured, (service) => service.timeoutMs);
-    } catch {
-      return result(Object.fromEntries(names.map((name) => [name, { status: "down" }] as const)));
-    }
+/**
+ * Probes every configured service in parallel, each within its own deadline. A configuration that
+ * fails reports every service down, so no private detail reaches the response.
+ */
+export async function aggregateHealth<const Config extends HealthConfig>({
+  config,
+  fetch,
+}: AggregateHealthConfigOptions<Config>): Promise<AggregatedHealth<Config>> {
+  const services = resolveConfig(config);
+  if (!services) {
+    return result(Object.fromEntries(Object.keys(config).map((name) => [name, { status: "down" }])));
   }
 
-  assertTimeout(options.timeoutMs);
-  return probeAll(options.fetch, options.services, () => options.timeoutMs);
+  const probes = services.map(async ([name, service]) => [name, await probeService(service.fetch ?? fetch, service)]);
+  return result(Object.fromEntries(await Promise.all(probes)));
 }

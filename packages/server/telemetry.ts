@@ -4,6 +4,8 @@ import {
   DiagConsoleLogger,
   DiagLogLevel,
   SpanKind,
+  SpanStatusCode,
+  type Span as TraceSpan,
   context,
   diag,
   propagation,
@@ -54,6 +56,26 @@ export interface TelemetryOptions {
 export interface Telemetry {
   /** Exports the spans still buffered and stops tracing. Await it before the process exits. */
   shutdown(): Promise<void>;
+}
+
+/** TracedRequest holds the parts of a SvelteKit request event that {@link traceResponse} reads. */
+export interface TracedRequest {
+  request: { method: string };
+  route: { id: string | null };
+  tracing: { root: Pick<TraceSpan, "setAttribute" | "setStatus" | "updateName"> };
+}
+
+/**
+ * Names the request's span after its route, as `GET /(app)/account`, and records the response's
+ * status, so span metrics split the traffic by page and tell a refusal from a fault. A request that
+ * matched no route keeps its method alone, so no path names a span. Call it from the `handle` hook
+ * with the response `resolve` returned.
+ */
+export function traceResponse({ request, route, tracing }: TracedRequest, { status }: { status: number }): void {
+  tracing.root.updateName(route.id ? `${request.method} ${route.id}` : request.method);
+  tracing.root.setAttribute("http.response.status_code", status);
+
+  if (status >= 500) tracing.root.setStatus({ code: SpanStatusCode.ERROR });
 }
 
 /**

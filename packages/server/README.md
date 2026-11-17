@@ -17,11 +17,18 @@ The environment schema maps private variable names into a typed application conf
 error names the invalid variables and never carries their values.
 
 ```ts
-import { environmentHttpUrl, environmentInteger, parseEnvironment } from "@a-novel-kit/nodelib-server";
+import {
+  environmentHttpUrl,
+  environmentInteger,
+  environmentOptional,
+  parseEnvironment,
+} from "@a-novel-kit/nodelib-server";
 
 function getConfig() {
   return parseEnvironment(process.env, {
+    downtimeUrl: environmentHttpUrl("DOWNTIME_URL", { defaultValue: "https://example.test/downtime.json" }),
     serviceUrl: environmentHttpUrl("SERVICE_URL"),
+    serviceTokenPath: environmentOptional("SERVICE_TOKEN_PATH"),
     timeoutMs: environmentInteger("HEALTHCHECK_TIMEOUT_MS", {
       defaultValue: 2_000,
       minimum: 100,
@@ -30,6 +37,9 @@ function getConfig() {
   });
 }
 ```
+
+`EnvironmentOutput<typeof schema>` names the config's type. An optional variable left empty reads as
+absent.
 
 ## Health aggregation
 
@@ -48,6 +58,8 @@ const health = await aggregateHealth({
       return {
         timeoutMs: config.timeoutMs,
         url: new URL("healthcheck", `${config.serviceUrl}/`),
+        // The service requires the platform's token, even on its health endpoint.
+        fetch: serviceFetch({ serviceTokenPath: config.serviceTokenPath }, fetch),
       };
     },
   },
@@ -58,9 +70,8 @@ const health = await aggregateHealth({
 `aggregateHealth` resolves the configuration itself. When resolution fails, every service named by
 `config` reports down, with no exception string or invented dependency map. A service whose request
 fails, or whose answer breaks the health contract, reports down the same way. Valid dependency maps
-pass through unchanged.
-
-Already-validated callers can instead provide an eager `services` registry and shared `timeoutMs`.
+pass through unchanged. A service's own `fetch` sends its probe, and the shared `fetch` sends the
+others.
 
 ## Planned downtime
 
@@ -162,3 +173,17 @@ join the same trace. Every trace is kept, even one the caller did not sample, as
 The requests to `untracedRoutes`, matched on the route ID SvelteKit records as `http.route`, produce
 no span, so a liveness probe spends no span quota. Recorded URLs keep their parameter names, but each
 query value becomes `REDACTED`, since links carry short codes and emails.
+
+`traceResponse` names the request's span after its route, as `GET /(app)/account`, records the
+response's status, and marks a 5xx answer as an error, so span metrics split the traffic by page and
+tell a refusal from a fault. Call it from the `handle` hook:
+
+```ts
+import { traceResponse } from "@a-novel-kit/nodelib-server/telemetry";
+
+export const handle: Handle = async ({ event, resolve }) => {
+  const response = await resolve(event);
+  traceResponse(event, response);
+  return response;
+};
+```

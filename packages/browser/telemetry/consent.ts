@@ -38,13 +38,10 @@ export function readTelemetryChoice(): TelemetryChoice | undefined {
   return parseTelemetryChoice(cookie?.slice(prefix.length));
 }
 
-/** Where the browser keeps a choice. */
-export type SaveTelemetryChoiceOptions = CookieOptions;
-
 /**
  * Keeps the visitor's choice in a cookie for six months. A browser that refuses cookies forgets it
  * with the page, and the banner asks again on the next visit.
  */
-export function saveTelemetryChoice(choice: TelemetryChoice, options?: SaveTelemetryChoiceOptions): void {
+export function saveTelemetryChoice(choice: TelemetryChoice, options?: CookieOptions): void {
   writeCookie(TELEMETRY_CONSENT_COOKIE, choice, CONSENT_LIFETIME_S, options);
 }

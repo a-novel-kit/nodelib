@@ -14,21 +14,24 @@ pnpm add @a-novel-kit/nodelib-i18n i18next
 
 ## Usage
 
-The caller owns its supported locales, namespaces, and static catalog loaders. Each request gets a
-new i18next instance, so changing one cannot leak locale state to another.
+The caller owns its supported locales, namespaces and catalogs. `createStaticI18n` builds an
+i18next instance from catalogs bundled with the application, ready to translate at once. Each call
+makes a new instance, so changing one cannot leak locale state to another.
 
 ```ts
-import { createRequestI18n, resolveAcceptLanguage } from "@a-novel-kit/nodelib-i18n";
+import resources from "./resources";
+
+import { createStaticI18n, resolveAcceptLanguage } from "@a-novel-kit/nodelib-i18n";
 
 const supportedLocales = ["en", "fr"] as const;
 const locale = resolveAcceptLanguage(request.headers.get("accept-language"), supportedLocales, "en");
 
-const i18n = await createRequestI18n({
+const i18n = createStaticI18n({
   locale,
   defaultLocale: "en",
   defaultNamespace: "common",
   namespaces: ["common"],
-  loadNamespace: async (language, namespace) => (await import(`./locales/${language}/${namespace}.json`)).default,
+  resources,
 });
 ```
 
@@ -39,7 +42,7 @@ catalogs in the product repository and create one instance per rendered componen
 resources initialize synchronously, so descendants can translate during their first render.
 
 ```svelte
-<!-- StudioI18nProvider.svelte -->
+<!-- I18nProvider.svelte -->
 <script lang="ts">
   import resources from "./resources";
 

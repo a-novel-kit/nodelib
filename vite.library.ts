@@ -13,6 +13,10 @@ interface Manifest {
  * path relative to `directory`. The entry becomes an ES module at `dist/<name>/index.es.js`, and the
  * `index` entry lands at `dist/index.es.js`. Each build empties `dist` first.
  *
+ * An entry written as `*.svelte.ts` holds runes, which only the consumer's Svelte compiler turns into
+ * code, and it compiles only modules named `*.svelte.js`. Such an entry lands at
+ * `dist/<name>/index.svelte.js`, its runes left as written.
+ *
  * Every dependency and peer stays external, subpath imports included, so the consumer resolves one
  * copy of each.
  */
@@ -29,10 +33,16 @@ export function libraryConfig(directory: string, entry: Record<string, string>, 
       sourcemap: true,
       rollupOptions: {
         output: {
-          entryFileNames: ({ name }) => (name === "index" ? "index.es.js" : `${name}/index.es.js`),
+          entryFileNames: ({ name }) => entryFileName(name, entry),
         },
         external: (id) => external.some((name) => id === name || id.startsWith(`${name}/`)),
       },
     },
   });
+}
+
+/** Names the file the entry `name` builds to, under `dist`. */
+function entryFileName(name: string, entry: Record<string, string>): string {
+  const file = entry[name]?.endsWith(".svelte.ts") ? "index.svelte.js" : "index.es.js";
+  return name === "index" ? file : `${name}/${file}`;
 }

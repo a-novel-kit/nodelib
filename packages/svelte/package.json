@@ -1,0 +1,40 @@
+{
+  "name": "@a-novel-kit/nodelib-svelte",
+  "version": "2.12.0",
+  "private": false,
+  "description": "Svelte 5 helpers shared by A-Novel platforms",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/a-novel-kit/nodelib.git"
+  },
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.svelte.d.ts",
+      "svelte": "./dist/index.svelte.js",
+      "import": "./dist/index.svelte.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "devDependencies": {
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "@a-novel-kit/nodelib-browser": "*",
+    "svelte": "^5.57.3"
+  },
+  "engines": {
+    "node": ">=24.0.0",
+    "npm": ">=10.9.2"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  }
+}
