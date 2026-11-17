@@ -70,7 +70,7 @@ describe("parseEnvironment", () => {
     try {
       parse();
     } catch (error) {
-      expect(JSON.stringify(error)).not.toContain(credentialUrl);
+      expect(JSON.stringify(error)).not.toContain("private");
     }
   });
 });

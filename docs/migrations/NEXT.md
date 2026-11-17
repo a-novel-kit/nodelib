@@ -72,9 +72,12 @@ leaves no abort listener behind.
 
 ## Import the Svelte helpers from `nodelib-svelte`
 
-A platform adds `@a-novel-kit/nodelib-svelte`, deletes `src/lib/client/retry.svelte.ts` and its
-test, `src/lib/ui/downtime.svelte.ts`, `src/lib/client/telemetry-preference.svelte.ts` and
-`src/lib/ui/telemetry-preference.ts`, and imports the same names from the new package.
+An a-novel-kit owner first makes the newly published package public, as nodelib-browser is: GitHub
+creates it private, and a platform's CI token cannot read a private package of another
+organization. A platform then adds `@a-novel-kit/nodelib-svelte`, deletes
+`src/lib/client/retry.svelte.ts` and its test, `src/lib/ui/downtime.svelte.ts`,
+`src/lib/client/telemetry-preference.svelte.ts` and `src/lib/ui/telemetry-preference.ts`, and
+imports the same names from the new package.
 `retryWhile` reports a bounded run's failure to `onError` instead of the platform's telemetry
 module:
 
