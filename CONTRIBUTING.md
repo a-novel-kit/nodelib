@@ -6,7 +6,7 @@ This guide covers what is specific to `nodelib`. The [developer guide](https://a
 
 `nodelib` is a [pnpm](https://pnpm.io) workspace. One repository hosts several packages that share tooling and a single version. Each package lives under `packages/*`, with its own `package.json` and build config; the [README](./README.md#packages) lists them.
 
-The `pnpm-workspace.yaml` **catalog** pins each shared dependency once, so every package resolves the same version. `vite.library.ts` holds the build every package shares, and `tsconfig.base.json` the TypeScript options every package extends. A new package also needs its `build:<name>` and `lint:typecheck:<name>` scripts in the root `package.json`, and a project in `vitest.config.ts`.
+The `pnpm-workspace.yaml` **catalog** pins each shared dependency once, so every package resolves the same version. `vite.library.ts` holds the build every package shares, and `tsconfig.base.json` and `tsconfig.build.json` the TypeScript and declaration options every package extends. A new package also needs its `build:<name>` and `lint:typecheck:<name>` scripts in the root `package.json`, and a project in `vitest.config.ts`.
 
 ## Working in the repo
 

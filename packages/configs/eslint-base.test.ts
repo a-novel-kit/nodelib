@@ -14,7 +14,11 @@ async function effectiveConfig(options: EslintOptions, file: string): Promise<Li
 
 describe("Eslint", () => {
   it("lints TypeScript with the strict defaults and the consumer's rules", async () => {
-    const config = await effectiveConfig({ customRules: { rules: { eqeqeq: "error" } } }, "src/index.ts");
+    const customRules = {
+      languageOptions: { parserOptions: { projectService: false } },
+      rules: { eqeqeq: "error" as const },
+    };
+    const config = await effectiveConfig({ customRules }, "src/index.ts");
 
     const severity = (rule: string) => (config?.rules?.[rule] as unknown[] | undefined)?.[0];
 
@@ -27,17 +31,26 @@ describe("Eslint", () => {
       2,
       expect.objectContaining({ argsIgnorePattern: "^_", varsIgnorePattern: "^_" }),
     ]);
+    // The consumer's language options join the default globals rather than replacing them.
     expect(config?.languageOptions?.globals).toMatchObject({ process: false, window: false });
+    expect(config?.languageOptions?.parserOptions).toMatchObject({ projectService: false });
   });
 
-  it.each([
-    { name: "skips build output", file: "dist/index.js", ignored: true },
-    { name: "skips dot directories", file: ".svelte-kit/types.ts", ignored: true },
-    { name: "skips the consumer's ignores", file: "coverage/index.ts", ignored: true },
-    { name: "skips the .gitignore patterns", file: "node_modules/a/index.ts", ignored: true },
-    { name: "lints the sources", file: "src/index.ts", ignored: false },
-  ])("$name", async ({ file, ignored }) => {
-    const options = { ignores: ["coverage/**"], gitIgnorePath: path.join(process.cwd(), ".gitignore") };
+  // Each row ignores a path through one source alone, and lints it once that source is absent.
+  const gitIgnorePath = path.join(process.cwd(), ".gitignore");
+  it.each<{ name: string; options: EslintOptions; file: string; ignored: boolean }>([
+    { name: "skips build output", options: {}, file: "dist/index.js", ignored: true },
+    { name: "skips dot directories", options: {}, file: ".svelte-kit/types.ts", ignored: true },
+    {
+      name: "skips the consumer's ignores",
+      options: { ignores: ["generated/**"] },
+      file: "generated/index.ts",
+      ignored: true,
+    },
+    { name: "skips the .gitignore patterns", options: { gitIgnorePath }, file: "coverage/index.ts", ignored: true },
+    { name: "lints a path no consumer ignore names", options: {}, file: "generated/index.ts", ignored: false },
+    { name: "lints a path no .gitignore names", options: {}, file: "coverage/index.ts", ignored: false },
+  ])("$name", async ({ options, file, ignored }) => {
     expect((await effectiveConfig(options, file)) === undefined).toBe(ignored);
   });
 });

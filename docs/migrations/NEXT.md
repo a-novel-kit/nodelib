@@ -108,8 +108,12 @@ The presets now hold what every platform overrode the same way:
   outside a library (`isLib: true`). Delete the override block, and export the factory's result as
   is: `export default EslintSvelte({ … })`. `Eslint` and `EslintSvelte` return `defineConfig`'s
   result, which a spread still accepts. The base preset no longer turns off
-  `@typescript-eslint/no-explicit-any` and `@typescript-eslint/ban-ts-comment`: replace an `any` with
-  `unknown` or a real type.
+  `@typescript-eslint/no-explicit-any` and `@typescript-eslint/ban-ts-comment`. The one `any` in
+  either organization, uikit's `packages/uikit/test/I18nFixture.svelte:16`
+  (`component: Component<any>`), cannot become `Component<Record<string, unknown>>`: a component's
+  props are contravariant, so a typed component no longer fits. Make the fixture generic instead:
+  `<script lang="ts" generics="Props extends Record<string, unknown>">`, with
+  `component: Component<Props>` and `props: Props`.
 - **Vite.** `SvelteKitVite` sets `paths.origin` from `ORIGIN` and `tracing.server`. Delete both from
   `vite.config.ts`, and account's `frame-ancestors`, which was already the default.
 - **Vitest.** `SvelteKitVitest` leaves stories, story harnesses, fixtures and

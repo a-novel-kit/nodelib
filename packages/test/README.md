@@ -32,10 +32,10 @@ It needs the optional `jsdom` peer.
 ```ts
 import { mailLinks, searchMail } from "@a-novel-kit/nodelib-test/mailpit";
 
-const [invitation] = await vi.waitFor(async () => {
-  const messages = await searchMail(process.env.MAIL_UI_URL!, `to:"${email}"`);
-  expect(messages).not.toHaveLength(0);
-  return messages;
+const invitation = await vi.waitFor(async () => {
+  const [message] = await searchMail(process.env.MAIL_UI_URL!, `to:"${email}"`);
+  if (!message) throw new Error(`No email to ${email} yet`);
+  return message;
 });
 const link = mailLinks(invitation.HTML).find((href) => new URL(href).pathname === "/ext/account/create");
 ```

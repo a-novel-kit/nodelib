@@ -33,8 +33,12 @@ export function downtimeOrigin(state: DowntimeState): string {
 
 /**
  * Builds a Playwright global setup that publishes each state's downtime document, as the infra
- * repository serves the real one: none, one far ahead, and one under way. `components` names what
- * the downtime stops, and must include a component the platform's downtime filter keeps.
+ * repository serves the real one. `components` names what the downtime stops, and must include a
+ * component the platform's downtime filter keeps.
+ *
+ * The windows are a contract with the platforms' downtime journeys, which assert them: `scheduled`
+ * runs from 2099-01-12 06:00 to 08:30 UTC, and `started` from 2026-01-12 06:00 UTC to the same end.
+ * A change here breaks those journeys at their next bump.
  */
 export function downtimeSetup(components: string[] = ["service-authentication.database"]) {
   const documents: Record<DowntimeState, unknown> = {

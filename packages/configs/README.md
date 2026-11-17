@@ -23,7 +23,7 @@ which only a project importing them installs.
 | `@a-novel-kit/nodelib-config/faro`             | Release-build source-map upload to Grafana Faro         | `vite`                                                                                     |
 | `@a-novel-kit/nodelib-config/i18next`          | Static JSON or YAML extraction, status, and type policy | `i18next-cli`, `i18next-cli-plugin-svelte`                                                 |
 | `@a-novel-kit/nodelib-config/playwright`       | End-to-end suite of a platform's production build       | `playwright`                                                                               |
-| `@a-novel-kit/nodelib-config/sveltekit`        | Vite config with SvelteKit and the Node adapter         | `vite`, `@sveltejs/kit`, `@sveltejs/adapter-node`                                          |
+| `@a-novel-kit/nodelib-config/sveltekit`        | Vite config with SvelteKit and the Node adapter         | `vite`, `@sveltejs/kit`, `@sveltejs/adapter-node`, `@opentelemetry/api`                    |
 | `@a-novel-kit/nodelib-config/vitest-offline`   | Vitest setup file that rejects every unstubbed `fetch`  | None                                                                                       |
 | `@a-novel-kit/nodelib-config/vitest-sveltekit` | Unit, browser-component, and Storybook test projects    | `vitest`, `@vitest/browser-playwright`, `@storybook/addon-vitest`, `@sveltejs/kit`         |
 | `@a-novel-kit/nodelib-config/yaml`             | Build-time JSON-compatible YAML modules for Vite        | `vite`                                                                                     |
@@ -37,6 +37,8 @@ forbids `import.meta.env`, since a SvelteKit app reads its configuration from `$
 `$app/env/public`; `isLib: true` lifts the second rule and lets a library link without a route table:
 
 ```ts
+import path from "node:path";
+
 import { EslintSvelte } from "@a-novel-kit/nodelib-config/eslint-svelte";
 
 export default EslintSvelte({
@@ -60,7 +62,8 @@ response.headers.append("content-security-policy", `form-action 'self' ${account
 
 `SvelteKitVite` also turns on SvelteKit's server spans, which `@a-novel-kit/nodelib-server/telemetry`
 exports, and trusts `ORIGIN` when it is set, as on the Playwright server; a deployment derives its
-origin from each request.
+origin from each request. SvelteKit then loads `@opentelemetry/api` on every request, and fails
+without it, so an app that does not trace passes `tracing: { server: false }`.
 
 The Vitest matrix runs unit tests offline through `vitest-offline`: the global `fetch` rejects every
 request a test does not stub. A test answers its requests with `vi.stubGlobal("fetch", …)`.

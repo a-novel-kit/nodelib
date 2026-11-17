@@ -75,6 +75,7 @@
     "@eslint/compat": "^2.1.1",
     "@eslint/config-helpers": "^0.7.0",
     "@eslint/js": "^10.0.1",
+    "@opentelemetry/api": "^1.10.0",
     "@storybook/addon-vitest": "^10.6.7",
     "@sveltejs/adapter-node": "^6.0.2",
     "@sveltejs/kit": "^3.2.0",
@@ -103,6 +104,9 @@
     "vitest": "^5.1.0"
   },
   "peerDependenciesMeta": {
+    "@opentelemetry/api": {
+      "optional": true
+    },
     "@storybook/addon-vitest": {
       "optional": true
     },
