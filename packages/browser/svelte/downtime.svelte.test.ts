@@ -22,7 +22,7 @@ describe("createPlatformDowntime", () => {
 
   afterEach(() => {
     vi.useRealTimers();
-    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   it("reads the downtime and its start from the load", () => {
@@ -84,10 +84,9 @@ describe("createPlatformDowntime", () => {
   });
 
   it("shows times in UTC until it runs in the visitor's browser", () => {
-    vi.spyOn(Intl.DateTimeFormat.prototype, "resolvedOptions").mockReturnValue({
-      ...new Intl.DateTimeFormat().resolvedOptions(),
-      timeZone: "Europe/Paris",
-    });
+    // Fake timers replace Intl.DateTimeFormat, so the visitor's zone is stubbed on the global itself.
+    const DateTimeFormat = () => ({ resolvedOptions: () => ({ timeZone: "Pacific/Kiritimati" }) });
+    vi.stubGlobal("Intl", Object.create(Intl, { DateTimeFormat: { value: DateTimeFormat } }));
     let tracked: ReturnType<typeof createPlatformDowntime> | undefined;
     const destroy = $effect.root(() => {
       tracked = createPlatformDowntime(() => ({ downtime: null, downtimeStarted: false }));
@@ -95,7 +94,7 @@ describe("createPlatformDowntime", () => {
 
     expect(tracked?.timeZone).toBe("UTC");
     flushSync();
-    expect(tracked?.timeZone).toBe("Europe/Paris");
+    expect(tracked?.timeZone).toBe("Pacific/Kiritimati");
 
     destroy();
   });
