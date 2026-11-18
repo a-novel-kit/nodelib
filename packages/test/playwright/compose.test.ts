@@ -30,6 +30,15 @@ function fakeCompose() {
   return vi.fn<Compose>(async (...args) => ({ stdout: args[0] === "logs" ? "service logs\n" : "", stderr: "" }));
 }
 
+/** Points `E2E_CONTAINER_ENGINE` at a Node script running `source`, and returns the script's path. */
+function fakeEngine(source: string): string {
+  const engine = join(directory(), "engine");
+  writeFileSync(engine, `#!/usr/bin/env node\n${source}\n`);
+  chmodSync(engine, 0o755);
+  vi.stubEnv("E2E_CONTAINER_ENGINE", engine);
+  return engine;
+}
+
 afterEach(() => {
   vi.unstubAllEnvs();
   for (const path of directories.splice(0)) rmSync(path, { force: true, recursive: true });
@@ -37,24 +46,29 @@ afterEach(() => {
 
 describe("createCompose", () => {
   it("runs compose against its file with the engine E2E_CONTAINER_ENGINE names", async () => {
-    const path = directory();
-    const engine = join(path, "engine");
-    writeFileSync(
-      engine,
-      `#!/usr/bin/env node\nrequire("node:fs").writeFileSync(${JSON.stringify(join(path, "calls"))}, JSON.stringify(process.argv.slice(2)));\n`
-    );
-    chmodSync(engine, 0o755);
-    vi.stubEnv("E2E_CONTAINER_ENGINE", engine);
+    const calls = join(directory(), "calls");
+    fakeEngine(`require("node:fs").writeFileSync(${JSON.stringify(calls)}, JSON.stringify(process.argv.slice(2)));`);
 
     await createCompose("builds/e2e.yaml")("up", "--detach");
 
-    expect(JSON.parse(readFileSync(join(path, "calls"), "utf8"))).toEqual([
-      "compose",
-      "--file",
-      "builds/e2e.yaml",
-      "up",
-      "--detach",
-    ]);
+    expect(JSON.parse(readFileSync(calls, "utf8"))).toEqual(["compose", "--file", "builds/e2e.yaml", "up", "--detach"]);
+  });
+
+  it("stops a command at its deadline and names the deadline, the command and its output", async () => {
+    const engine = fakeEngine(`process.stderr.write("pulling images\\n");\nsetTimeout(() => {}, 60_000);`);
+
+    await expect(createCompose("builds/e2e.yaml", { timeout: 1_000 })("up", "--detach")).rejects.toThrow(
+      `Command timed out after 1 s: ${engine} compose --file builds/e2e.yaml up --detach\npulling images\n`
+    );
+  });
+
+  it("rejects with the engine's own error when a command fails", async () => {
+    fakeEngine(`process.stderr.write("no such service: missing\\n");\nprocess.exit(1);`);
+
+    await expect(createCompose()("start", "missing")).rejects.toMatchObject({
+      code: 1,
+      stderr: "no such service: missing\n",
+    });
   });
 });
 

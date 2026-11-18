@@ -1,4 +1,4 @@
-import { execFile } from "node:child_process";
+import { type ExecFileException, execFile } from "node:child_process";
 import { writeFile } from "node:fs/promises";
 import { promisify } from "node:util";
 
@@ -9,13 +9,33 @@ const run = promisify(execFile);
 /** Runs one `compose` subcommand against the suite's services. */
 export type Compose = (...args: string[]) => Promise<{ stdout: string; stderr: string }>;
 
+/** ComposeOptions bounds the commands a {@link Compose} runs. */
+export interface ComposeOptions {
+  /**
+   * Deadline of each command in milliseconds, 10 minutes by default. A first `up` pulls the stack's
+   * missing images, and Podman Compose waits for a health-checked dependency with no deadline of
+   * its own.
+   */
+  timeout?: number;
+}
+
 /**
  * Binds `compose` to one file. The engine comes from `E2E_CONTAINER_ENGINE` and defaults to
- * `docker`, so a Podman host sets it to `podman`.
+ * `docker`, so a Podman host sets it to `podman`. A command still running at its deadline receives
+ * `SIGTERM` and rejects with an error that names the deadline.
  */
-export function createCompose(file = "builds/compose.e2e.yaml"): Compose {
-  return (...args) =>
-    run(process.env.E2E_CONTAINER_ENGINE ?? "docker", ["compose", "--file", file, ...args], { timeout: 120_000 });
+export function createCompose(file = "builds/compose.e2e.yaml", { timeout = 600_000 }: ComposeOptions = {}): Compose {
+  return async (...args) => {
+    try {
+      return await run(process.env.E2E_CONTAINER_ENGINE ?? "docker", ["compose", "--file", file, ...args], {
+        timeout,
+      });
+    } catch (error) {
+      const { killed, cmd, stderr } = error as ExecFileException & { stderr: string };
+      if (!killed) throw error;
+      throw new Error(`Command timed out after ${timeout / 1000} s: ${cmd}\n${stderr}`, { cause: error });
+    }
+  };
 }
 
 /** Services a global setup starts and the check that tells when they accept requests. */
