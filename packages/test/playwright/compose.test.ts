@@ -70,6 +70,14 @@ describe("createCompose", () => {
       stderr: "no such service: missing\n",
     });
   });
+
+  it("rejects with the engine's own error when its output overflows the buffer", async () => {
+    fakeEngine(`process.stdout.write("x".repeat(2 ** 21));`);
+
+    await expect(createCompose()("logs", "--no-color")).rejects.toMatchObject({
+      code: "ERR_CHILD_PROCESS_STDIO_MAXBUFFER",
+    });
+  });
 });
 
 describe("composeSetup", () => {
