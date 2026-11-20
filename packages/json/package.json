@@ -1,0 +1,38 @@
+{
+  "name": "@a-novel-kit/nodelib-json",
+  "version": "2.14.0",
+  "private": false,
+  "description": "JSON Pointers and JSON Schema validation and repair, for a browser, a Worker and Node",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/a-novel-kit/nodelib.git"
+  },
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.es.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "dependencies": {
+    "@cfworker/json-schema": "4.1.6"
+  },
+  "devDependencies": {
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=24.0.0",
+    "npm": ">=10.9.2"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  }
+}

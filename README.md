@@ -33,6 +33,7 @@ Then add the packages the application needs:
 ```bash
 pnpm add @a-novel-kit/nodelib-browser
 pnpm add @a-novel-kit/nodelib-i18n
+pnpm add @a-novel-kit/nodelib-json
 pnpm add @a-novel-kit/nodelib-server
 pnpm add -D @a-novel-kit/nodelib-config
 pnpm add -D @a-novel-kit/nodelib-test
@@ -45,6 +46,7 @@ pnpm add -D @a-novel-kit/nodelib-test
 | [`@a-novel-kit/nodelib-browser`](./packages/browser) | The base of every service's REST client, shared async behavior, preferences and consented telemetry. |
 | [`@a-novel-kit/nodelib-config`](./packages/configs)  | The shared lint, format, build and test presets.                                                     |
 | [`@a-novel-kit/nodelib-i18n`](./packages/i18n)       | Isolated i18next instances and locale negotiation. Catalogs stay with each app.                      |
+| [`@a-novel-kit/nodelib-json`](./packages/json)       | JSON Pointers and JSON Schema validation and repair, for a browser, a Worker and Node.               |
 | [`@a-novel-kit/nodelib-server`](./packages/server)   | Framework-independent runtime primitives for platform servers.                                       |
 | [`@a-novel-kit/nodelib-svelte`](./packages/svelte)   | Svelte 5 helpers every platform shares: retries, planned downtime and the telemetry answer.          |
 | [`@a-novel-kit/nodelib-test`](./packages/test)       | HTTP status assertions and the helpers of platform end-to-end suites.                                |
