@@ -228,8 +228,8 @@ catalogs:
       specifier: ^17.0.0
       version: 17.14.0
     i18next:
-      specifier: 27.1.5
-      version: 27.1.5
+      specifier: 27.2.1
+      version: 27.2.1
     i18next-cli:
       specifier: 1.91.0
       version: 1.91.0
@@ -333,7 +333,7 @@ importers:
         version: 17.14.0
       i18next:
         specifier: 'catalog:'
-        version: 27.1.5(typescript@6.0.3)
+        version: 27.2.1(typescript@6.0.3)
       i18next-cli:
         specifier: 'catalog:'
         version: 1.91.0(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3)
@@ -499,8 +499,8 @@ importers:
   packages/i18n:
     dependencies:
       i18next:
-        specifier: ^27.1.5
-        version: 27.1.5(typescript@6.0.3)
+        specifier: ^27.2.1
+        version: 27.2.1(typescript@6.0.3)
       svelte:
         specifier: ^5.58.0
         version: 5.58.0(@typescript-eslint/types@8.73.0)
@@ -2315,8 +2315,8 @@ packages:
     resolution: {integrity: sha512-1SwWSlbgpMx/AyWYJvPrg2ns1CzXsaM0olmqfDSm2fIzwbChdkxeaiAXw0xhdNPuo/v8nuwxVTLfpf8NxrdlNw==}
     hasBin: true
 
-  i18next@27.1.5:
-    resolution: {integrity: sha512-KLrH2SWYWiI8Rx+ZbJ4+fdl5Ny2i8V9bJ6TkJ5YFrSyHgeUIGxoueQTZaafcHZcr1ENFqBicpu7ofr3SCSYDgA==}
+  i18next@27.2.1:
+    resolution: {integrity: sha512-dNYOxb2d+zjmn/vlvx99XribYwtJ/WcIfVY3d61QkOKAiJ1Kgt7Ow+mBq8v7YUC/K3dCr9dDDEjheKbRycWGdA==}
     engines: {node: '>=22'}
     peerDependencies:
       typescript: ^5 || ^6 || ^7
@@ -4753,7 +4753,7 @@ snapshots:
       commander: 15.1.0
       glob: 14.0.6
       html-parse-stringify: 4.0.1
-      i18next: 27.1.5(typescript@6.0.3)
+      i18next: 27.2.1(typescript@6.0.3)
       i18next-resources-for-ts: 2.1.2
       jiti: 2.7.0
       jsonc-parser: 3.3.1
@@ -4761,7 +4761,7 @@ snapshots:
       messageformat: 4.1.0
       minimatch: 11.0.9
       nano-spawn: 2.1.0
-      react-i18next: 18.0.3(i18next@27.1.5(typescript@6.0.3))(react@19.3.1)(typescript@6.0.3)
+      react-i18next: 18.0.3(i18next@27.2.1(typescript@6.0.3))(react@19.3.1)(typescript@6.0.3)
       yaml: 2.9.1
       yocto-spinner: 1.2.2
     transitivePeerDependencies:
@@ -4780,7 +4780,7 @@ snapshots:
     transitivePeerDependencies:
       - '@swc/helpers'
 
-  i18next@27.1.5(typescript@6.0.3):
+  i18next@27.2.1(typescript@6.0.3):
     optionalDependencies:
       typescript: 6.0.3
 
@@ -5197,10 +5197,10 @@ snapshots:
       discontinuous-range: 1.0.0
       ret: 0.1.15
 
-  react-i18next@18.0.3(i18next@27.1.5(typescript@6.0.3))(react@19.3.1)(typescript@6.0.3):
+  react-i18next@18.0.3(i18next@27.2.1(typescript@6.0.3))(react@19.3.1)(typescript@6.0.3):
     dependencies:
       html-parse-stringify: 4.0.1
-      i18next: 27.1.5(typescript@6.0.3)
+      i18next: 27.2.1(typescript@6.0.3)
       react: 19.3.1
     optionalDependencies:
       typescript: 6.0.3
