@@ -44,6 +44,12 @@ export default defineConfig({
         extends: true,
       },
       {
+        root: "packages/json",
+        extends: true,
+        // The package promises to run without a DOM.
+        test: { environment: "node" },
+      },
+      {
         root: "packages/server",
         extends: true,
       },

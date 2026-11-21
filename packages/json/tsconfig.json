@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // The package runs wherever a Worker does, so the DOM is out of scope. The declaration build
+    // leaves out the tests and the Vite configuration, which puts Node out of scope too.
+    "lib": ["ESNext", "WebWorker"],
+    "types": []
+  },
+  "include": ["**/*.ts"]
+}
