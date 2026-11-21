@@ -447,7 +447,7 @@ importers:
         specifier: ^10.6.7
         version: 10.6.7(prettier@3.10.1)(react@19.3.1)
       svelte:
-        specifier: ^5.57.3
+        specifier: ^5.58.0
         version: 5.58.0(@typescript-eslint/types@8.73.0)
       typescript:
         specifier: ^6.0.3
@@ -502,7 +502,7 @@ importers:
         specifier: ^27.1.5
         version: 27.1.5(typescript@6.0.3)
       svelte:
-        specifier: ^5.57.3
+        specifier: ^5.58.0
         version: 5.58.0(@typescript-eslint/types@8.73.0)
     devDependencies:
       typescript:
@@ -558,7 +558,7 @@ importers:
         specifier: '*'
         version: link:../browser
       svelte:
-        specifier: ^5.57.3
+        specifier: ^5.58.0
         version: 5.58.0(@typescript-eslint/types@8.73.0)
     devDependencies:
       typescript:
