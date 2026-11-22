@@ -228,11 +228,11 @@ catalogs:
       specifier: ^17.0.0
       version: 17.14.0
     i18next:
-      specifier: 27.2.1
-      version: 27.2.1
+      specifier: 27.2.2
+      version: 27.2.2
     i18next-cli:
-      specifier: 1.91.0
-      version: 1.91.0
+      specifier: 1.91.2
+      version: 1.91.2
     i18next-cli-plugin-svelte:
       specifier: 2.5.0
       version: 2.5.0
@@ -333,13 +333,13 @@ importers:
         version: 17.14.0
       i18next:
         specifier: 'catalog:'
-        version: 27.2.1(typescript@6.0.3)
+        version: 27.2.2(typescript@6.0.3)
       i18next-cli:
         specifier: 'catalog:'
-        version: 1.91.0(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3)
+        version: 1.91.2(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3)
       i18next-cli-plugin-svelte:
         specifier: 'catalog:'
-        version: 2.5.0(estree-walker@3.0.3)(i18next-cli@1.91.0(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3))(svelte@5.59.1(@typescript-eslint/types@8.73.0))
+        version: 2.5.0(estree-walker@3.0.3)(i18next-cli@1.91.2(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3))(svelte@5.59.1(@typescript-eslint/types@8.73.0))
       jiti:
         specifier: 'catalog:'
         version: 2.7.0
@@ -479,10 +479,10 @@ importers:
         version: 3.0.3
       i18next-cli:
         specifier: 'catalog:'
-        version: 1.91.0(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3)
+        version: 1.91.2(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3)
       i18next-cli-plugin-svelte:
         specifier: 'catalog:'
-        version: 2.5.0(estree-walker@3.0.3)(i18next-cli@1.91.0(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3))(svelte@5.59.1(@typescript-eslint/types@8.73.0))
+        version: 2.5.0(estree-walker@3.0.3)(i18next-cli@1.91.2(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3))(svelte@5.59.1(@typescript-eslint/types@8.73.0))
       jiti:
         specifier: 'catalog:'
         version: 2.7.0
@@ -499,8 +499,8 @@ importers:
   packages/i18n:
     dependencies:
       i18next:
-        specifier: ^27.2.1
-        version: 27.2.1(typescript@6.0.3)
+        specifier: ^27.2.2
+        version: 27.2.2(typescript@6.0.3)
       svelte:
         specifier: ^5.58.0
         version: 5.59.1(@typescript-eslint/types@8.73.0)
@@ -2306,8 +2306,8 @@ packages:
       i18next-cli: ^1.51.6
       svelte: ^5.53.11
 
-  i18next-cli@1.91.0:
-    resolution: {integrity: sha512-WIHzhKGBL4f4NMw+UqP5nPyIptY6K0YnNusAVDSoguNhWj5IisXC+J3mK2GxT0heoIrNyFFmcrZV8SSklN4S4A==}
+  i18next-cli@1.91.2:
+    resolution: {integrity: sha512-3841yfEfuCzSjjU8ARHxTLZ92iWyDqjLPfBcXnYLcCdE5UaLRqWoZ+ZWeaYpUA17e8EyEtMQPJ7bTjibKnZIGQ==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -2315,8 +2315,8 @@ packages:
     resolution: {integrity: sha512-1SwWSlbgpMx/AyWYJvPrg2ns1CzXsaM0olmqfDSm2fIzwbChdkxeaiAXw0xhdNPuo/v8nuwxVTLfpf8NxrdlNw==}
     hasBin: true
 
-  i18next@27.2.1:
-    resolution: {integrity: sha512-dNYOxb2d+zjmn/vlvx99XribYwtJ/WcIfVY3d61QkOKAiJ1Kgt7Ow+mBq8v7YUC/K3dCr9dDDEjheKbRycWGdA==}
+  i18next@27.2.2:
+    resolution: {integrity: sha512-1/AJgz/bpE/YL6tqekQlZAzDhkmrUBbgU8+Xon/Lwv6c5WdYuyFZ9mb86OVfR2C2XujUDT7Rz23Ydaq4l981lA==}
     engines: {node: '>=22'}
     peerDependencies:
       typescript: ^5 || ^6 || ^7
@@ -2579,9 +2579,9 @@ packages:
     resolution: {integrity: sha512-gSrprq0fJ3EiOErzjdIZrjysVVmJ4uu1QWfCDss5LypA5OXvrMje5Ym5z6V6RLyJ2eF87lasX7t6a0AnFvZblg==}
     engines: {node: ^22.22.2 || ^24.15.0 || >=26.0.0}
 
-  nano-spawn@2.1.0:
-    resolution: {integrity: sha512-yTW+2okrElHiH4fsiz/+/zc0EDo9BDDoC3iKk8dpv1GeRc9nUWzUZHx6TofMWErchhUQR8hY9/Eu1Uja9x1nqA==}
-    engines: {node: '>=20.17'}
+  nano-spawn@3.0.0:
+    resolution: {integrity: sha512-b5ex7XqP35eAVjOhf71GdDXI7a9l6jKIC4fYA26f0UVUOl5TCemJm2WyqF70nfAJF9wyq7T3EfWjVC9HBfjAow==}
+    engines: {node: '>=22'}
 
   nanoid@3.3.20:
     resolution: {integrity: sha512-uKdg2G3GNCKQn9byYOpxbGqrT2fGO5KRt5J/8b3pok8rT6qxGWF6hxMyJiEYtAf+FVyYuD9hRaDqX5uPFYJ4ZQ==}
@@ -4733,14 +4733,14 @@ snapshots:
 
   html-parse-stringify@4.0.1: {}
 
-  i18next-cli-plugin-svelte@2.5.0(estree-walker@3.0.3)(i18next-cli@1.91.0(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3))(svelte@5.59.1(@typescript-eslint/types@8.73.0)):
+  i18next-cli-plugin-svelte@2.5.0(estree-walker@3.0.3)(i18next-cli@1.91.2(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3))(svelte@5.59.1(@typescript-eslint/types@8.73.0)):
     dependencies:
       estree-walker: 3.0.3
-      i18next-cli: 1.91.0(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3)
+      i18next-cli: 1.91.2(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3)
       recast: 0.23.21
       svelte: 5.59.1(@typescript-eslint/types@8.73.0)
 
-  i18next-cli@1.91.0(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3):
+  i18next-cli@1.91.2(@types/node@26.6.6)(react@19.3.1)(typescript@6.0.3):
     dependencies:
       '@croct/json5-parser': 0.2.2
       '@formatjs/icu-messageformat-parser': 3.5.23
@@ -4753,15 +4753,15 @@ snapshots:
       commander: 15.1.0
       glob: 14.0.6
       html-parse-stringify: 4.0.1
-      i18next: 27.2.1(typescript@6.0.3)
+      i18next: 27.2.2(typescript@6.0.3)
       i18next-resources-for-ts: 2.1.2
       jiti: 2.7.0
       jsonc-parser: 3.3.1
       magic-string: 1.4.5
       messageformat: 4.1.0
       minimatch: 11.0.9
-      nano-spawn: 2.1.0
-      react-i18next: 18.0.3(i18next@27.2.1(typescript@6.0.3))(react@19.3.1)(typescript@6.0.3)
+      nano-spawn: 3.0.0
+      react-i18next: 18.0.3(i18next@27.2.2(typescript@6.0.3))(react@19.3.1)(typescript@6.0.3)
       yaml: 2.9.1
       yocto-spinner: 1.2.2
     transitivePeerDependencies:
@@ -4780,7 +4780,7 @@ snapshots:
     transitivePeerDependencies:
       - '@swc/helpers'
 
-  i18next@27.2.1(typescript@6.0.3):
+  i18next@27.2.2(typescript@6.0.3):
     optionalDependencies:
       typescript: 6.0.3
 
@@ -4985,7 +4985,7 @@ snapshots:
 
   mute-stream@4.0.0: {}
 
-  nano-spawn@2.1.0: {}
+  nano-spawn@3.0.0: {}
 
   nanoid@3.3.20: {}
 
@@ -5197,10 +5197,10 @@ snapshots:
       discontinuous-range: 1.0.0
       ret: 0.1.15
 
-  react-i18next@18.0.3(i18next@27.2.1(typescript@6.0.3))(react@19.3.1)(typescript@6.0.3):
+  react-i18next@18.0.3(i18next@27.2.2(typescript@6.0.3))(react@19.3.1)(typescript@6.0.3):
     dependencies:
       html-parse-stringify: 4.0.1
-      i18next: 27.2.1(typescript@6.0.3)
+      i18next: 27.2.2(typescript@6.0.3)
       react: 19.3.1
     optionalDependencies:
       typescript: 6.0.3
