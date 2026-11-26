@@ -130,6 +130,30 @@ just rotated to verifies at once. A failed fetch is retried after 30 seconds, an
 in use for `staleIfErrorMs` past its cache. Every rejection throws, so a caller with another way to
 check a token, such as asking its issuer, can fall back to it.
 
+## Request tokens
+
+An API key is an Ed25519 key pair made for one purpose. Its holder keeps the private key and never
+sends it: for each request, `createRequestTokenSigner` signs a request token, which the request
+carries as its bearer token. The service verifies it with the public key.
+
+```ts
+import { createRequestTokenSigner } from "@a-novel-kit/nodelib-server";
+
+const signRequest = createRequestTokenSigner({ privateKey: apiKeyPem, purpose: "publish-package" });
+
+const body = JSON.stringify(document);
+await fetch(url, { method: "POST", headers: { authorization: `Bearer ${signRequest(body)}` }, body });
+```
+
+The token is a JWT signed with Ed25519, under the `EdDSA` label. Its claims name the purpose
+(`aud`), a life of five minutes (`iat`, `exp`) and the lowercase hex SHA-256 of the body
+(`bodySHA256`), so the signature covers the content as well as the caller. Sign the body exactly as
+it is sent: a string counts as its UTF-8 bytes, as `fetch` sends it. The token names no key ID,
+since the verifier of a system API key holds one public key.
+
+The signer reads the key once and refuses anything but an Ed25519 private key in PEM. Its error
+never quotes the key.
+
 ## Tracing
 
 `@a-novel-kit/nodelib-server/telemetry` traces a SvelteKit server and carries each trace into the

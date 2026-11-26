@@ -1,7 +1,8 @@
 // @vitest-environment node
-import { type JwtVerifierOptions, type PublicJwk, createJwtVerifier } from "./jwt";
+import { type JwtVerifierOptions, type PublicJwk, createJwtVerifier, createRequestTokenSigner } from "./jwt";
 
 import { Buffer } from "node:buffer";
+import { type KeyObject, generateKeyPairSync, verify } from "node:crypto";
 
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
@@ -191,5 +192,65 @@ describe("createJwtVerifier", () => {
     const verify = verifier(async () => Promise.reject(new TypeError("fetch failed")));
 
     await expect(verify(await sign(current, claims))).rejects.toThrow("signature");
+  });
+});
+
+describe("createRequestTokenSigner", () => {
+  const purpose = "publish-package";
+  // The SHA-256 of the UTF-8 bytes of the body, as `sha256sum` prints it.
+  const body = '{"title":"Café"}';
+  const bodySHA256 = "97abf59ac9ce42d34f62d32f6b75eb18a16cedc16ef9de9c818e902a93c51e5f";
+
+  let privateKey: string;
+  let publicKey: KeyObject;
+
+  beforeAll(() => {
+    const pair = generateKeyPairSync("ed25519");
+    privateKey = pair.privateKey.export({ format: "pem", type: "pkcs8" }).toString();
+    publicKey = pair.publicKey;
+  });
+
+  /** Verifies a token as the service of its purpose does, and returns what it holds. */
+  function verifyRequestToken(token: string) {
+    const [header = "", payload = "", signature = ""] = token.split(".");
+    const signed = Buffer.from(`${header}.${payload}`);
+    if (!verify(null, signed, publicKey, Buffer.from(signature, "base64url"))) throw new Error("signature invalid");
+
+    const decode = (part: string): unknown => JSON.parse(Buffer.from(part, "base64url").toString());
+    return { header: decode(header), payload: decode(payload) };
+  }
+
+  it("signs a token for one body that the public key verifies", () => {
+    vi.useFakeTimers({ now, toFake: ["Date"] });
+    const signRequest = createRequestTokenSigner({ privateKey, purpose });
+
+    expect(verifyRequestToken(signRequest(body))).toEqual({
+      header: { alg: "EdDSA", typ: "JWT" },
+      payload: { aud: purpose, iat: seconds, exp: seconds + 300, bodySHA256 },
+    });
+  });
+
+  it("digests the bytes of the body, whichever way they come", () => {
+    const signRequest = createRequestTokenSigner({ privateKey, purpose });
+    const digest = (sent: string | Uint8Array) =>
+      (verifyRequestToken(signRequest(sent)).payload as Record<string, unknown>).bodySHA256;
+
+    expect(digest(new TextEncoder().encode(body))).toBe(bodySHA256);
+    expect(digest('{"title":"Cafe"}')).toBe("a1358dc1772b00bf3f1f72f339ae14506ceb8732b2fefd13f461ec85ef29b464");
+  });
+
+  it.each([
+    { name: "an empty value", key: () => "" },
+    { name: "text that is no key", key: () => "not a key" },
+    { name: "a cut private key", key: () => privateKey.slice(0, 60) + privateKey.slice(70) },
+    { name: "the public key", key: () => publicKey.export({ format: "pem", type: "spki" }).toString() },
+    {
+      name: "an X25519 private key",
+      key: () => generateKeyPairSync("x25519").privateKey.export({ format: "pem", type: "pkcs8" }).toString(),
+    },
+  ])("refuses $name, without quoting it", ({ key }) => {
+    expect(() => createRequestTokenSigner({ privateKey: key(), purpose })).toThrow(
+      new Error("not an Ed25519 private key in PEM")
+    );
   });
 });

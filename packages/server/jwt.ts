@@ -1,4 +1,5 @@
 import { Buffer } from "node:buffer";
+import { type KeyObject, createHash, createPrivateKey, sign } from "node:crypto";
 
 /** PublicJwk is one public key of an issuer's JSON Web Key Set (RFC 7517). */
 export interface PublicJwk {
@@ -146,5 +147,60 @@ export function createJwtVerifier(options: JwtVerifierOptions): (token: string) 
     checkClaims(payload, options, Date.now());
 
     return payload;
+  };
+}
+
+/** RequestTokenSignerOptions names the API key that signs and the one thing it may do. */
+export interface RequestTokenSignerOptions {
+  /** The private key of the API key, in PEM, as its owner keeps it. */
+  privateKey: string;
+  /** The purpose of the API key, which every token names in `aud`. */
+  purpose: string;
+}
+
+// A request token authenticates one request, so it lives only as long as sending it takes.
+const requestTokenLifetimeSeconds = 300;
+
+function encodeObject(value: object): string {
+  return Buffer.from(JSON.stringify(value)).toString("base64url");
+}
+
+function readEd25519PrivateKey(pem: string): KeyObject {
+  try {
+    const key = createPrivateKey(pem);
+    if (key.asymmetricKeyType === "ed25519") return key;
+  } catch {
+    // The error below replaces the parser's, so no error about the key carries any of it.
+  }
+
+  throw new Error("not an Ed25519 private key in PEM");
+}
+
+/**
+ * createRequestTokenSigner returns a function that signs the request token of an API key for one
+ * request body: a compact JWT (RFC 7519) signed with Ed25519 under the `EdDSA` label of RFC 8037,
+ * which RFC 9864 deprecates and keeps valid. Its claims are the purpose (`aud`), a life of five
+ * minutes (`iat`, `exp`) and the lowercase hex SHA-256 of the body (`bodySHA256`).
+ *
+ * Sign the body exactly as sent: a string counts as its UTF-8 bytes, as fetch sends it. The token
+ * names no key ID, since the verifier of a system API key holds one public key.
+ *
+ * @throws When `privateKey` is not an Ed25519 private key in PEM. The error never quotes it.
+ */
+export function createRequestTokenSigner(options: RequestTokenSignerOptions): (body: string | Uint8Array) => string {
+  const key = readEd25519PrivateKey(options.privateKey);
+  const header = encodeObject({ alg: "EdDSA", typ: "JWT" });
+
+  return (body) => {
+    const iat = Math.floor(Date.now() / 1000);
+    const payload = encodeObject({
+      aud: options.purpose,
+      iat,
+      exp: iat + requestTokenLifetimeSeconds,
+      bodySHA256: createHash("sha256").update(body).digest("hex"),
+    });
+    const signature = sign(null, Buffer.from(`${header}.${payload}`), key);
+
+    return `${header}.${payload}.${signature.toString("base64url")}`;
   };
 }
