@@ -133,14 +133,14 @@ check a token, such as asking its issuer, can fall back to it.
 ## API key tokens
 
 An API key is an Ed25519 key pair made for one purpose. Its holder keeps the private key and never
-sends it. With it, the holder signs two kinds of token, and anyone with the public key verifies
-them.
+sends it. With it, the holder signs two kinds of token:
 
 - **A request token** authenticates one request, which carries it as its bearer token. It lives five
   minutes and names the SHA-256 of the body, so the signature covers the content as well as the
-  caller.
+  caller. The service that owns the purpose verifies it through JSON Keys, so nodelib only signs it.
 - **A proof** vouches for the caller's claims, such as the digests of what the holder published. It
-  is stored with what it vouches for and never expires, so a client can check it long after.
+  is stored with what it vouches for and never expires, so anyone with the public key can check it
+  long after.
 
 ```ts
 import { createProofSigner, createRequestTokenSigner } from "@a-novel-kit/nodelib-server";
@@ -169,18 +169,18 @@ quotes the key. A signer also refuses claims that make a token longer than 8192 
 verifier here reads.
 
 ```ts
-import { verifyProof, verifyRequestToken } from "@a-novel-kit/nodelib-server";
+import { verifyProof } from "@a-novel-kit/nodelib-server";
 
-const apiKey = { publicKey: jwk, purpose: "publish-package" };
-const request = await verifyRequestToken(token, receivedBody, apiKey);
-const vouched = await verifyProof(stored.proof, apiKey);
+const vouched = await verifyProof(stored.proof, { publicKey: jwk, purpose: "publish-package" });
 ```
 
-The verifiers take the public key as a JWK and resolve to the claims, after the checks of
-`createJwtVerifier` on the header and the signature. Each checks the token's `typ` exactly (RFC 8725
-§3.11). A proof's age is no failure. A request token must name the digest of the body as received,
-and live at most five minutes from its `iat`. Both tolerate 30 seconds of clock skew, and every
-rejection throws. Compare a proof's claims with what it vouches for: the verifier checks only who
+`verifyProof` takes the public key as a JWK and resolves to the claims, after the checks of
+`createJwtVerifier` on the header and the signature. It checks `typ` exactly (RFC 8725 §3.11), so a
+request token never passes. A proof names when it was signed: its `iat` is required, at most 30
+seconds ahead, as JSON Keys requires. Its age is no failure, and every rejection throws.
+
+Pass only a key its source serves for this purpose and does not mark leaked: the verifier sees
+neither. Then compare the proof's claims with what it vouches for: the verifier checks only who
 signed them.
 
 ## Tracing

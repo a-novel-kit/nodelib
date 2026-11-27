@@ -188,11 +188,14 @@ export interface ApiKeySignerOptions {
   keyID?: string;
 }
 
-/** ApiKeyVerifierOptions names the public key of an API key and the purpose a token must name. */
+/** ApiKeyVerifierOptions names the public key of an API key and the purpose a proof must name. */
 export interface ApiKeyVerifierOptions {
-  /** The public key of the API key, as a key set lists it. */
+  /**
+   * The public key of the API key, as a key set lists it. Pass only a key its source serves for this
+   * purpose and does not mark leaked: the verifier sees neither.
+   */
   publicKey: PublicJwk;
-  /** The purpose a token's `aud` must name. */
+  /** The purpose a proof's `aud` must name. */
   purpose: string;
 }
 
@@ -291,53 +294,23 @@ export function createRequestTokenSigner(options: ApiKeySignerOptions): (body: s
 }
 
 /**
- * Resolves to the claims of a token of type `typ` once the public key verifies its signature and its
- * `aud` names the purpose. An `exp` or `nbf` it carries holds, with 30 seconds of clock skew.
+ * verifyProof resolves to the claims of a proof once its type is `proof+jwt`, the public key of its
+ * API key verifies its signature, and its `aud` names the purpose. A proof names when it was signed:
+ * its `iat` is required, at most 30 seconds ahead, as JSON Keys requires. Its age is no failure, but
+ * an `exp` or `nbf` it carries holds, with 30 seconds of clock skew (RFC 7519 §4.1.4, §4.1.5).
  */
-async function verifyApiKeyToken(
-  token: string,
-  typ: string,
-  { publicKey, purpose }: ApiKeyVerifierOptions
-): Promise<JwtPayload> {
+export async function verifyProof(token: string, { publicKey, purpose }: ApiKeyVerifierOptions): Promise<JwtPayload> {
   const payload = await verifySignature(token, async (header) => {
-    if (header.typ !== typ) throw new Error("JWT of another type");
+    if (header.typ !== proofType) throw new Error("JWT of another type");
     return isEd25519(publicKey) ? importKey(publicKey) : undefined;
   });
   if (!namesAudience(payload.aud, purpose)) throw new Error("JWT issued for another use");
   checkWindow(payload, apiKeyLeewayMs);
 
-  return payload;
-}
-
-/**
- * verifyProof resolves to the claims of a proof once its type is `proof+jwt`, the public key of its
- * API key verifies its signature, and its `aud` names the purpose. Age is no failure, but an `exp` or
- * `nbf` the proof carries holds, with 30 seconds of clock skew (RFC 7519 §4.1.4, §4.1.5). It rejects
- * any other token, a request token included.
- */
-export function verifyProof(token: string, options: ApiKeyVerifierOptions): Promise<JwtPayload> {
-  return verifyApiKeyToken(token, proofType, options);
-}
-
-/**
- * verifyRequestToken resolves to the claims of a request token once its type is `JWT`, the public key
- * of its API key verifies its signature, its `aud` names the purpose, it names the digest of this
- * body, and it lives at most five minutes from its `iat`, with 30 seconds of clock skew on each side.
- * Pass the body exactly as received.
- */
-export async function verifyRequestToken(
-  token: string,
-  body: string | Uint8Array,
-  options: ApiKeyVerifierOptions
-): Promise<JwtPayload> {
-  const payload = await verifyApiKeyToken(token, requestTokenType, options);
-  const { iat, exp, bodySHA256 } = payload;
-
-  if (typeof iat !== "number" || typeof exp !== "number" || exp - iat > requestTokenLifetimeSeconds) {
-    throw new Error("JWT lifetime invalid");
-  }
-  if (iat * 1000 > Date.now() + apiKeyLeewayMs) throw new Error("JWT not valid yet");
-  if (bodySHA256 !== digest(body)) throw new Error("JWT signed for another body");
+  // JSON Keys reads `iat` as a whole number of seconds, so any other value fails there too.
+  const { iat } = payload;
+  if (typeof iat !== "number" || !Number.isInteger(iat) || iat <= 0) throw new Error("JWT names no signing time");
+  if (iat * 1000 > Date.now() + apiKeyLeewayMs) throw new Error("JWT signed in the future");
 
   return payload;
 }

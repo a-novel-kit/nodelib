@@ -9,11 +9,10 @@ import {
   createRequestTokenSigner,
   jwkThumbprint,
   verifyProof,
-  verifyRequestToken,
 } from "./jwt";
 
 import { Buffer } from "node:buffer";
-import { KeyObject, createPublicKey, generateKeyPairSync, verify } from "node:crypto";
+import { KeyObject, verify as checkSignature, createPublicKey, generateKeyPairSync } from "node:crypto";
 
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
@@ -211,8 +210,6 @@ describe("API key tokens", () => {
   // The SHA-256 of the UTF-8 bytes of the body, as `sha256sum` prints it.
   const body = '{"title":"Café"}';
   const bodySHA256 = "97abf59ac9ce42d34f62d32f6b75eb18a16cedc16ef9de9c818e902a93c51e5f";
-  const otherBodySHA256 = "a1358dc1772b00bf3f1f72f339ae14506ceb8732b2fefd13f461ec85ef29b464";
-  const proofHeader = { typ: "proof+jwt" };
 
   // The private half of `current`, as the holder of an API key keeps it.
   let privateKey: string;
@@ -227,7 +224,7 @@ describe("API key tokens", () => {
   function readToken(token: string) {
     const [header = "", payload = "", signature = ""] = token.split(".");
     const publicKey = createPublicKey(privateKey);
-    if (!verify(null, Buffer.from(`${header}.${payload}`), publicKey, Buffer.from(signature, "base64url"))) {
+    if (!checkSignature(null, Buffer.from(`${header}.${payload}`), publicKey, Buffer.from(signature, "base64url"))) {
       throw new Error("signature invalid");
     }
 
@@ -310,41 +307,53 @@ describe("API key tokens", () => {
         (readToken(signRequest(sent)).payload as Record<string, unknown>).bodySHA256;
 
       expect(digest(new TextEncoder().encode(body))).toBe(bodySHA256);
-      expect(digest('{"title":"Cafe"}')).toBe(otherBodySHA256);
+      expect(digest('{"title":"Cafe"}')).toBe("a1358dc1772b00bf3f1f72f339ae14506ceb8732b2fefd13f461ec85ef29b464");
     });
   });
 
   describe("verifyProof", () => {
+    /** Signs a proof of the purpose, signed now, with `current` unless `key` says otherwise. */
+    const proof = (claims: JwtPayload, key = current) =>
+      sign(key, { aud: purpose, iat: seconds, ...claims }, { typ: "proof+jwt" });
+
     it("accepts the proof its signer made however old, and resolves to its claims", async () => {
       vi.useFakeTimers({ now, toFake: ["Date"] });
-      const proof = createProofSigner({ privateKey, purpose })({ name: "sample" });
+      const signed = createProofSigner({ privateKey, purpose })({ name: "sample" });
       vi.setSystemTime(now + 400 * 86_400_000);
 
-      await expect(verifyProof(proof, options)).resolves.toEqual({ name: "sample", aud: purpose, iat: seconds });
+      await expect(verifyProof(signed, options)).resolves.toEqual({ name: "sample", aud: purpose, iat: seconds });
+    });
+
+    it("accepts a proof signed 30 seconds ahead", async () => {
+      vi.useFakeTimers({ now, toFake: ["Date"] });
+
+      await expect(verifyProof(await proof({ iat: seconds + 30 }), options)).resolves.toMatchObject({
+        iat: seconds + 30,
+      });
     });
 
     it.each([
-      { name: "another purpose", token: () => sign(current, { aud: "another" }, proofHeader), error: "another use" },
+      { name: "another purpose", token: () => proof({ aud: "another" }), error: "another use" },
+      { name: "a proof without `iat`", token: () => proof({ iat: undefined }), error: "no signing time" },
+      { name: "a proof whose `iat` is text", token: () => proof({ iat: String(seconds) }), error: "no signing time" },
+      {
+        name: "a proof whose `iat` is no whole second",
+        token: () => proof({ iat: seconds + 0.5 }),
+        error: "no signing time",
+      },
+      { name: "a proof signed 31 seconds ahead", token: () => proof({ iat: seconds + 31 }), error: "in the future" },
       {
         name: "a proof 30 seconds past the expiry it sets",
-        token: () => sign(current, { aud: purpose, exp: seconds - 30 }, proofHeader),
+        token: () => proof({ exp: seconds - 30 }),
         error: "expired",
       },
-      {
-        name: "a proof before the start it sets",
-        token: () => sign(current, { aud: purpose, nbf: seconds + 31 }, proofHeader),
-        error: "not valid yet",
-      },
-      {
-        name: "a proof signed by another key",
-        token: () => sign(other, { aud: purpose }, proofHeader),
-        error: "signature",
-      },
+      { name: "a proof before the start it sets", token: () => proof({ nbf: seconds + 31 }), error: "not valid yet" },
+      { name: "a proof signed by another key", token: () => proof({}, other), error: "signature" },
       {
         name: "a proof changed after signing",
         token: async () => {
-          const [header, , signature] = (await sign(current, { name: "sample", aud: purpose }, proofHeader)).split(".");
-          return `${header}.${encode({ name: "forged", aud: purpose })}.${signature}`;
+          const [header, , signature] = (await proof({ name: "sample" })).split(".");
+          return `${header}.${encode({ name: "forged", aud: purpose, iat: seconds })}.${signature}`;
         },
         error: "signature",
       },
@@ -355,7 +364,7 @@ describe("API key tokens", () => {
       },
       {
         name: "a token of no type",
-        token: () => sign(current, { aud: purpose }, { typ: undefined }),
+        token: () => sign(current, { aud: purpose, iat: seconds }, { typ: undefined }),
         error: "another type",
       },
     ])("rejects $name", async ({ token, error }) => {
@@ -367,61 +376,7 @@ describe("API key tokens", () => {
     it("rejects every proof for a key that is not Ed25519", async () => {
       const publicKey = { kid: "current", kty: "EC", crv: "P-256" };
 
-      await expect(
-        verifyProof(await sign(current, { aud: purpose }, proofHeader), { publicKey, purpose })
-      ).rejects.toThrow("signature");
-    });
-  });
-
-  describe("verifyRequestToken", () => {
-    const request = (claims: JwtPayload) => sign(current, { aud: purpose, bodySHA256, ...claims });
-
-    it("accepts the token its signer made for the body", async () => {
-      vi.useFakeTimers({ now, toFake: ["Date"] });
-      const token = createRequestTokenSigner({ privateKey, purpose })(body);
-
-      await expect(verifyRequestToken(token, new TextEncoder().encode(body), options)).resolves.toEqual({
-        aud: purpose,
-        iat: seconds,
-        exp: seconds + 300,
-        bodySHA256,
-      });
-    });
-
-    it.each([
-      { name: "29 seconds past its expiry", claims: { iat: seconds - 329, exp: seconds - 29 } },
-      { name: "signed 30 seconds ahead", claims: { iat: seconds + 30, exp: seconds + 330 } },
-    ])("accepts a token $name", async ({ claims }) => {
-      vi.useFakeTimers({ now, toFake: ["Date"] });
-
-      await expect(verifyRequestToken(await request(claims), body, options)).resolves.toEqual({
-        aud: purpose,
-        bodySHA256,
-        ...claims,
-      });
-    });
-
-    it.each([
-      { name: "30 seconds past its expiry", claims: { iat: seconds - 330, exp: seconds - 30 }, error: "expired" },
-      { name: "signed 31 seconds ahead", claims: { iat: seconds + 31, exp: seconds + 331 }, error: "not valid yet" },
-      { name: "that lives past five minutes", claims: { iat: seconds, exp: seconds + 301 }, error: "lifetime" },
-      { name: "without a lifetime", claims: {}, error: "lifetime" },
-      {
-        name: "of another body",
-        claims: { iat: seconds, exp: seconds + 300, bodySHA256: otherBodySHA256 },
-        error: "another body",
-      },
-    ])("rejects a token $name", async ({ claims, error }) => {
-      vi.useFakeTimers({ now, toFake: ["Date"] });
-
-      await expect(verifyRequestToken(await request(claims), body, options)).rejects.toThrow(error);
-    });
-
-    it("rejects a proof, even of the claims of a request token", async () => {
-      vi.useFakeTimers({ now, toFake: ["Date"] });
-      const proof = createProofSigner({ privateKey, purpose })({ exp: seconds + 300, bodySHA256 });
-
-      await expect(verifyRequestToken(proof, body, options)).rejects.toThrow("another type");
+      await expect(verifyProof(await proof({}), { publicKey, purpose })).rejects.toThrow("signature");
     });
   });
 });
