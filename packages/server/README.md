@@ -11,6 +11,9 @@ Configure the `@a-novel-kit` registry as the
 pnpm add @a-novel-kit/nodelib-server
 ```
 
+The main entry needs nothing more. Only the `telemetry` entry loads OpenTelemetry, so its peers are
+optional and a consumer of that entry installs them, as [tracing](#tracing) shows.
+
 ## Runtime configuration
 
 The environment schema maps private variable names into a typed application config. A validation
@@ -202,7 +205,15 @@ compresses each export. `serviceName` names the platform on every span, and the 
 
 A platform sets up tracing in three steps:
 
-1. Install the OpenTelemetry peers.
+1. Install the OpenTelemetry peers. They are optional, so no package manager adds them for you:
+
+   ```bash
+   pnpm add "@opentelemetry/api@^1.10.0" "@opentelemetry/context-async-hooks@^3.1.1" \
+     "@opentelemetry/core@^3.1.1" "@opentelemetry/exporter-trace-otlp-proto@^0.301.2" \
+     "@opentelemetry/instrumentation@^0.301.2" "@opentelemetry/instrumentation-undici@^0.35.1" \
+     "@opentelemetry/resources@^3.1.1" "@opentelemetry/sdk-trace@^3.1.1"
+   ```
+
 2. Turn on SvelteKit's server spans, which `SvelteKitVite` from `@a-novel-kit/nodelib-config/sveltekit`
    does by default.
 3. Start tracing from `src/instrumentation.server.ts`. SvelteKit loads that file before the

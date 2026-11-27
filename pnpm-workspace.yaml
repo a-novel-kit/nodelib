@@ -19,6 +19,14 @@ catalog:
   "@eslint/js": ^10.0.1
   "@grafana/faro-web-sdk": ^2.13.0
   "@grafana/faro-web-tracing": ^2.13.0
+  "@opentelemetry/api": ^1.10.0
+  "@opentelemetry/context-async-hooks": ^3.1.1
+  "@opentelemetry/core": ^3.1.1
+  "@opentelemetry/exporter-trace-otlp-proto": ^0.301.2
+  "@opentelemetry/instrumentation": ^0.301.2
+  "@opentelemetry/instrumentation-undici": ^0.35.1
+  "@opentelemetry/resources": ^3.1.1
+  "@opentelemetry/sdk-trace": ^3.1.1
   "@storybook/addon-vitest": ^10.5.8
   "@sveltejs/adapter-node": ^6.0.0
   "@sveltejs/kit": ^3.0.0
