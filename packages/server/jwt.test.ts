@@ -1,7 +1,18 @@
 // @vitest-environment node
-import { type JwtVerifierOptions, type PublicJwk, createJwtVerifier } from "./jwt";
+import {
+  type ApiKeyVerifierOptions,
+  type JwtPayload,
+  type JwtVerifierOptions,
+  type PublicJwk,
+  createJwtVerifier,
+  createProofSigner,
+  createRequestTokenSigner,
+  jwkThumbprint,
+  verifyProof,
+} from "./jwt";
 
 import { Buffer } from "node:buffer";
+import { KeyObject, verify as checkSignature, createPublicKey, generateKeyPairSync } from "node:crypto";
 
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
@@ -191,5 +202,182 @@ describe("createJwtVerifier", () => {
     const verify = verifier(async () => Promise.reject(new TypeError("fetch failed")));
 
     await expect(verify(await sign(current, claims))).rejects.toThrow("signature");
+  });
+});
+
+describe("API key tokens", () => {
+  const purpose = "publish-package";
+  // The SHA-256 of the UTF-8 bytes of the body, as `sha256sum` prints it.
+  const body = '{"title":"Café"}';
+  const bodySHA256 = "97abf59ac9ce42d34f62d32f6b75eb18a16cedc16ef9de9c818e902a93c51e5f";
+
+  // The private half of `current`, as the holder of an API key keeps it.
+  let privateKey: string;
+  let options: ApiKeyVerifierOptions;
+
+  beforeAll(() => {
+    privateKey = KeyObject.from(current.privateKey).export({ format: "pem", type: "pkcs8" }).toString();
+    options = { publicKey: current.jwk, purpose };
+  });
+
+  /** Verifies a token as a verifier outside this module does, and returns what it holds. */
+  function readToken(token: string) {
+    const [header = "", payload = "", signature = ""] = token.split(".");
+    const publicKey = createPublicKey(privateKey);
+    if (!checkSignature(null, Buffer.from(`${header}.${payload}`), publicKey, Buffer.from(signature, "base64url"))) {
+      throw new Error("signature invalid");
+    }
+
+    const decode = (part: string): unknown => JSON.parse(Buffer.from(part, "base64url").toString());
+    return { header: decode(header), payload: decode(payload) };
+  }
+
+  describe("jwkThumbprint", () => {
+    it("hashes the public members of an Ed25519 key", () => {
+      // The example of RFC 8037, appendix A.3.
+      const key = { kty: "OKP", crv: "Ed25519", x: "11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo" };
+
+      expect(jwkThumbprint(key)).toBe("kPrK_qmxVWaYVA9wwBF6Iuo3vVzz7TxHCTwXBygrS4k");
+    });
+
+    it.each([
+      { name: "a P-256 key", key: { kty: "EC", crv: "P-256", x: "AA", y: "AA" } },
+      { name: "an Ed25519 key without its public member", key: { kty: "OKP", crv: "Ed25519" } },
+    ])("refuses $name", ({ key }) => {
+      expect(() => jwkThumbprint(key)).toThrow(new Error("not an Ed25519 public key"));
+    });
+  });
+
+  describe("createProofSigner", () => {
+    it("signs the claims under the purpose and the time, naming the key by its thumbprint", () => {
+      vi.useFakeTimers({ now, toFake: ["Date"] });
+      const proof = createProofSigner({ privateKey, purpose })({ name: "sample", aud: "another", iat: 1 });
+
+      expect(readToken(proof)).toEqual({
+        header: { alg: "EdDSA", typ: "proof+jwt", kid: jwkThumbprint(current.jwk) },
+        payload: { name: "sample", aud: purpose, iat: seconds },
+      });
+    });
+
+    it("names the key by the ID it is given", () => {
+      const proof = createProofSigner({ privateKey, purpose, keyID: "user-key" })({});
+
+      expect(readToken(proof).header).toMatchObject({ kid: "user-key" });
+    });
+
+    it("refuses claims too long for a verifier to read", () => {
+      expect(() => createProofSigner({ privateKey, purpose })({ note: "a".repeat(8192) })).toThrow(
+        new Error("JWT too long to verify")
+      );
+    });
+
+    it.each([
+      { name: "an empty value", key: () => "" },
+      { name: "text that is no key", key: () => "not a key" },
+      { name: "a cut private key", key: () => privateKey.slice(0, 60) + privateKey.slice(70) },
+      {
+        name: "the public key",
+        key: () => createPublicKey(privateKey).export({ format: "pem", type: "spki" }).toString(),
+      },
+      {
+        name: "an X25519 private key",
+        key: () => generateKeyPairSync("x25519").privateKey.export({ format: "pem", type: "pkcs8" }).toString(),
+      },
+    ])("refuses $name, without quoting it", ({ key }) => {
+      expect(() => createProofSigner({ privateKey: key(), purpose })).toThrow(
+        new Error("not an Ed25519 private key in PEM")
+      );
+    });
+  });
+
+  describe("createRequestTokenSigner", () => {
+    it("signs a token for one body that the public key verifies", () => {
+      vi.useFakeTimers({ now, toFake: ["Date"] });
+      const signRequest = createRequestTokenSigner({ privateKey, purpose });
+
+      expect(readToken(signRequest(body))).toEqual({
+        header: { alg: "EdDSA", typ: "JWT", kid: jwkThumbprint(current.jwk) },
+        payload: { aud: purpose, iat: seconds, exp: seconds + 300, bodySHA256 },
+      });
+    });
+
+    it("digests the bytes of the body, whichever way they come", () => {
+      const signRequest = createRequestTokenSigner({ privateKey, purpose });
+      const digest = (sent: string | Uint8Array) =>
+        (readToken(signRequest(sent)).payload as Record<string, unknown>).bodySHA256;
+
+      expect(digest(new TextEncoder().encode(body))).toBe(bodySHA256);
+      expect(digest('{"title":"Cafe"}')).toBe("a1358dc1772b00bf3f1f72f339ae14506ceb8732b2fefd13f461ec85ef29b464");
+    });
+  });
+
+  describe("verifyProof", () => {
+    /** Signs a proof of the purpose, signed now, with `current` unless `key` says otherwise. */
+    const proof = (claims: JwtPayload, key = current) =>
+      sign(key, { aud: purpose, iat: seconds, ...claims }, { typ: "proof+jwt" });
+
+    it("accepts the proof its signer made however old, and resolves to its claims", async () => {
+      vi.useFakeTimers({ now, toFake: ["Date"] });
+      const signed = createProofSigner({ privateKey, purpose })({ name: "sample" });
+      vi.setSystemTime(now + 400 * 86_400_000);
+
+      await expect(verifyProof(signed, options)).resolves.toEqual({ name: "sample", aud: purpose, iat: seconds });
+    });
+
+    it("accepts a proof signed 30 seconds ahead", async () => {
+      vi.useFakeTimers({ now, toFake: ["Date"] });
+
+      await expect(verifyProof(await proof({ iat: seconds + 30 }), options)).resolves.toMatchObject({
+        iat: seconds + 30,
+      });
+    });
+
+    it.each([
+      { name: "another purpose", token: () => proof({ aud: "another" }), error: "another use" },
+      { name: "a proof without `iat`", token: () => proof({ iat: undefined }), error: "no signing time" },
+      { name: "a proof whose `iat` is zero", token: () => proof({ iat: 0 }), error: "no signing time" },
+      { name: "a proof whose `iat` is text", token: () => proof({ iat: String(seconds) }), error: "no signing time" },
+      {
+        name: "a proof whose `iat` is no whole second",
+        token: () => proof({ iat: seconds + 0.5 }),
+        error: "no signing time",
+      },
+      { name: "a proof signed 31 seconds ahead", token: () => proof({ iat: seconds + 31 }), error: "in the future" },
+      {
+        name: "a proof 30 seconds past the expiry it sets",
+        token: () => proof({ exp: seconds - 30 }),
+        error: "expired",
+      },
+      { name: "a proof before the start it sets", token: () => proof({ nbf: seconds + 31 }), error: "not valid yet" },
+      { name: "a proof signed by another key", token: () => proof({}, other), error: "signature" },
+      {
+        name: "a proof changed after signing",
+        token: async () => {
+          const [header, , signature] = (await proof({ name: "sample" })).split(".");
+          return `${header}.${encode({ name: "forged", aud: purpose, iat: seconds })}.${signature}`;
+        },
+        error: "signature",
+      },
+      {
+        name: "a request token",
+        token: async () => createRequestTokenSigner({ privateKey, purpose })(body),
+        error: "another type",
+      },
+      {
+        name: "a token of no type",
+        token: () => sign(current, { aud: purpose, iat: seconds }, { typ: undefined }),
+        error: "another type",
+      },
+    ])("rejects $name", async ({ token, error }) => {
+      vi.useFakeTimers({ now, toFake: ["Date"] });
+
+      await expect(verifyProof(await token(), options)).rejects.toThrow(error);
+    });
+
+    it("rejects every proof for a key that is not Ed25519", async () => {
+      const publicKey = { kid: "current", kty: "EC", crv: "P-256" };
+
+      await expect(verifyProof(await proof({}), { publicKey, purpose })).rejects.toThrow("signature");
+    });
   });
 });

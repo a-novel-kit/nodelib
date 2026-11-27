@@ -130,6 +130,59 @@ just rotated to verifies at once. A failed fetch is retried after 30 seconds, an
 in use for `staleIfErrorMs` past its cache. Every rejection throws, so a caller with another way to
 check a token, such as asking its issuer, can fall back to it.
 
+## API key tokens
+
+An API key is an Ed25519 key pair made for one purpose. Its holder keeps the private key and never
+sends it. With it, the holder signs two kinds of token:
+
+- **A request token** authenticates one request, which carries it as its bearer token. It lives five
+  minutes and names the SHA-256 of the body, so the signature covers the content as well as the
+  caller. The service that owns the purpose verifies it through JSON Keys, so nodelib only signs it.
+- **A proof** vouches for the caller's claims, such as the digests of what the holder published. It
+  is stored with what it vouches for and never expires, so anyone with the public key can check it
+  long after.
+
+```ts
+import { createProofSigner, createRequestTokenSigner } from "@a-novel-kit/nodelib-server";
+
+const apiKey = { privateKey: apiKeyPem, purpose: "publish-package" };
+const signRequest = createRequestTokenSigner(apiKey);
+const signProof = createProofSigner(apiKey);
+
+const body = JSON.stringify({ ...document, proof: signProof({ name, version, archiveSHA256 }) });
+await fetch(url, { method: "POST", headers: { authorization: `Bearer ${signRequest(body)}` }, body });
+```
+
+Both are JWTs signed with Ed25519, under the `EdDSA` label. `aud` names the purpose and `iat` the
+time of signing. A request token adds a life of five minutes (`exp`) and the lowercase hex SHA-256 of
+the body (`bodySHA256`). Sign the body exactly as it is sent: a string counts as its UTF-8 bytes, as
+`fetch` sends it. A proof's `typ` is `proof+jwt` and a request token's is `JWT`, so neither passes
+for the other.
+
+Every token names its key in `kid`, so a verifier can find the public key. A system API key goes by
+the JWK thumbprint of its public key (RFC 7638), which a signer derives from the private key, and
+`jwkThumbprint` computes from a public key in JWK form. Pass `keyID` for a key listed under another
+ID.
+
+A signer reads the key once and refuses anything but an Ed25519 private key in PEM. Its error never
+quotes the key. A signer also refuses claims that make a token longer than 8192 characters, which no
+verifier here reads.
+
+```ts
+import { verifyProof } from "@a-novel-kit/nodelib-server";
+
+const vouched = await verifyProof(stored.proof, { publicKey: jwk, purpose: "publish-package" });
+```
+
+`verifyProof` takes the public key as a JWK and resolves to the claims, after the checks of
+`createJwtVerifier` on the header and the signature. It checks `typ` exactly (RFC 8725 §3.11), so a
+request token never passes. A proof names when it was signed: its `iat` is required, at most 30
+seconds ahead, as JSON Keys requires. Its age is no failure, and every rejection throws.
+
+Pass only a key its source serves for this purpose and does not mark leaked: the verifier sees
+neither. Then compare the proof's claims with what it vouches for: the verifier checks only who
+signed them.
+
 ## Tracing
 
 `@a-novel-kit/nodelib-server/telemetry` traces a SvelteKit server and carries each trace into the
