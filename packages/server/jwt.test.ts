@@ -335,6 +335,7 @@ describe("API key tokens", () => {
     it.each([
       { name: "another purpose", token: () => proof({ aud: "another" }), error: "another use" },
       { name: "a proof without `iat`", token: () => proof({ iat: undefined }), error: "no signing time" },
+      { name: "a proof whose `iat` is zero", token: () => proof({ iat: 0 }), error: "no signing time" },
       { name: "a proof whose `iat` is text", token: () => proof({ iat: String(seconds) }), error: "no signing time" },
       {
         name: "a proof whose `iat` is no whole second",
