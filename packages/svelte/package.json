@@ -1,6 +1,6 @@
 {
   "name": "@a-novel-kit/nodelib-svelte",
-  "version": "2.15.1",
+  "version": "2.16.0",
   "private": false,
   "description": "Svelte 5 helpers shared by A-Novel platforms",
   "repository": {
