@@ -130,29 +130,58 @@ just rotated to verifies at once. A failed fetch is retried after 30 seconds, an
 in use for `staleIfErrorMs` past its cache. Every rejection throws, so a caller with another way to
 check a token, such as asking its issuer, can fall back to it.
 
-## Request tokens
+## API key tokens
 
 An API key is an Ed25519 key pair made for one purpose. Its holder keeps the private key and never
-sends it: for each request, `createRequestTokenSigner` signs a request token, which the request
-carries as its bearer token. The service verifies it with the public key.
+sends it. With it, the holder signs two kinds of token, and anyone with the public key verifies
+them.
+
+- **A request token** authenticates one request, which carries it as its bearer token. It lives five
+  minutes and names the SHA-256 of the body, so the signature covers the content as well as the
+  caller.
+- **A proof** vouches for the caller's claims, such as the digests of what the holder published. It
+  is stored with what it vouches for and never expires, so a client can check it long after.
 
 ```ts
-import { createRequestTokenSigner } from "@a-novel-kit/nodelib-server";
+import { createProofSigner, createRequestTokenSigner } from "@a-novel-kit/nodelib-server";
 
-const signRequest = createRequestTokenSigner({ privateKey: apiKeyPem, purpose: "publish-package" });
+const apiKey = { privateKey: apiKeyPem, purpose: "publish-package" };
+const signRequest = createRequestTokenSigner(apiKey);
+const signProof = createProofSigner(apiKey);
 
-const body = JSON.stringify(document);
+const body = JSON.stringify({ ...document, proof: signProof({ name, version, archiveSHA256 }) });
 await fetch(url, { method: "POST", headers: { authorization: `Bearer ${signRequest(body)}` }, body });
 ```
 
-The token is a JWT signed with Ed25519, under the `EdDSA` label. Its claims name the purpose
-(`aud`), a life of five minutes (`iat`, `exp`) and the lowercase hex SHA-256 of the body
-(`bodySHA256`), so the signature covers the content as well as the caller. Sign the body exactly as
-it is sent: a string counts as its UTF-8 bytes, as `fetch` sends it. The token names no key ID,
-since the verifier of a system API key holds one public key.
+Both are JWTs signed with Ed25519, under the `EdDSA` label. `aud` names the purpose and `iat` the
+time of signing. A request token adds a life of five minutes (`exp`) and the lowercase hex SHA-256 of
+the body (`bodySHA256`). Sign the body exactly as it is sent: a string counts as its UTF-8 bytes, as
+`fetch` sends it. A proof's `typ` is `proof+jwt` and a request token's is `JWT`, so neither passes
+for the other.
 
-The signer reads the key once and refuses anything but an Ed25519 private key in PEM. Its error
-never quotes the key.
+Every token names its key in `kid`, so a verifier can find the public key. A system API key goes by
+the JWK thumbprint of its public key (RFC 7638), which a signer derives from the private key, and
+`jwkThumbprint` computes from a public key in JWK form. Pass `keyID` for a key listed under another
+ID.
+
+A signer reads the key once and refuses anything but an Ed25519 private key in PEM. Its error never
+quotes the key. A signer also refuses claims that make a token longer than 8192 characters, which no
+verifier here reads.
+
+```ts
+import { verifyProof, verifyRequestToken } from "@a-novel-kit/nodelib-server";
+
+const apiKey = { publicKey: jwk, purpose: "publish-package" };
+const request = await verifyRequestToken(token, receivedBody, apiKey);
+const vouched = await verifyProof(stored.proof, apiKey);
+```
+
+The verifiers take the public key as a JWK and resolve to the claims, after the checks of
+`createJwtVerifier` on the header and the signature. Each checks the token's `typ` exactly (RFC 8725
+§3.11). A proof's age is no failure. A request token must name the digest of the body as received,
+and live at most five minutes from its `iat`. Both tolerate 30 seconds of clock skew, and every
+rejection throws. Compare a proof's claims with what it vouches for: the verifier checks only who
+signed them.
 
 ## Tracing
 
